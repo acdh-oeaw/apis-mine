@@ -1,0 +1,60 @@
+[tool.poetry]
+name = "oebl-irs-devops"
+version = "0.1.0"
+description = "OEBL irs project for auto devops"
+authors = ["Matthias Schlögl <m.schloegl@gmail.com>"]
+license = "MIT"
+
+
+[tool.poetry.dependencies]
+python = "~3.6"
+Django = "^3.1.4"
+djangorestframework = "^3.12.2"
+whitenoise = "^5.2.0"
+django-filter = "^2.4.0"
+django-autocomplete-light = "^3.8.1"
+django-cors-headers = "^3.5.0"
+django-crum = "^0.7.9"
+django-crispy-forms = "^1.10.0"
+django-haystack = "^3.0"
+django-gm2m = "^1.1.1"
+django-guardian = "^2.3.0"
+django-leaflet = "^0.27.1"
+django-reversion = "^3.0.8"
+django-tables2 = "^2.3.3"
+djangorestframework-csv = "^2.1.0"
+djangorestframework-xml = "^2.0.0"
+jmespath = "^0.10.0"
+jsonschema = "^3.2.0"
+lxml = "^4.6.2"
+convertdate = "^2.3.0"
+PyYAML = "^5.3.1"
+rdflib = "^5.0.0"
+drf-spectacular = "^0.11.1"
+tablib = "^3.0.0"
+regex = "^2020.11.13"
+requests = "^2.25.0"
+sentry-sdk = "^0.19.5"
+SPARQLWrapper = "^1.8.5"
+unicodecsv = "^0.14.1"
+django-model-utils = "^4.1.1"
+django-summernote = "^0.8.11"
+djangorestframework-jsonschema = "^0.1.1"
+pysolr = "^3.9.0"
+dj-database-url = "^0.5.0"
+gunicorn = "^20.0.4"
+psycopg2 = "^2.8.6"
+acdh-django-charts = "^0.5.3"
+pandas = "0.25.3"
+django-allow-cidr = "^0.3.1"
+apis-core = "^0.15.2"
+
+[tool.poetry.dev-dependencies]
+black = "^20.8b1"
+django-extensions = "^3.1.0"
+pylint = "^2.6.0"
+dephell = {extras = ["full"], version = "^0.8.3"}
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

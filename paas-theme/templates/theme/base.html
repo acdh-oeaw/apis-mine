@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+{% load webpage_extras %}
+{% load browsing_extras %}
+{% load infos_extras %}
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{% block title %} Geschichte der Akademie {% endblock %}</title>
+
+    <!-- Fundament -->
+    <link href="https://shared.acdh.oeaw.ac.at/fundament/dist/fundament/css/fundament.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.6.0/nouislider.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.6.0/nouislider.min.css" />
+    <!-- Custom styles for this template -->
+    <script src="https://unpkg.com/feather-icons@4.28.0/dist/feather.min.js"></script>
+    <link rel="stylesheet" href="{%static 'theme/css/main.css' %}" />
+
+    <!--
+      this global event bus is used as a simple
+      means of communication between components.
+    -->
+    <script type="text/javascript">
+    class EventBus {
+      constructor() {
+        this.bus = document.createElement('fakeelement');
+      }
+      on(event, callback) {
+        this.bus.addEventListener(event, callback)
+      }
+      off(event, callback) {
+        this.bus.removeEventListener(event, callback);
+      }
+      emit(event, detail = {}) {
+        this.bus.dispatchEvent(new CustomEvent(event, { detail }));
+      }
+    }
+    window.eventBus = new EventBus()
+    </script>
+
+    <!-- Begin Cookie Consent plugin by Silktide - http://silktide.com/cookieconsent -->
+    <script type="text/javascript">
+      window.cookieconsent_options = {
+          "message":"This website uses cookies to ensure you get the best experience on our website",
+          "dismiss":"Got it!",
+          "learnMore":"More info",
+          "link":"{% projects_metadata 'imprint' %}",
+          "theme":"dark-bottom"};
+    </script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.9/cookieconsent.min.js"></script>
+    <!-- End Cookie Consent plugin -->
+        <!-- Matomo -->
+    <script type="text/javascript">
+      var _paq = window._paq || [];
+      /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+      _paq.push(['trackPageView']);
+      _paq.push(['enableLinkTracking']);
+      (function() {
+        var u="{% projects_metadata 'matomo_url' %}";
+        _paq.push(['setTrackerUrl', u+'piwik.php']);
+        _paq.push(['setSiteId', '{% projects_metadata "matomo_id" %}']);
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+        g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+      })();
+    </script>
+    <!-- End Matomo Code -->
+
+
+    {% block scriptHeader %}
+    {% endblock %}
+</head>
+
+<body id="body" data-searchtype="erw" class="oebl-background-grey">
+<div class="hfeed site" id="page">
+    <!-- NAVBAR
+================================================== -->
+    <!-- ******************* The Navbar Area ******************* -->
+      <div class="wrapper-fluid wrapper-navbar sticky-navbar" id="wrapper-navbar" itemscope itemtype="http://schema.org/WebSite">
+        <a class="skip-link screen-reader-text sr-only" href="#content">Skip to content</a>
+        <nav class="navbar navbar-expand-lg navbar-dark oebl-inverted">
+          <div class="container" >
+            <a href="/" class="navbar-brand custom-logo-link" rel="home" itemprop="url"><h3>PAAS</h3></a><!-- end custom logo -->
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+              <!-- Your menu goes here -->
+              <ul id="main-menu" class="navbar-nav">
+                <!--<li class="nav-item dropdown">
+                  <a title="Dropdown" href="#" data-toggle="dropdown" class="nav-link dropdown-toggle">Entities <span class="caret"></span></a>
+                  <ul class=" dropdown-menu" role="menu">
+                    <li class="nav-item dropdown-submenu">
+                        {% for ent in entities_list %}
+                      <a title="{{ent|title}}" href="{% url 'apis:apis_entities:generic_entities_list' ent %}" class="nav-link">{{ent|title}}</a>
+                      {% endfor %}
+                      <a title="URIS" href="{% url 'apis:apis_metainfo:uri_browse' %}" class="nav-link">URIs</a>
+                    </li>
+                  </ul>
+                </li>-->
+                <li class="nav-item"><a title="Suche" href="{% url 'theme:search' %}" class="nav-link">Suche</a></li>
+                <li class="nav-item"><a title="UeberOEBL" href="{% url 'theme:about' %}" class="nav-link">Über</a></li>
+                <li class="nav-item"><a title="Kontakt" href="{% url 'theme:contact' %}" class="nav-link">Kontakt</a></li>
+              </ul>
+              <form class="form-inline my-2 my-lg-0 navbar-search-form" method="get" action="/search" role="search">
+                <input class="form-control navbar-search" id="s" name="q" type="text" placeholder="Volltextsuche" value="" autocomplete="off">
+                <button type="submit" class="navbar-search-icon">
+                  <i data-feather="search"></i>
+                </button>
+              </form>
+            </div>
+            <!-- .collapse navbar-collapse -->
+          </div>
+          <!-- .container -->
+        </nav>
+        <!-- .site-navigation -->
+      </div>
+      <!-- .wrapper-navbar end -->
+      <div class="h-100">
+    {% block content %}{% endblock %}
+      </div>
+<div>
+    <div class="footer oebl-inverted">
+        <div>
+            <div class="container">
+                <footer>
+                  <div class="row pt-3 pb-3 align-items-center">
+                    <div class="col-sm-4 col-md-4 col-lg-4 col-12 footermenu">
+                    <ul class="mb-0 pl-0">
+                      <li class="pb-1 pl-0"><a title="Impressum" href="{% url 'theme:imprint' %}" class="nav-link">Impressum</a></li>
+                      <li class=" pl-0"><small>&#xa9; Österreichische Akademie der Wissenschaften</small></li>
+                    </ul>
+                  </div>
+                  <div class="col-sm-4 col-md-4 col-lg-4 col-12" style="text-align:right">
+                      <i onclick="scrollToTop()" data-feather="arrow-up"></i>
+                  </div>
+                  </div>
+                </footer>
+            </div>
+        </div>
+    </div>   
+  </div>
+    <!-- Bootstrap core JavaScript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="{% static 'theme/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+    <script>
+        feather.replace()
+    </script>
+    <script>
+    function scrollToTop() {
+      $('body,html').animate({
+        scrollTop : 0
+    }, 500);
+    }
+    </script>
+    {% block scripts %}
+    {% endblock %}
+    {% block scripts2 %}
+    {% endblock scripts2 %}
+</div>
+</body>
+
+</html>

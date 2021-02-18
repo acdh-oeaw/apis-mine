@@ -1,0 +1,62 @@
+{% load custom_tags %}
+
+{% load staticfiles %}
+<div class="card-wrapper">
+  <article class="card col-md-4 flat-style">
+    <div class="card-inner card-vertical  d-flex flex-column justify-content-between">
+      <div class="entry-content">
+        <div class="row">
+          <div class="col-3">
+            <div class="avatar-icon">
+              <i class="" data-feather="user"></i>
+            </div>
+          </div>
+          <div class="col-9">
+            <span style="color:#125794">{% people_count %}</span><br /><small>Personen in der Datenbank</small>
+          </div>
+        </div>
+      </div>
+      <footer class="entry-footer">
+      </footer>
+    </div>
+  </article>
+  <article class="card col-md-4 flat-style">
+    <div class="card-inner card-vertical  d-flex flex-column justify-content-between">
+      <div class="entry-content">
+        <div class="row">
+          <div class="col-3">
+            <div class="avatar-icon">
+              <i class="" data-feather="home"></i>
+            </div>
+          </div>
+          <div class="col-9">
+            <span style="color:#125794">{% institution_count %}</span><br /><small>Institutionen in der Datenbank</small>
+          </div>
+        </div>
+      </div>
+      <footer class="entry-footer">
+
+      </footer>
+    </div>
+  </article>
+  <article class="card col-md-4 flat-style">
+    <div class="card-inner card-vertical  d-flex flex-column justify-content-between">
+      <div class="entry-content">
+        <div class="row">
+          <div class="col-3">
+            <div class="avatar-icon">
+              <i class="" data-feather="map-pin"></i>
+            </div>
+          </div>
+          <div class="col-9">
+            <span style="color:#125794">{% place_count %}</span><br /><small>Orte in der Datenbank</small>
+          </div>
+        </div>
+      </div>
+      <footer class="entry-footer">
+
+      </footer>
+    </div>
+  </article>
+  <!-- #post-## -->
+</div>

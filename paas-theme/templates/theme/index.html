@@ -1,0 +1,110 @@
+{% extends "theme/base.html" %}
+{% load staticfiles %}
+
+{% block content %}
+<div class="wrapper" id="wrapper-hero">
+
+
+
+  <!-- ******************* The Hero Area ******************* -->
+  <div class="wrapper" id="wrapper-hero-content">
+    <div class="container hero-light" id="wrapper-hero-inner" tabindex="-1">
+
+
+      <div>
+
+        <h1>Geschichte der Akademie</h1>
+        <p>Teaser text...</p>
+      </div>
+
+    </div><!-- #wrapper-hero-content -->
+
+  </div>
+  <div class="container pt-3">
+    {% include "theme/stats.html" %}
+  </div>
+  <div class="container startPageSearch">
+    <form action="/search?" method="get">
+      <div class="input-group mb-3">
+        <input id="fulltextsearch" class="form-control navbar-search" name="q" id="s" type="text" placeholder="Suche"
+          value="" autocomplete="off">
+        <div class="input-group-append">
+          <button class="btn btn-primary" type="submit">
+            <i data-feather="search" style="width: 20px; height: 20px;"></i>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="wrapper" id="index-wrapper">
+    <div class="container" id="content" tabindex="-1">
+      <div class="row">
+        <!-- Do the left sidebar check and opens the primary div -->
+        <div class="col-md-12 content-area" id="primary">
+
+          {% include "theme/random_entries.html" %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wrapper" id="partners-wrapper">
+    <div class="container" id="content" tabindex="-1">
+      <div class="row">
+        <!-- Do the left sidebar check and opens the primary div -->
+        <div class="col-md-12 content-area" id="primary">
+          {% include "theme/partners.html" %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts2 %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/js/select2.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.7/css/select2.min.css" rel="stylesheet" />
+<link href="{%static 'theme/vendor/select2-bootstrap4/select2-bootstrap4.min.css' %}" rel="stylesheet" />
+
+<script type="text/javascript">
+  $('#searchindex').val("personsearch");
+  $('.js-data-example-ajax').select2({
+    placeholder: "Anfangen zu tippen um Vorschläge zu erhalten.",
+    language: "de",
+    ajax: {
+      url: "{% url 'theme:obel-person-autocomplete' %}",
+      dataType: 'json'
+      // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
+    },
+    theme: 'bootstrap4'
+  });
+  $('#searchindex').change(function () {
+    var selval = $(this).children("option:selected").val();
+    if (selval === 'personsearch') {
+      $("#fulltextsearch").hide();
+      $(".select2*").show();
+      $("#submitcontainer").attr("onclick", "goToPageEvent(event)");
+    } else {
+      $(".select2*").hide();
+      $("#fulltextsearch").show();
+      $("#submitcontainer").attr("onclick", "doFullTextSearch()");
+    }
+
+
+  });
+
+  function goToPage() {
+    var optionElements = document.querySelectorAll('option');
+    var option = optionElements[optionElements.length - 1]
+    if (option && option.value) {
+      window.location = `/person/${option.value}`;
+    }
+
+  }
+
+  function doFullTextSearch() {
+    window.location.href = "/search?q=" + $("#fulltextsearch").val();
+  }
+
+
+</script>
+{% endblock scripts2 %}

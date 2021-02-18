@@ -1,0 +1,142 @@
+{% extends "theme/base.html" %}
+{% block scriptHeader %}
+<script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/three@latest/build/three.min.js"></script>
+<script src="https://unpkg.com/@acdh/network-visualization@0/lib/network-visualization.umd.js"></script>
+<style>
+#loader {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  border: 16px solid #f3f3f3; /* Light grey */
+  border-top: 16px solid #125794; /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+{% endblock scriptHeader %}
+{% block content %}
+<div style="height: 100%">
+<div id="banner_viz" style></div>
+<div id="visualization" style="overflow: hidden; position: relative; flex: 1 1; height: 100%"><div id="loader"></div></div>
+</div>
+{% endblock content %}
+{% block scripts %}
+<script>
+        const getNetworkViz = (rel_type, offset) => {
+            let urlParams = new URLSearchParams(window.location.search) ;
+            const endpoint = '/api/network/';
+
+            urlParams.append('format', 'json+net');
+            urlParams.append('limit', '1000')
+            urlParams.append('offset', offset)
+        console.log(window.location.search)
+      let url = new URL(endpoint, window.location.origin)
+      console.log(urlParams.get('q'))
+      urlParams.forEach((value, key) => {
+          console.log(key);
+        url.searchParams.set(key, value)
+      });
+      console.log(url);
+          fetch(url)
+              .then(response => {
+                  if (!response.ok) {
+                      throw new Error(response.statusText)
+                  }
+                  let loader = document.getElementById("loader");
+                    if (loader) {
+                    loader.remove();}
+                  return response.json()
+              })
+              .then(data => {
+                  if (data['next']){
+                      let urlparams = new URLSearchParams(data['next'])
+                      if (!document.getElementById('loadmore')) {
+                      console.log('more than 1000')
+                      let b_more = document.createElement('DIV')
+                      b_more.id = "loadmore"
+                      b_more.style = "width:100%; height:50px; color: grey;"
+                      b_more.append(document.createTextNode('Mehr als 1000 Verbindungen geladen! '))
+                      let b_more_link = document.createElement('Button')
+                      b_more_link.onclick = function() {getNetworkViz("test", urlparams.get('offset'))};
+                      b_more_link.append(document.createTextNode('Clicken um weiter zu laden.'))
+                      b_more.append(b_more_link)
+                      let cv = document.getElementById('banner_viz')
+                        cv.prepend(b_more)
+                      } else {
+                        let b_more_link = document.querySelector('#loadmore > a:first-of-type')
+                        b_more_link.onclick = function() {getNetworkViz("test", urlparams.get('offset'))}
+                      }
+                  } else if (document.getElementById('loadmore')) {
+                      document.getElementById('loadmore').remove()
+                  }
+                  const edges = {}
+                  const nodes = {}
+                  const types = {edges: {}, nodes: {}}
+                  data.results.forEach(relation => {
+                      const {id, source, target, relation_type: relationType} = relation
+                      edges[id] = {
+                          id,
+                          source: source.id,
+                          target: target.id,
+                          type: relationType.id,
+                      }
+                      nodes[source.id] = {
+                          id: source.id,
+                          label: source.label,
+                          type: 'Person',
+                      }
+                      nodes[target.id] = {
+                          id: target.id,
+                          label: target.label,
+                          type: 'Institution',
+                      }
+                      types.edges[relationType.id] = {
+                          id: relationType.id,
+                          label: relationType.label,
+                      }
+                      types.nodes['Person'] = {
+                          id: 'Person',
+                          label: 'Person',
+                          color: 'hotpink',
+                      }
+                      types.nodes['Place'] = {
+                          id: 'Place',
+                          label: 'Place',
+                          color: 'rebeccapurple',
+                      }
+                      types.nodes['Institution'] = {
+                          id: 'Institution',
+                          label: 'Institution',
+                          color: 'green',
+                      }
+                  })
+                  ReactDOM.render(
+                      React.createElement(NetworkVisualization.Visualization, {
+                          graph: {
+                              edges,
+                              nodes,
+                              types,
+                          },
+                      }),
+                      document.getElementById('visualization')
+                  );
+              })
+              .catch(error => {
+                  console.error(error)
+              })
+      };
+
+    </script>
+<script>
+window.onload = getNetworkViz('personinstitution', 0)
+</script>
+{% endblock scripts %}

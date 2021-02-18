@@ -1,0 +1,11 @@
+.noUi-connect {
+    background:#CD2324;
+  }
+
+.sliderlegend {
+  font-size:0.8rem;
+}  
+
+.sliderlegendstart:after {
+  content:" - "
+}

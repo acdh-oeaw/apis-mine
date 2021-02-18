@@ -1,0 +1,79 @@
+
+{% load staticfiles %}
+<div class="sectionheader">
+        <h6>Dieser Tag in der Geschichte</h6>
+      </div>
+
+        <div class="card-wrapper">
+          <!-- #post-## -->
+          <article class="card col-md-6 flat-style">
+            <div class="card-inner card-vertical  d-flex flex-column" style="min-height:420px;">
+                <header class="entry-header mb-3">
+                    <h6 class="pb-2">An diesem Tag geboren</h6>
+                  <div class="row align-items-end">
+                      <div class="col-lg-2 col-md-2 col-12 pr-0">
+                          <img src="{% static 'theme/img/oebl_person_red.svg' %}" />
+                        </div>
+                        <div class="col-lg-10 col-md-10 col-12">
+                            {% if person_born %}
+                                {% for x in person_born %}
+                                    <h5 class="mb-1">{%if x.first_name %} {{ x.first_name}} {% endif %}{{ x.name}}</h5>
+                                    <p class="profession m-0 p-0">{% for x in x.profession.all %} {{x.name }} {% endfor %}</p>
+                                    <p class="startend  mt-1 mb-0 p-0">{{x.start_date_written }} - {{x.end_date_written }}</p>
+                                    {% for y in x.text.all %}
+                                        {% if forloop.first %}
+                                            <p>{{y.text | truncatechars:500}}</p>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <a class="btn btn-round  mb-1" href="{% url 'theme:person-detail' pk=x.id %}">Mehr lesen</a>
+                                {% endfor %}
+                            {% else %}
+                                <h5>heute ist niemand gestorben</h5>
+                            {% endif %}
+                        </div>
+                </header>
+                <div class="card-body">
+                  <p>{{randombornthisday.desc | truncatechars:500}}</p>
+                </div>
+                <footer class="entry-footer">
+                    
+                </footer>
+            </div>
+            <!-- .card-inner -->
+          </article>
+          <!-- #post-## -->
+          <article class="card col-md-6 flat-style oeblredcard">
+              <div class="card-inner card-vertical  d-flex flex-column" style="min-height:420px;">
+                    <h6 class="pb-2">An diesem Tag verstorben</h6>
+                <header class="entry-header mb-3">
+                      <div class="row align-items-end">
+                          <div class="col-lg-2 col-md-2 col-12 pr-0">
+                              <img src="{%static 'theme/img/oebl_person_white.svg' %}" />
+                            </div>
+                            <div class="col-lg-10 col-md-10 col-12">
+                                {% if person_died %}
+                                    {% for x in person_died %}
+                                        <h5 class="mb-1">{%if x.first_name %} {{ x.first_name}} {% endif %}{{ x.name}}</h5>
+                                        <p class="profession m-0 p-0">{% for x in x.profession.all %} {{x.name }} {% endfor %}</p>
+                                        <p class="startend  mt-1 mb-0 p-0">{{x.start_date_written }} - {{x.end_date_written }}</p>
+                                        {% for y in x.text.all %}
+                                            {% if forloop.first %}
+                                                <p>{{y.text | truncatechars:500}}</p>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <a class="btn btn-round  mb-1" href="{% url 'theme:person-detail' pk=x.id %}">Mehr lesen</a>
+                                    {% endfor %}
+                                {% else %}
+                                    <h5>heute ist niemand gestorben</h5>
+                                {% endif %}
+                            </div>
+                    </header>
+                <!-- .entry-header -->
+                <div class="card-body">
+                 <p>{{randomdiedthisday.desc | truncatechars:500}}</p></div>
+                <footer class="entry-footer">
+
+                </footer>
+              </div>
+          </article>
+          </div>

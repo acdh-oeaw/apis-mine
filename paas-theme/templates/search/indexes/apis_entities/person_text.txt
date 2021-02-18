@@ -1,0 +1,8 @@
+{{ object.name }}
+{{ object.first_name }}
+{% for y in object.texts %}
+{{ y }}
+{% endfor %}
+{% for x in object.alternative_names %}
+{{ x }}
+{% endfor %}

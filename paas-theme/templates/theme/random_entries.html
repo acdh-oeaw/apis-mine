@@ -1,0 +1,42 @@
+{% load staticfiles %}
+
+
+{% if featured_pers %}
+<div class="sectionheader">
+    <h5 class="sectiontitle">Featured</h5>
+</div>
+<div class="card-wrapper">
+    <article class="card col-md-6 offset-md-3 flat-style">
+        <div class="card-inner card-vertical  d-flex flex-column" style="min-height:420px;">
+            <header class="entry-header mb-3">
+                <!--<h6 class="pb-2">An diesem Tag geboren</h6>-->
+                <div class="row align-items-end">
+                    <div class="col-lg-2 col-md-2 col-12 pr-0">
+                        <img src="{%static 'theme/img/oebl_person_red.svg' %}" />
+                    </div>
+                    <div class="col-lg-10 col-md-10 col-12">
+                        <h5 class="mb-1">{%if featured_pers.first_name %} {{ featured_pers.first_name}}
+                            {% endif %}{{ featured_pers.name}}</h5>
+                        <p class="profession m-0 p-0">{% for x in featured_pers.profession.all %} {{x.name }}
+                            {% endfor %}</p>
+                        <p class="startend  mt-1 mb-0 p-0">{{featured_pers.start_date_written }} -
+                            {{featured_pers.end_date_written }}</p>
+                    </div>
+            </header>
+            <div class="card-body">
+                {% for y in featured_pers.text.all %}
+                {% if forloop.first %}
+                <p>{{y.text | truncatechars:500}}</p>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <footer class="entry-footer">
+                <a class="btn btn-primary btn-round  mb-1" href="{% url 'theme:person-detail' pk=featured_pers.id %}">Mehr lesen</a>
+            </footer>
+        </div>
+        <!-- .card-inner -->
+    </article>
+</div>
+{% else %}
+<h3>No Person related to collection "FEATURED", go do so!</h3>
+{% endif %}

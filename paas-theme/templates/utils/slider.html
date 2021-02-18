@@ -1,0 +1,96 @@
+<div class="sliderwrapper" data-start="{{widget.attrs.date_min}}" data-end="{{widget.attrs.date_max}}">
+        <input name="{{widget.name}}_min" class="hiddeninputafter" disabled="disabled"  type="hidden"/>
+        <input name="{{widget.name}}_max" class="hiddeninputbefore" disabled="disabled" type="hidden"/>
+    </div>
+<script>
+    var sliders = document.getElementsByClassName('slider');
+    var sliderwrappers = document.getElementsByClassName('sliderwrapper');
+    var sliderlegendstart = document.createElement("span");
+    sliderlegendstart.setAttribute("id", "slgs" + (sliders.length + 1));
+    var sliderlegendend = document.createElement("span");
+    sliderlegendend.setAttribute("id", "slge" + (sliders.length + 1));
+    sliderlegendstart.setAttribute("class","sliderlegend sliderlegendstart");
+    sliderlegendend.setAttribute("class","sliderlegend");
+    sliderwrappers[sliders.length].append(sliderlegendstart);
+    sliderwrappers[sliders.length].append(sliderlegendend);
+    var slider = document.createElement("div");
+    slider.setAttribute("class", "slider");
+    slider.setAttribute("disabled",true);
+    slider.setAttribute("id", "slider" + (sliders.length + 1));
+    sliderwrappers[sliders.length].prepend(slider);
+    var slidercheckbox = $('<div class="form-check"><input class="form-check-input sliderenabler" type="checkbox" value="" id="slidercheckbox'+ (sliders.length)+'"><label class="form-check-label" for="slidercheckbox'+ (sliders.length)+'">Zeitraum einschränken</label></div>');
+    $(slidercheckbox).on('change','.sliderenabler',function(){
+       if (this.checked) {
+        $(this).parent().parent().find(".slider").removeAttr('disabled');
+           $(this).parent().parent().find(".hiddeninputafter").removeAttr('disabled');
+           $(this).parent().parent().find(".hiddeninputbefore").removeAttr('disabled');
+       } else {
+        $(this).parent().parent().find(".slider").attr('disabled',true);
+        $(this).parent().parent().find(".hiddeninputafter").prop('disabled',true);
+        $(this).parent().parent().find(".hiddeninputbefore").prop('disabled',true);
+       }
+    });
+    $(sliderwrappers[sliders.length -1]).prepend(slidercheckbox);
+    noUiSlider.create(slider, {
+        connect: true,
+        range: {
+            'min': new Date($(sliderwrappers[sliders.length-1]).find(".hiddeninputafter").val()).getTime() ||new Date($(sliderwrappers[sliders.length-1]).data("start")).getTime(),
+            'max': new Date($(sliderwrappers[sliders.length-1]).find(".hiddeninputbefore").val()).getTime() || new Date($(sliderwrappers[sliders.length-1]).data("end")).getTime()
+        },
+        step: 7 * 24 * 60 * 60 * 1000,
+        start: [
+        new Date($(sliderwrappers[sliders.length-1]).find(".hiddeninputafter").val()).getTime() ||new Date($(sliderwrappers[sliders.length-1]).data("start")).getTime(),
+        new Date($(sliderwrappers[sliders.length-1]).find(".hiddeninputbefore").val()).getTime() || new Date($(sliderwrappers[sliders.length-1]).data("end")).getTime()
+            ],
+        // No decimals
+        format: wNumb({
+            decimals: 0
+        })
+    });
+
+    // Create a list of day and month names.
+    var weekdays = [
+        "Sonntag",
+        "Montag",
+        "Dienstag",
+        "Mittwoch",
+        "Donnerstag",
+        "Freitag",
+        "Samstag"
+    ];
+
+    var months = [
+        "Januar", "Februar", "März",
+        "April", "Mai", "Juni", "Juli",
+        "August", "September", "Oktober",
+        "November", "Dezember"
+    ];
+
+    
+
+    // Create a string representation of the date.
+    function formatDate(date) {
+        return weekdays[date.getDay()] + ", " +
+            date.getDate() + ".  " +
+            months[date.getMonth()] + " " +
+            date.getFullYear();
+    }
+
+     slider.noUiSlider.on('update', function (values, handle) {
+         console.log("updated");
+        var slidernr = this.target.attributes.id.value.replace("slider","");  
+
+        var dateValues = 
+        [
+            document.getElementById("slgs" + slidernr),
+            document.getElementById("slge" + slidernr)
+        ];
+        dateValues[handle].innerHTML = formatDate(new Date(+values[handle]));
+        var start = new Date(parseInt(values[0]));
+        var end = new Date(parseInt(values[1]));
+           $("#slider" + slidernr).parent().find(".hiddeninputafter").val(start.toISOString().slice(0,10));
+           $("#slider" + slidernr).parent().find(".hiddeninputbefore").val(end.toISOString().slice(0,10));
+           
+    });
+    
+</script>

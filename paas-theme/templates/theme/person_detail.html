@@ -1,0 +1,456 @@
+{% extends "theme/base.html" %}
+{% load leaflet_tags %}
+{% block scriptHeader %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/three@latest/build/three.min.js"></script>
+  <script crossorigin src="https://unpkg.com/@acdh/network-visualization@latest/lib/network-visualization.umd.js"></script>
+  {% leaflet_js %}
+  {% leaflet_css %}
+{% endblock %}
+{% load staticfiles %}
+{% load webpage_extras %}
+{% load custom_tags %}
+{% block title %}{{ object }}{% endblock %}
+{% block content %}
+<div id="contentDetails" class="container pt-5">
+  <div class="row bio-outer p-5">
+    <div class="col-md-12 pb-4">
+      <div class="row justify-content-between">
+        <div class="col-md-auto">
+          {% if prev.id %}
+          <a class="card-link preventity" href="{% url 'theme:person-detail' pk=prev.id %}" title="{{ prev }}">
+            &larr; {{ prev }}
+          </a>
+          {% endif %}
+        </div>
+        <div class="col"></div>
+        <div class="col-md-auto">
+          {% if next.id %}
+          <a class="card-link nextentity" href="{% url 'theme:person-detail' pk=next.id %}" title="{{ next }}">
+            {{ next }} &rarr;
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8 pr-5">
+      <article class="bio">
+        <div class="entry-header">
+          <div class="row">
+            <div class="col">
+              <h2>{{ object.name }}{%if object.first_name %}, {{ object.first_name }}{% endif %}</h2>
+              {% if kurzinfo %}<div class="mt-5 text-secondary">{{ kurzinfo }}</div>{% else %}
+              <p class="profession-date-of-birth">
+                {{ profession }}, <abbr
+                title='geboren'>geb.</abbr> {% if place_of_birth is not None %} {{place_of_birth}}, {% endif %}{{object.start_date_written }}; <abbr
+                title='gestorben'>gest.</abbr> {% if place_of_death is not None %} {{place_of_death}}, {% endif %}{{object.end_date_written }}
+                {% endif %}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div id="main-bio-text" class="card-body p-0 pt-3">
+          <p class="p-0">{{ cv_de }}</p>
+          <hr/>
+          <p class="p-0">{{ cv_en }}</p>
+        </div>
+        <div class="mt-5 text-secondary">
+          <hr class="m-5" />
+          {% if werkverzeichnis %}<i>Werke:</i> {{ werkverzeichnis}}<br>{% endif %}
+          {% if object.references %}<i>Literatur:</i> {{ object.references }}<br>{% endif %}
+          {% if object.source.author %}<i>Autor:</i> {{ object.source.author }}<br>{% endif %}
+          {% if object.source.pubinfo %}<i>Referenz:</i> {{ object.source.pubinfo }}<br>{% endif %}
+        </div>
+      </article>
+    </div>
+    <div id="right-pane" class="col-md-4">
+      <article>
+        <div class="inline-map card-inner relentitiescard card-vertical d-flex flex-column justify-content-between">
+        <a style="position: absolute; right: 10px; top: 10px; z-index: 1000; cursor: pointer" class="leaflet-control-zoom-in" role="button" onClick="move_map()">
+            <i data-feather="maximize-2"></i>
+        </a>
+          {% leaflet_map "main" %}
+        </div>
+        <div class="card-inner relentitiescard card-vertical  d-flex flex-column justify-content-between">
+          <div class="pl-2 pt-4">
+            <h4>Links</h4>
+            <ul class="uris pl-0">{% for uri in object.uri_set.all %}
+              <li class="pl-0"><a target="_blank" rel="noopener noreferrer" href="{{uri}}">{{uri}}</a></li>
+              {% endfor %}
+            </ul>
+            <h4>Download</h4>
+            <ul class="uris pl-0">
+              <li class="p-0"><a href="{% url 'apis:apis_api2:GetEntityGeneric' pk=object.pk %}?format=tei" download>XML/TEI</a></li>
+              <li class="p-0"><a href="{% url 'apis:apis_api2:GetEntityGeneric' pk=object.pk %}?format=rdf%2Bturtle" download>RDF/Turtle</a></li>
+              <li class="p-0"><a href="{% url 'apis:apis_api2:GetEntityGeneric' pk=object.pk %}?format=json" download>JSON</a></li>
+            </ul>
+            {% if related_persons %}
+            <h4>Personen</h4>
+            <ul class="relentities">
+              {% for x in related_persons %}
+              <li class="pl-0">
+
+                {{ x.relation_type }} <i style="color: darkred">></i> <strong>{{ x.related_place }}</strong>
+                {% formated_daterange x.start_date_written x.end_date_written %}
+              </li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            {% include "theme/spacetime_graph.html" %}
+            {% if related_places %}
+            <h4>Orte</h4>
+            <ul class="relentities">
+              {% for x in related_places %}
+              <li class="pl-0">
+                {{ x.relation_type }} <i style="color: darkred">></i> <strong>{{ x.related_place }}</strong>
+                 {% formated_daterange x.start_date_written x.end_date_written %}
+              </li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            {% if related_institutions %}
+            <h4>Institutionen</h4>
+            <ul class="relentities">
+              {% for x in related_institutions %}
+              <li class="pl-0">
+                {{ x.relation_type }} <i style="color: darkred">></i> <strong>{{x.related_institution }}</strong>
+                {% formated_daterange x.start_date_written x.end_date_written %}
+              </li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
+{% block scripts %}
+  <script>
+    const getNetworkViz = (pers_id, relationtype, t1) => {
+    document.getElementById("visualization").style.height = "400px";
+    const basePath = 'http://127.0.0.1:8000'
+    const endpoint = '/apis/api/relations/'+relationtype
+    const query = {
+    format: 'json+net',
+    related_person__id: pers_id,
+    };
+    if (relationtype == "personperson") {
+    query['related_personA__id'] = pers_id
+    }
+    const url = new URL(endpoint, basePath)
+    Object.keys(query).forEach(key => {
+    url.searchParams.set(key, query[key])
+    })
+    fetch(url)
+    .then(response => {
+      if (!response.ok) {
+      throw new Error(response.statusText)
+      }
+      return response.json()
+    })
+    .then(data => {
+      const edges = {}
+      const nodes = {}
+      const types = {edges: {}, nodes: {}}
+      data.results.forEach(relation => {
+      const {id, source, target, relation_type: relationType} = relation
+      edges[id] = {
+        id,
+        source: source.id,
+        target: target.id,
+        type: relationType.id,
+      }
+      nodes[source.id] = {
+        id: source.id,
+        label: source.label,
+        type: 'Person',
+      }
+      nodes[target.id] = {
+        id: target.id,
+        label: target.label,
+        type: t1,
+      }
+      types.edges[relationType.id] = {
+        id: relationType.id,
+        label: relationType.label,
+      }
+      types.nodes['Person'] = {
+        id: 'Person',
+        label: 'Person',
+        color: 'hotpink',
+      }
+      types.nodes['Place'] = {
+        id: 'Place',
+        label: 'Place',
+        color: 'rebeccapurple',
+      }
+      types.nodes['Institution'] = {
+        id: 'Institution',
+        label: 'Institution',
+        color: 'green',
+      }
+      })
+      ReactDOM.render(
+      React.createElement(NetworkVisualization.Visualization, {
+        graph: {
+          edges,
+          nodes,
+          types,
+        },
+      }),
+      document.getElementById('visualization')
+      )
+    })
+    .catch(error => {
+      console.error(error)
+    })
+  }
+  </script>
+  <script type="text/javascript">
+    var dataurl = "{% url 'apis:apis_api2:GetRelatedPlaces' %}?person_id={{object.pk}}";
+    let lst_dates = []
+    let lst_long_lat = []
+    var map;
+    var date;
+    iconSettings = {
+        mapIconUrl: '<svg xmlns="http://www.w3.org/2000/svg"  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-map-pin"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>',
+        mapIconColor: '#cc756b',
+       // mapIconColorInnerCircle: '#fff',
+        //pinInnerCircleRadius: 48
+    },
+
+    // icon normal state
+    divIcon = L.divIcon({
+        className: "leaflet-data-marker",
+        html: L.Util.template(iconSettings.mapIconUrl, iconSettings),
+        iconAnchor: [12, 24],
+        iconSize: [24,24],
+        popupAnchor: [0, -24]
+    }),
+
+    window.addEventListener("map:init", function (event) {
+    map = event.detail.map;
+    // Download GeoJSON data with Ajax
+    fetch(dataurl)
+      .then(function(resp) {
+      return resp.json();
+      })
+      .then(function(data) {
+        return data;
+      })
+      .then(function(data) {
+      var jsonLayer = L.geoJson(data, {
+        pointToLayer: function(feature, latlng) {
+                return L.marker(latlng, {icon: divIcon}); },
+        onEachFeature: function onEachFeature(feature, layer) {
+          var props = feature.properties;
+          let relations = "";
+          props.relations.forEach(function(element){relations += `<li>${element.relation}</li>`;
+              if (!lst_dates.includes(element.start_date) && element.start_date != null) {
+                lst_dates.push(element.start_date)
+              };
+              if (!lst_dates.includes(element.end_date) && element.end_date != null) {
+                lst_dates.push(element.end_date)
+              };
+              if (!lst_long_lat.includes(feature.geometry.coordinates)){
+                lst_long_lat.push(feature.geometry.coordinates)
+              }
+          });
+        var content = `<div><h3><a href=${props.url}>${props.name}</a></h3><p>${props.kind}<br/><ul class="maps-list">${relations}<ul></p></div>`;
+        layer.bindPopup(content);
+        layer.on('mouseover', e => {
+          window.eventBus.emit('apismap.mouseover', e);
+          e.target._icon.classList.add('activated')
+      for (f in e.target.feature.properties.relations){
+        let rel = e.target.feature.properties.relations[f]
+        let d_obj = document.querySelector(`.spacetime-graph circle[relid='${rel.id}']`)
+        if (d_obj){
+        d_obj.closest('div').classList.add('dot-hover')
+        d_obj.classList.add('hover')
+        document.querySelector(`.spacetime-graph circle[relid='${rel.id}'] + g.label-text`).classList.add('hover')
+        }}});
+        layer.on('mouseout', e => {
+          e.target._icon.classList.remove('activated');
+          window.eventBus.emit('apismap.mouseout', e)
+          document.querySelectorAll('.spacetime-graph circle').forEach(c => {c.classList.remove('hover')})
+          document.querySelectorAll('.spacetime-graph g.label-text').forEach(c => {c.classList.remove('hover')})
+          document.querySelector('div.spacetime-graph').classList.remove('dot-hover')
+          }
+
+          )
+      }});
+      jsonLayer.addTo(map);
+      var bounds =  jsonLayer.getBounds();
+      if (JSON.stringify(bounds['_northEast']) === JSON.stringify(bounds['_southWest'])) {
+        map.setView(bounds['_northEast'], 12);
+      } else {
+        map.fitBounds(jsonLayer.getBounds());
+      }
+      
+      })
+      .then(function(){console.log('event issued');
+        window.eventBus.emit('apismap.marker.loaded')})
+    });
+
+   async function add_histogis_shape(){
+      let colors_shapes = ['#302f2f', '#3388ff', '#229c41', '#b8252c', '#d1c847']
+      const featHistoGIS = []
+      let list_permalinks = [];
+      let histogis_url = new URL('https://histogis.acdh-dev.oeaw.ac.at/api/where-was')
+      const parsed_dates = lst_dates.map(d => Date.parse(d))
+      const min_date = Math.min(...parsed_dates)
+      const max_date = Math.max(...parsed_dates)
+      const ts = (max_date + min_date)/2
+      date = new Date(ts)
+      const listHistoGIS = []
+      const preList = {}
+      let count_runs = 0
+      
+      const hgis_requests = lst_long_lat.map(function(coords){
+        histogis_url.search = new URLSearchParams({
+          lat: coords[1],
+          lng: coords[0],
+          when:  date.toLocaleDateString('en-UK'),
+          page_size: 15
+        });
+        return fetch(histogis_url)
+          .then(res => res.json())
+          .then(res => listHistoGIS.push(...res.features))
+      })
+      await Promise.all(hgis_requests)
+      listHistoGIS.forEach(ft => {
+        var count = 0
+        let lst_perm = []
+        ft.properties.parents.forEach(pr => {       
+          listHistoGIS.forEach(ft2 => {
+            let subst = ft2['@id'].replace(/^.*\/\/[^\/]+/, '')
+            if (pr.permalink === subst && !lst_perm.includes(subst)) {
+              count += 1
+              lst_perm.push(subst)
+            }
+          })         
+        })
+        if (count in preList) {
+            if (!preList[count].some(ft3 => ft3['@id'] === ft['@id'])) {
+            preList[count].push(ft)
+            }
+          } else {
+            preList[count] = [ft,]
+          }
+      })
+      for (var idx in preList) {
+        let pn = `histogis${idx}`
+        map.createPane(pn);
+        map.getPane(pn).style.zIndex = parseInt(`4${idx}0`)
+
+        preList[idx].forEach(ft3 => {
+          let jsonLayer = L.geoJson(ft3, {
+            'pane': `histogis${idx}`,
+            'color': colors_shapes[idx]
+          })
+          jsonLayer.bindTooltip(
+            `${ft3.properties.name} (${ft3.properties.start_date} - ${ft3.properties.end_date})`,
+                      {
+                      permanent: false,
+                      direction: 'center',
+                      className: 'countryLabel'
+                      }
+);
+        featHistoGIS.push(jsonLayer)
+        })
+        const featGroupHistogis = L.featureGroup(featHistoGIS).addTo(map)
+        const bounds =  featGroupHistogis.getBounds();
+            if (JSON.stringify(bounds['_northEast']) === JSON.stringify(bounds['_southWest'])) {
+              map.setView(bounds['_northEast'], 12);
+            } else {
+              map.fitBounds(featGroupHistogis.getBounds());
+            }
+      }
+
+    }
+
+  function minimize_map(){
+    window.location.href = window.location.origin + window.location.pathname
+  }
+
+  function move_map() {
+    const map_element = document.querySelector('div.inline-map')
+    const bio = document.querySelector('article.bio')
+    const biotext = document.querySelector('#main-bio-text')
+    const spacetime = document.querySelector('div#spacetime-graph-content')
+    const rightpane = document.querySelector('#right-pane > article')
+    const mapleaflet = map_element.querySelector('#main')
+    rightpane.insertBefore(spacetime, map_element)
+    let height_space_time = spacetime.offsetHeight
+    if (height_space_time > 500){
+      mapleaflet.style.height = `${height_space_time}px`
+    } else {
+      mapleaflet.style.height = "500px"
+    }
+    spacetime.style.paddingTop = `${document.querySelector('div.entry-header').offsetHeight}px`
+    
+    bio.insertBefore(map_element, biotext)
+    add_histogis_shape()
+    map.invalidateSize()
+    const caption = document.createElement("p")
+    caption.style.fontSize = '0.8em'
+    caption.style.fontStyle = 'italic'
+    caption.innerHTML = `Die Polygone werden dynamisch aus <a href="https://histogis.acdh.oeaw.ac.at">HistoGIS</a> erstellt. 
+    Es werden die administrativen Einheiten für die Position aller Marker zum Zeitpunkt ${date.toLocaleDateString('de-DE')} 
+    (Mitte der bekannten Lebensspanne) geladen.`
+    //caption.appendChild(tnode)
+    bio.insertBefore(caption, biotext)
+    let max_icon = document.querySelector('div.inline-map > a')
+    max_icon.setAttribute('onclick', 'minimize_map()')
+    max_icon.innerHTML = '<i data-feather="minimize-2"></i>'
+    feather.replace()
+    let url = new URL(window.location.href)
+    url.searchParams.set('mapview', 'true')
+    history.replaceState(null, '{{object}}', [url])
+  }
+window.eventBus.on('spacetime.mouseover', e => {
+  let nm = e.detail[0][0].data.id
+  for (l in map._layers) {
+    if (!("feature" in map._layers[l])) {
+      continue
+    }
+    if (map._layers[l].feature.geometry.type === "Point"){
+    let lst_rels = map._layers[l].feature.properties.relations.map(x => ( x.id ))
+    if (map._layers[l].feature.geometry.type === "Point" && lst_rels.includes(nm)){
+      map._layers[l]._icon.classList.add("activated")
+    }
+    }
+  }
+})
+
+window.eventBus.on('spacetime.mouseout', e => {
+  for (l in map._layers) {
+    if (!("feature" in map._layers[l])) {
+      continue
+    }
+    if (map._layers[l].feature.geometry.type === "Point"){
+    if (map._layers[l]._icon.classList.contains("activated")){
+      map._layers[l]._icon.classList.remove("activated")
+    }
+    }
+  }
+
+})
+
+document.addEventListener("DOMContentLoaded", function() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const mapview = urlParams.get('mapview', false);
+    window.eventBus.on('apismap.marker.loaded', function(){
+      if (mapview){
+      move_map();
+      }
+    }
+    )
+});
+  </script>
+{% endblock %}

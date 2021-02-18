@@ -1,0 +1,233 @@
+{% extends 'theme/base.html' %}
+{% load apis_templatetags %}
+{% load custom_tags %}
+{% block header %}
+{% endblock %}
+{% block content %}
+{% load staticfiles %}
+{% load render_table from django_tables2 %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-3">
+      <div class="card mt-3 border-0 rounded-0 background_none">
+        <div class="card-body p-0">
+          <form action="" method="get">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+              <div class="input-group-text">
+                <input type="checkbox" id="academy_member">
+                <label for="academy_member" style="margin-left: 0.375rem;margin-bottom: 0">nur WM</label>
+              </div>
+              </div>
+              <input type="text" name="q" class="form-control form-suche-input rounded-0" id="suche" placeholder="Suche"
+                {% if query %}value="{{form.cleaned_data.q}}" {% endif %}>
+                {% if query %}<input type="hidden" name="sort" value="{{form.cleaned_data.sort}}">{% endif %}
+              <div class="input-group-append">
+                <button class="btn btn-primary rounded-0" type="submit">
+                  <i data-feather="search" style="width: 20px; height: 20px;"></i>
+                </button>
+              </div>
+            </div>
+          </form>
+
+            <!-- Begin faceting. -->
+            <div class="facet">
+              <form>
+              {% for param_name, value in request.GET.items %}
+                {% filter_params request param_name as param_list %}
+                  {% for param_value in param_list  %}
+                    {%if param_name == 'q' or param_name == 'selected_facets'%}
+                      <input type="hidden" name="{{param_name}}" class="form-suche-input" id="suche" placeholder="Suche" {% if query %}value="{{param_value}}" {% endif %}>
+                    {%endif%}
+                  {%endfor%}
+              {%endfor%}
+              <div class="card rounded-0">
+                <div class="card-header p-0" id="heading_lebensdaten">
+                  <h5 class="mb-0">
+                    <button type="button" class="btn btn-link collapsebtn w-100 text-left" data-toggle="collapse"
+                      data-target="#lebensdaten" aria-expanded="true" aria-controls="lebensdaten">
+                      Lebensdaten
+                      <i class="chevron-down" data-feather="chevron-down"></i>
+                    </button>
+                  </h5>
+                </div>
+                <div id="lebensdaten" class="collapse show" aria-labelledby="heading_lebensdaten">
+                  <div class="card-body pt-5 pb-5 pl-4 pr-4">
+                    <div class="range-slider"></div>
+                  </div>
+                </div>
+              </div>
+              {% for field in facets.fields %}
+                {% filter_facetfields facets.fields field as filtered_vals %}
+                  {% if filtered_vals|length > 0 %}
+                    <div class="card mt-2 rounded-0">
+                      <div class="card-header p-0" id="heading{{field}}">
+                        <h5 class="mb-0">
+                          <button type="button" class="btn btn-link collapsebtn w-100 text-left" data-toggle="collapse"
+                            data-target="#{{field}}" aria-expanded="true" aria-controls="{{field}}">
+                            {% normalize_facet field 'simple' %}
+                            <i class="chevron-down" data-feather="chevron-down"></i>
+                          </button>
+                        </h5>
+                      </div>
+                      <div id="{{field}}" class="collapse show" aria-labelledby="heading{{field}}">
+                        <div class="card-body p-2 pl-3 pr-3 show-limited-number">
+                          <ul class="pl-0 mb-0">
+                            {% for fv in filtered_vals %}
+                              {% if fv.1 > 0 %}
+                                <li class="facet-group-item mt-2 mb-2 pl-0">
+                                  {% check_facet_selection field fv.0 form.selected_facets as facet_selected %}
+                                  {% if facet_selected %}
+                                    <span class="disabled">{{ fv.0 }} ({{ fv.1 }})</span>
+                                  {% else %}
+                                    {% if query or request.GET|length > 0 %}
+                                  <a href="{{ request.get_full_path }}&amp;selected_facets={{field}}_exact:{{ fv.0|urlencode }}"
+                                      class="facet-group-link">{{ fv.0 }} ({{ fv.1 }})</a>
+                                    {% else %}
+                                    <a href="{{ request.get_full_path }}?selected_facets={{field}}_exact:{{ fv.0|urlencode }}"
+                                      class="facet-group-link">{{ fv.0 }} ({{ fv.1 }})</a>
+                                    {% endif %}
+                                  {% endif %}
+                                </li>
+                              {% endif %}
+                            {% endfor %}
+                          </ul>
+                          {% if filtered_vals.5.1 > 0 %}
+                          <button type="button" class="pl-0 btn btn-link btn-sm load-more-less" class="oebl-font-red more-facetitems-link">mehr...</a>
+                            {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  {%endif%}
+                {%endfor%}
+              </form>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="col-md-9 mt-3" id="results">
+      <div>
+        {% if form.data.selected_facets|length > 0 %}
+          <ul class="facet-group pl-0 mb-0" >
+            {% for fac in form.selected_facets %}
+              <li class="facet-group-item facet-badges pl-0">
+                <a href="{% normalize_facet fac 'filter' request.get_full_path %}" type="button"
+                  class="badge badge-custom badge-pill p-1 oebl-inverted">
+                  {% normalize_facet fac 'name' %}<i class="remove-badge ml-1" data-feather="x"></i>
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        <!-- <a href="{% remove_facets request.get_full_path %}" type="button"
+          class="btn btn-link btn-sm btn-right">Filter zurücksetzen<span
+            class="icon-remove"></span></a>-->
+        {% endif %}
+      </div>
+      <div>
+        {% render_table table %}
+        <!-- End faceting -->
+
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+
+  const qs = new URLSearchParams(window.location.search)
+  const el = document.querySelector('.range-slider')
+
+  const [startKey, endKey] = ['start_date_form', 'end_date_form']
+  const [min, max] = [1700, 1990]
+
+  if (window.location.search.length > 0) {
+    const table_h = document.querySelector('div.table-container > div:first-of-type')
+    const html_raw = `<div class="dropdown show" style="float: left">
+  <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownNetworksLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    als Netzwerk
+  </a>
+
+  <div class="dropdown-menu" aria-labelledby="dropdownNetworksLink">
+    <a class="dropdown-item" href="/network/${window.location.search}&network_type=kommissionen">Kommissionen</a>
+    <a class="dropdown-item" href="/network/${window.location.search}&network_type=universitaeten">Universitäten</a>
+    <a class="dropdown-item" href="/network/${window.location.search}&network_type=andere_akademien">andere Akademien</a>
+    <a class="dropdown-item" href="/network/${window.location.search}&network_type=ausbildung">Ausbildung</a>
+    <a class="dropdown-item" href="/network/${window.location.search}&network_type=karierre">Karierre</a>
+  </div>
+</div>`
+    
+    let bt = document.createElement('A')
+    let ft = document.createElement('I')
+    ft.style = 'margin-right: 5px;'
+    ft.dataset.feather = 'external-link'
+    bt.appendChild(ft)
+    let tn = document.createTextNode('als Netzwerk')
+    bt.appendChild(tn)
+    bt.href = '/network/' + window.location.search
+    //bt.innerHTML = 'als Netzwerk'
+    bt.style = "margin-top: auto; margin-right: auto;"
+    //table_h.prepend(bt)
+    table_h.insertAdjacentHTML("beforebegin", html_raw);
+  }
+
+  const s = noUiSlider.create(el, {
+    start: [
+      qs.get(startKey) || min,
+      qs.get(endKey) || max
+    ],
+    connect: true,
+    format: {
+      to: (num) => num.toFixed(0),
+      from: (string) => parseInt(string)
+    },
+    tooltips: true,
+    range: { min, max },
+    pips: {
+      mode: 'values',
+      values: [1700, 1750, 1800, 1850, 1900, 1950, 1990],
+      density: 4
+    }
+  })
+  s.on('change', ([start, end]) => {
+    qs.set(startKey, start)
+    qs.set(endKey, end)
+    window.location.search = qs.toString()
+  })
+
+  document.getElementById("academy_member").addEventListener(
+    "click", e => {console.log(e);
+        console.log("event listener")
+        const qs = new URLSearchParams(window.location.search)
+        if (e.target.checked) {
+          qs.set("academy_member", true)
+        } else {
+          qs.set("academy_member", false)
+        }
+        window.location.search = qs.toString()
+    }
+  )
+
+  $(".load-more-less").on("click",this,function() {
+    $(this).parent().toggleClass("show-limited-number");
+    if ($(this).parent().hasClass("show-limited-number")) {
+        $(this).text("mehr...");
+    } else {
+        $(this).text("weniger...");
+    }
+  });
+window.onload = function() {
+  const qs = new URLSearchParams(window.location.search)
+  let wm = qs.get("academy_member")
+  console.log(wm)
+  if (!wm) {
+    document.getElementById("academy_member").checked = false
+  } else if (wm == "false") {
+    document.getElementById("academy_member").checked = false;
+    console.log("ran through check");
+    console.log(wm);
+  } else {
+    document.getElementById("academy_member").checked = true;
+  }
+}
+</script>
+
+{% endblock %}
