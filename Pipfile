@@ -47,6 +47,7 @@ sparqlwrapper = "==1.*,>=1.8.5"
 tablib = "==3.*,>=3.0.0"
 unicodecsv = "==0.*,>=0.14.1"
 whitenoise = "==5.*,>=5.2.0"
+mysqlclient = "==2.*,>=2.0.3"
 
 [dev-packages]
 dephell = {version = "==0.*,>=0.8.3", extras = ["full"]}
