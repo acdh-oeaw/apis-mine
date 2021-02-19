@@ -26,11 +26,21 @@ ALLOWED_HOSTS = re.sub(
     os.environ.get(
         "GITLAB_ENVIRONMENT_URL", os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1")
     ),
+    os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1"),
 ).split(",")
 # You need to allow '10.0.0.0/8' for service health checks.
 ALLOWED_CIDR_NETS = ["10.0.0.0/8", "127.0.0.0/8"]
 
-# INSTALLED_APPS += []
+HAYSTACK_CONNECTIONS = {
+    "default": {
+        "ENGINE": "haystack.backends.solr_backend.SolrEngine",
+        "URL": "http://paas_solr:8983/solr/paas_solr",
+        "ADMIN_URL": "http://paas_solr:8983/solr/admin/cores",
+    }
+}
+INSTALLED_APPS += [
+    "haystack",
+]
 
 SECRET_KEY = (
     os.environ.get("APIS_SECRET_KEY", "TO_CHANGE")
