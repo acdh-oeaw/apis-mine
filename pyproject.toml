@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "oebl-irs-devops"
+name = "paas-devops"
 version = "0.1.0"
-description = "OEBL irs project for auto devops"
+description = "PAAS APIS project for auto devops"
 authors = ["Matthias Schlögl <m.schloegl@gmail.com>"]
 license = "MIT"
 

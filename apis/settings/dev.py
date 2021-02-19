@@ -9,15 +9,15 @@ SECRET_KEY = os.environ.get("APIS_SECRET_KEY", "TO_CHANGE")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-REDMINE_ID = "14590"
+# REDMINE_ID = "14590"
 APIS_LIST_VIEWS_ALLOWED = True
 APIS_DETAIL_VIEWS_ALLOWED = True
 FEATURED_COLLECTION_NAME = "FEATURED"
-MAIN_TEXT_NAME = "ÖBL Haupttext"
+# MAIN_TEXT_NAME = "ÖBL Haupttext"
 BIRTH_REL_NAME = "place of birth"
 DEATH_REL_NAME = "place of death"
-APIS_BASE_URI = "https://apis.acdh.oeaw.ac.at/"
-APIS_OEBL_BIO_COLLECTION = "ÖBL Biographie"
+APIS_BASE_URI = "https://paas.acdh.oeaw.ac.at/"
+# APIS_OEBL_BIO_COLLECTION = "ÖBL Biographie"
 
 
 ALLOWED_HOSTS = re.sub(
@@ -30,7 +30,7 @@ ALLOWED_HOSTS = re.sub(
 # You need to allow '10.0.0.0/8' for service health checks.
 ALLOWED_CIDR_NETS = ["10.0.0.0/8", "127.0.0.0/8"]
 
-INSTALLED_APPS += ["oebl_irs_workflow"]
+# INSTALLED_APPS += []
 
 SECRET_KEY = (
     os.environ.get("APIS_SECRET_KEY", "TO_CHANGE")

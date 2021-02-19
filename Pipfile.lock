@@ -497,9 +497,9 @@
         },
         "pymeeus": {
             "hashes": [
-                "sha256:116937baaa45897929ad3f1bd3f6dd4cb407c22bf06b194b700bcc7d3159f1d7"
+                "sha256:8890170d4c8f24401c82deda7253de544819ed29c5160d7dfe16284d1ba07f6a"
             ],
-            "version": "==0.3.9"
+            "version": "==0.3.11"
         },
         "pymongo": {
             "hashes": [

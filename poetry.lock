@@ -1294,7 +1294,7 @@ toml = ">=0.7.1"
 
 [[package]]
 name = "pymeeus"
-version = "0.3.9"
+version = "0.3.11"
 description = "Python implementation of Jean Meeus astronomical routines"
 category = "main"
 optional = false
@@ -2342,7 +2342,7 @@ pylint = [
     {file = "pylint-2.6.2.tar.gz", hash = "sha256:718b74786ea7ed07aa0c58bf572154d4679f960d26e9641cc1de204a30b87fc9"},
 ]
 pymeeus = [
-    {file = "PyMeeus-0.3.9.tar.gz", hash = "sha256:116937baaa45897929ad3f1bd3f6dd4cb407c22bf06b194b700bcc7d3159f1d7"},
+    {file = "PyMeeus-0.3.11.tar.gz", hash = "sha256:8890170d4c8f24401c82deda7253de544819ed29c5160d7dfe16284d1ba07f6a"},
 ]
 pymongo = [
     {file = "pymongo-3.11.3-cp27-cp27m-macosx_10_14_intel.whl", hash = "sha256:4d959e929cec805c2bf391418b1121590b4e7d5cb00af7b1ba521443d45a0918"},
