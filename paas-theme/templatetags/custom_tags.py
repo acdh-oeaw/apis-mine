@@ -90,7 +90,6 @@ def normalize_key(value):
 
 @register.simple_tag
 def election(institutions):
-    print(institutions[0].relation_type.id)
     return [x for x in institutions if x.relation_type.id in (42,43,46,35,36,33)]
 
 @register.simple_tag
