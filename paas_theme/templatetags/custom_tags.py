@@ -3,7 +3,7 @@ from django import template
 import urllib.parse
 
 from apis_core.apis_entities.models import Institution, Place
-from theme.utils import oebl_persons
+from .utils import oebl_persons
 
 register = template.Library()
 
