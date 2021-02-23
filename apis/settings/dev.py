@@ -24,7 +24,7 @@ ALLOWED_HOSTS = re.sub(
     r"https?://",
     "",
     os.environ.get(
-        "GITLAB_ENVIRONMENT_URL", os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1")
+        "GITLAB_ENVIRONMENT_URL", os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1,paas.acdh-dev.oeaw.ac.at")
     )
     + os.environ.get("ALLOWED_HOSTS", ""),
 ).split(",")
