@@ -10,8 +10,8 @@ SECRET_KEY = os.environ.get("APIS_SECRET_KEY", "TO_CHANGE")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 # REDMINE_ID = "14590"
-APIS_LIST_VIEWS_ALLOWED = True
-APIS_DETAIL_VIEWS_ALLOWED = True
+APIS_LIST_VIEWS_ALLOWED = False
+APIS_DETAIL_VIEWS_ALLOWED = False
 FEATURED_COLLECTION_NAME = "FEATURED"
 # MAIN_TEXT_NAME = "ÖBL Haupttext"
 BIRTH_REL_NAME = "place of birth"
@@ -37,6 +37,7 @@ HAYSTACK_CONNECTIONS = {
 }
 INSTALLED_APPS += [
     "haystack",
+    "paas_theme"
 ]
 
 SECRET_KEY = (
