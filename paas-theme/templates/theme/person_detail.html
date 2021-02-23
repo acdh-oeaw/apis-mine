@@ -9,7 +9,7 @@
   {% leaflet_js %}
   {% leaflet_css %}
 {% endblock %}
-{% load staticfiles %}
+{% load static %}
 {% load webpage_extras %}
 {% load custom_tags %}
 {% block title %}{{ object }}{% endblock %}
@@ -35,23 +35,130 @@
         </div>
       </div>
     </div>
-    <div class="col-md-8 pr-5">
+    <div class="col-md-12 pr-5">
       <article class="bio">
         <div class="entry-header">
           <div class="row">
             <div class="col">
               <h2>{{ object.name }}{%if object.first_name %}, {{ object.first_name }}{% endif %}</h2>
-              {% if kurzinfo %}<div class="mt-5 text-secondary">{{ kurzinfo }}</div>{% else %}
-              <p class="profession-date-of-birth">
-                {{ profession }}, <abbr
-                title='geboren'>geb.</abbr> {% if place_of_birth is not None %} {{place_of_birth}}, {% endif %}{{object.start_date_written }}; <abbr
-                title='gestorben'>gest.</abbr> {% if place_of_death is not None %} {{place_of_death}}, {% endif %}{{object.end_date_written }}
-                {% endif %}
-              </p>
             </div>
           </div>
         </div>
-        <div id="main-bio-text" class="card-body p-0 pt-3">
+        <div id="main" class="card-body">
+          <div class="row">
+            <div class="col-md-4">
+              {% if kurzinfo %}<div class="mt-5 text-secondary">{{ kurzinfo }}</div>{% else %}
+              <p class="profession-date-of-birth">
+                {% if profession is not None %}{{ profession }} <br/>{% endif %}
+                <span  class="font-weight-normal"><abbr title='geboren'>*</abbr> {% if place_of_birth is not None %}{{place_of_birth}}, {% endif %}{{object.start_date_written }}</span><br/> 
+                {% if object.end_date is not None %}<span  class="font-weight-normal"><abbr title='gestorben'>&dagger;</abbr> {% if place_of_death is not None %} {{place_of_death}}, {% endif %}{{object.end_date_written }}{% endif %}</span>
+                {% endif %}
+              </p>
+              <p>
+                <b>Wahl</b>
+                {% if related_institutions %}
+            <ul class="relentities">
+              {% election related_institutions as election_institutions %}
+              {%if election_institutions %}
+              {% for x in election_institutions %}
+              <li class="pl-0 font-weight-normal">
+                {{ x.relation_type }}: {% abbreviate x.related_institution %}
+                {% formated_daterange x.start_date_written x.end_date_written %}
+              </li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            {% endif %}
+              </p>
+              <p>
+                <b>Normdaten</b>
+                <ul class="uris pl-0">{% for uri in object.uri_set.all %}
+                  <li class="pl-0"><a target="_blank" rel="noopener noreferrer" href="{{uri}}">{{uri}}</a></li>
+                  {% endfor %}
+                </ul>
+              </p>
+              </div>
+              <div class="col-md-8">
+                <h3 class="mb-4">Der Weg zur Akademiemitgliedschaft</h3>
+                {% for key in relation_dict %}
+                    <div class="card mt-2 rounded-0">
+                      <div class="card-header p-0" id="heading{{key}}">
+                        <h5 class="mb-0">
+                          <button type="button" class="btn btn-link collapsebtn w-100 text-left text-uppercase" data-toggle="collapse"
+                            data-target="#{{key}}" aria-expanded="true" aria-controls="{{key}}">
+                            {% normalize_key key %}
+                            <i class="chevron-down" data-feather="chevron-down"></i>
+                          </button>
+                        </h5>
+                      </div>
+                      <div id="{{key}}" class="collapse show" aria-labelledby="heading{{key}}">
+                        <div class="card-body p-2 pl-3 pr-3 show-limited-number">
+                          <ul class="pl-0 mb-0">
+                           <!-- {% for fv in filtered_vals %}
+                              {% if fv.1 > 0 %}
+                                <li class="facet-group-item mt-2 mb-2 pl-0">
+                                  {% check_facet_selection field fv.0 form.selected_facets as facet_selected %}
+                                  {% if facet_selected %}
+                                    <span class="disabled">{{ fv.0 }} ({{ fv.1 }})</span>
+                                  {% else %}
+                                    {% if query or request.GET|length > 0 %}
+                                  <a href="{{ request.get_full_path }}&amp;selected_facets={{field}}_exact:{{ fv.0|urlencode }}"
+                                      class="facet-group-link">{{ fv.0 }} ({{ fv.1 }})</a>
+                                    {% else %}
+                                    <a href="{{ request.get_full_path }}?selected_facets={{field}}_exact:{{ fv.0|urlencode }}"
+                                      class="facet-group-link">{{ fv.0 }} ({{ fv.1 }})</a>
+                                    {% endif %}
+                                  {% endif %}
+                                </li>
+                              {% endif %}
+                            {% endfor %}-->
+                          </ul>
+                         <!-- {% if filtered_vals.5.1 > 0 %}
+                          <button type="button" class="pl-0 btn btn-link btn-sm load-more-less" class="oebl-font-red more-facetitems-link">mehr...</a>
+                            {% endif %}-->
+                        </div>
+                      </div>
+                    </div>
+                {% endfor %}
+            {% if related_persons %}
+            <h4>Personen</h4>
+            <ul class="relentities">
+              {% for x in related_persons %}
+              <li class="pl-0">
+
+                {{ x.relation_type }} <i style="color: darkred">></i> <strong>{{ x.related_place }}</strong>
+                {% formated_daterange x.start_date_written x.end_date_written %}
+              </li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            <!--{% include "theme/spacetime_graph.html" %}-->
+            {% if related_places %}
+            <h4>Orte</h4>
+            <ul class="relentities">
+              {% for x in related_places %}
+              <li class="pl-0">
+                {{ x.relation_type }} <i style="color: darkred">></i> <strong>{{ x.related_place }}</strong>
+                 {% formated_daterange x.start_date_written x.end_date_written %}
+              </li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            {% if related_institutions %}
+            <h4>Institutionen</h4>
+            <ul class="relentities">
+              {% for x in related_institutions %}
+              <li class="pl-0">
+                {{ x.relation_type }} <i style="color: darkred">></i> <strong>{{x.related_institution }}</strong>
+                {% formated_daterange x.start_date_written x.end_date_written %}
+              </li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+              </div>
+            </div>
+        </div>
+        <!--<div id="main-bio-text" class="card-body p-0 pt-3">
           <p class="p-0">{{ cv_de }}</p>
           <hr/>
           <p class="p-0">{{ cv_en }}</p>
@@ -62,10 +169,10 @@
           {% if object.references %}<i>Literatur:</i> {{ object.references }}<br>{% endif %}
           {% if object.source.author %}<i>Autor:</i> {{ object.source.author }}<br>{% endif %}
           {% if object.source.pubinfo %}<i>Referenz:</i> {{ object.source.pubinfo }}<br>{% endif %}
-        </div>
+        </div>-->
       </article>
     </div>
-    <div id="right-pane" class="col-md-4">
+    <!--<div id="right-pane" class="col-md-4">
       <article>
         <div class="inline-map card-inner relentitiescard card-vertical d-flex flex-column justify-content-between">
         <a style="position: absolute; right: 10px; top: 10px; z-index: 1000; cursor: pointer" class="leaflet-control-zoom-in" role="button" onClick="move_map()">
@@ -124,7 +231,7 @@
           </div>
         </div>
       </article>
-    </div>
+    </div>-->
   </div>
 </div>
 

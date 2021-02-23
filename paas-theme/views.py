@@ -21,7 +21,8 @@ from haystack.forms import FacetedSearchForm
 from haystack.query import SearchQuerySet
 from haystack.query import RelatedSearchQuerySet
 from haystack.models import SearchResult
-from django.shortcuts import render_to_response
+#from django.shortcuts import render_to_response
+from django.shortcuts import render
 
 from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
@@ -111,6 +112,7 @@ class SearchView(SingleTableMixin, PersonSearchView):
 class PersonDetailView(DetailView):
     model = Person
     template_name = "theme/person_detail.html"
+    
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -126,9 +128,25 @@ class PersonDetailView(DetailView):
         except AttributeError:
             context["next"] = None
         enriched_context = enrich_person_context(self.object, context)
-
+        
+        enriched_context["relation_dict"] = {
+        "herkunft": [{}],
+        "schulbildung": [{}], 
+        "studium": [{}],
+        "berufslaufbahn":[{}],
+        "wahl_mitgliederstatus":[{}],
+        "funktionen":[{}],
+        "wahlvorschläge":[{}],
+        "mitgliedschaften_in_anderen_akademien":[{}],
+        "akademiepreise":[{}],
+        "akademieaustausch":[{}],
+        "nachrufe":[{}],
+        } 
+        
         return enriched_context
 
 
 def network_viz(request):
     return render_to_response('theme/network.html')
+
+
