@@ -149,14 +149,20 @@ def get_born_range():
     oebl_persons_sorted_by_start_date = oebl_persons_with_date.order_by("start_date")
     oldest_person = oebl_persons_sorted_by_start_date.first()
     youngest_person = oebl_persons_sorted_by_start_date.last()
-    return [oldest_person.start_date, youngest_person.start_date]
+    return [
+        oldest_person.start_date if oldest_person else date(1700, 1, 1),
+        youngest_person.start_date if youngest_person else date(2000, 1, 1),
+    ]
 
 
 def get_died_range():
     oebl_persons_sorted_by_end_date = oebl_persons_with_date.order_by("end_date")
     person_died_first = oebl_persons_sorted_by_end_date.first()
     person_died_last = oebl_persons_sorted_by_end_date.last()
-    return [person_died_first.end_date, person_died_last.end_date]
+    return [
+        person_died_first.end_date if person_died_first else date(1700, 1, 1),
+        person_died_last.end_date if person_died_last else date(2000, 1, 1),
+    ]
 
 
 def get_died_latest():
