@@ -3,6 +3,8 @@ import random
 import requests
 from django.views.generic import TemplateView
 from django.views.generic.detail import DetailView
+from django.contrib.auth.mixins import UserPassesTestMixin
+
 
 from apis_core.apis_entities.models import Person
 from apis_core.apis_relations.models import PersonPlace
@@ -13,6 +15,7 @@ from apis_core.apis_vocabularies.models import (
     PersonPlaceRelation,
     PersonWorkRelation,
 )
+from apis_core.apis_entities.views import set_session_variables
 from browsing.browsing_utils import GenericListView
 from webpage.views import get_imprint_url
 from .filters import PersonListFilter
@@ -24,6 +27,9 @@ from .utils import (
     get_featured_person,
     enrich_person_context,
 )
+
+from apis_core.helper_functions.utils import access_for_all
+
 from haystack.generic_views import FacetedSearchView
 from haystack.forms import FacetedSearchForm
 from haystack.query import SearchQuerySet
@@ -132,9 +138,16 @@ class SearchView(SingleTableMixin, PersonSearchView):
         return self.queryset
 
 
-class PersonDetailView(DetailView):
+class PersonDetailView(UserPassesTestMixin, DetailView):
     model = Person
     template_name = "theme/person_detail.html"
+    login_url = "/webpage/accounts/login/"
+
+    def test_func(self):
+        access = access_for_all(self, viewtype="detail")
+        if access:
+            self.request = set_session_variables(self.request)
+        return access
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
