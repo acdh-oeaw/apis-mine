@@ -37,7 +37,8 @@ HAYSTACK_CONNECTIONS = {
 }
 INSTALLED_APPS += [
     "haystack",
-    "paas_theme"
+    "paas_theme",
+    "leaflet"
 ]
 
 SECRET_KEY = (
