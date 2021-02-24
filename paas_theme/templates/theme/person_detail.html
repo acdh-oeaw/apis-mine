@@ -97,35 +97,13 @@
                     {% for ent in value %}
                     <li style=list-style-type:none;">{{ent|safe}}</li>
                     {% endfor %}
-                      <!-- {% for fv in filtered_vals %}
-                              {% if fv.1 > 0 %}
-                                <li class="facet-group-item mt-2 mb-2 pl-0">
-                                  {% check_facet_selection field fv.0 form.selected_facets as facet_selected %}
-                                  {% if facet_selected %}
-                                    <span class="disabled">{{ fv.0 }} ({{ fv.1 }})</span>
-                                  {% else %}
-                                    {% if query or request.GET|length > 0 %}
-                                  <a href="{{ request.get_full_path }}&amp;selected_facets={{field}}_exact:{{ fv.0|urlencode }}"
-                                      class="facet-group-link">{{ fv.0 }} ({{ fv.1 }})</a>
-                                    {% else %}
-                                    <a href="{{ request.get_full_path }}?selected_facets={{field}}_exact:{{ fv.0|urlencode }}"
-                                      class="facet-group-link">{{ fv.0 }} ({{ fv.1 }})</a>
-                                    {% endif %}
-                                  {% endif %}
-                                </li>
-                              {% endif %}
-                            {% endfor %}-->
                     </ul>
-                    <!-- {% if filtered_vals.5.1 > 0 %}
-                          <button type="button" class="pl-0 btn btn-link btn-sm load-more-less" class="oebl-font-red more-facetitems-link">mehr...</a>
-                            {% endif %}-->
                   </div>
                 </div>
               </div>
               {% endif %}
               {% endfor %}
-            </div>
-            <div class="col-md-8">
+              <hr/>
               <h3 class="mb-4">Akteur/in in der Akademie</h3>
               {% for key, value in rel_dict_in_akademie.items %}
               {% if value|length > 0 %}
