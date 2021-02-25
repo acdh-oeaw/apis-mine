@@ -53,6 +53,9 @@
                     title='gestorben'>&dagger;</abbr> {% if place_of_death is not None %} {{place_of_death}}, {% endif %}{{object.end_date_written }}{% endif %}</span>
                 {% endif %}
               </p>
+              <div class="mb-5 imgcontainer">
+                <img style="max-height:300px" src="{% static image %}">
+              </div>
               <p>
                 <b>Wahl</b>
                 {% if related_institutions %}
