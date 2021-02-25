@@ -57,6 +57,7 @@ MAIN_TEXT_NAME = "ÖBL Haupttext"
 
 LANGUAGE_CODE = "de"
 
+STATICFILES_DIRS = [BASE_DIR + "/member_images"]
 
 # APIS_COMPONENTS = ['deep learning']
 
