@@ -14,11 +14,16 @@ APIS_LIST_VIEWS_ALLOWED = False
 APIS_DETAIL_VIEWS_ALLOWED = False
 FEATURED_COLLECTION_NAME = "FEATURED"
 # MAIN_TEXT_NAME = "ÖBL Haupttext"
-BIRTH_REL_NAME = "place of birth"
-DEATH_REL_NAME = "place of death"
+BIRTH_REL_NAME = [64, 152, 3090]
+DEATH_REL_NAME = [153, 3054, 3091]
 APIS_BASE_URI = "https://paas.acdh.oeaw.ac.at/"
 # APIS_OEBL_BIO_COLLECTION = "ÖBL Biographie"
 
+APIS_SKOSMOS = {
+    "url": os.environ.get("APIS_SKOSMOS", "https://vocabs.acdh-dev.oeaw.ac.at"),
+    "vocabs-name": os.environ.get("APIS_SKOSMOS_THESAURUS", "apisthesaurus"),
+    "description": "Thesaurus of the APIS project. Used to type entities and relations.",
+}
 
 ALLOWED_HOSTS = re.sub(
     r"https?://",

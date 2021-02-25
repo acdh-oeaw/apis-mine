@@ -31,14 +31,15 @@ services:
     # (Adding the "ports" property to this file will not forward from a Codespace.)
 
   db:
-    image: postgres:latest
+    image: mariadb:latest
     restart: unless-stopped
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - mariadb-data:/var/lib/mysql
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
-      POSTGRES_PASSWORD: postgres
+      MYSQL_ROOT_PASSWORD: mariadb
+      MYSQL_DATABASE: paasdb
+      MYSQL_USER: mariadb
+      MYSQL_PASSWORD: mariadb
 
     # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
@@ -49,4 +50,4 @@ services:
     network_mode: service:db
 
 volumes:
-  postgres-data:
+  mariadb-data:

@@ -47,36 +47,47 @@
             <div class="col-md-4">
               {% if kurzinfo %}<div class="mt-5 text-secondary">{{ kurzinfo }}</div>{% else %}
               <p class="profession-date-of-birth">
-                {% if profession %}{{ profession }} <br />{% endif %}
+                {% if profession %}<span style="text-align: left">{{ profession }}</span> <br />{% endif %}
                 <span class="font-weight-normal"><abbr title="geboren">*</abbr> {% if place_of_birth is not None %}{{place_of_birth}}, {% endif %}{{object.start_date_written }}</span><br />
                 {% if object.end_date_written is not None %}<span class="font-weight-normal"><abbr
                     title='gestorben'>&dagger;</abbr> {% if place_of_death is not None %} {{place_of_death}}, {% endif %}{{object.end_date_written }}{% endif %}</span>
                 {% endif %}
               </p>
+              {% if image %}
               <div class="mb-5 imgcontainer">
                 <img style="max-height:300px" src="{% static image %}">
               </div>
+              {% endif %}
               <p>
-                <b>Wahl</b>
-                {% if related_institutions %}
+                <b>Mitgliedschaft</b>
+                {% if mitgliedschaften %}
               <ul class="relentities">
-                {% election related_institutions as election_institutions %}
-                {% if election_institutions %}
-                {% for x in election_institutions %}
+                {% for x in mitgliedschaften %}
                 <li class="pl-0 font-weight-normal">
-                  {{ x.relation_type }}: {% abbreviate x.related_institution %}
-                  {% formated_daterange x.start_date_written x.end_date_written %}
+                  {{x|safe}}
                 </li>
                 {% endfor %}
               </ul>
               {% endif %}
-              {% endif %}
               </p>
+              {% if normdaten %}
               <p>
                 <b>Normdaten</b>
-              <ul class="uris pl-0">{% for uri in object.uri_set.all %}
+              <ul class="uris pl-0">{% for uri in normdaten %}
                 <li class="pl-0"><a target="_blank" rel="noopener noreferrer" href="{{uri}}">{{uri}}</a></li>
                 {% endfor %}
+              </ul>
+              </p>
+              {% endif %}
+              <p>
+                <b>Downloads</b>
+              <ul class="uris pl-0">
+                <li class="pl-0"><a target="_blank" rel="noopener noreferrer"
+                    href="/apis/api/entities/person/{{object.pk}}/?format=json">Json</a></li>
+                <li class="pl-0"><a target="_blank" rel="noopener noreferrer"
+                    href="/apis/api2/entity/{{object.pk}}/?format=rdf%2Bturtle">RDF/Turtle</a></li>
+                <li class="pl-0"><a target="_blank" rel="noopener noreferrer"
+                    href="/apis/api2/entity/{{object.pk}}/?format=tei">TEI</a></li>
               </ul>
               </p>
             </div>
@@ -97,16 +108,16 @@
                 <div id="{{key}}" class="collapse" aria-labelledby="heading{{key}}">
                   <div class="card-body p-2 pl-3 pr-3 show-limited-number">
                     <ul class="pl-0 mb-0">
-                    {% for ent in value %}
-                    <li style=list-style-type:none;">{{ent|safe}}</li>
-                    {% endfor %}
+                      {% for ent in value %}
+                      <li style=list-style-type:none;">{{ent|safe}}</li>
+                      {% endfor %}
                     </ul>
                   </div>
                 </div>
               </div>
               {% endif %}
               {% endfor %}
-              <hr/>
+              <hr />
               <h3 class="mb-4">Akteur/in in der Akademie</h3>
               {% for key, value in rel_dict_in_akademie.items %}
               {% if value|length > 0 %}
@@ -115,7 +126,7 @@
                   <h5 class="mb-0">
                     <button type="button" class="btn btn-link collapsebtn w-100 text-left text-uppercase collapsed"
                       data-toggle="collapse" data-target="#{{key}}" aria-expanded="true" aria-controls="{{key}}">
-                      {% normalize_key key %} ({{value|length}}) 
+                      {% normalize_key key %} ({{value|length}})
                       <i class="chevron-down" data-feather="chevron-down"></i>
                     </button>
                   </h5>
@@ -123,14 +134,14 @@
                 <div id="{{key}}" class="collapse" aria-labelledby="heading{{key}}">
                   <div class="card-body p-2 pl-3 pr-3 show-limited-number">
                     <ul class="pl-0 mb-0">
-                    {% for ent in value %}
-                    <li style=list-style-type:none;">{{ent|safe}}</li>
-                    {% endfor %}
+                      {% for ent in value %}
+                      <li style=list-style-type:none;">{{ent|safe}}</li>
+                      {% endfor %}
                     </ul>
                   </div>
                 </div>
               </div>
-                {% endif %}
+              {% endif %}
               {% endfor %}
             </div>
           </div>

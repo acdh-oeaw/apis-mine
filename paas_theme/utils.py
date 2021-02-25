@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 import glob
+import re
 
 from django.conf import settings
 from django.db.models import Q
@@ -60,15 +61,25 @@ def get_main_text(MAIN_TEXT):
         return None
 
 
+def abbreviate(value):
+    print(value.name)
+    if value.name == "MATHEMATISCH-NATURWISSENSCHAFTLICHE KLASSE":
+        return "mn. K."
+    elif value.name == "PHILOSOPHISCH-HISTORISCHE KLASSE":
+        return "ph. K."
+    else:
+        return value
+
+
 def enrich_person_context(person_object, context):
     if BIRTH_REL_NAME is not None:
         try:
+            if isinstance(BIRTH_REL_NAME, list):
+                qdict = {"relation_type_id__in": BIRTH_REL_NAME}
+            elif isinstance(BIRTH_REL_NAME, str):
+                qdict = {"relation_type__name": BIRTH_REL_NAME}
             context["place_of_birth"] = (
-                person_object.personplace_set.filter(
-                    relation_type__name__icontains=BIRTH_REL_NAME
-                )
-                .first()
-                .related_place
+                person_object.personplace_set.filter(**qdict).first().related_place
             )
         except AttributeError:
             context["place_of_birth"] = None
@@ -76,19 +87,22 @@ def enrich_person_context(person_object, context):
         context["place_of_birth"] = "Please define place of birth variable"
     if DEATH_REL_NAME is not None:
         try:
+            if isinstance(DEATH_REL_NAME, list):
+                qdict = {"relation_type_id__in": DEATH_REL_NAME}
+            elif isinstance(DEATH_REL_NAME, str):
+                qdict = {"relation_type__name": DEATH_REL_NAME}
             context["place_of_death"] = (
-                person_object.personplace_set.filter(
-                    relation_type__name__icontains=DEATH_REL_NAME
-                )
-                .first()
-                .related_place
+                person_object.personplace_set.filter(**qdict).first().related_place
             )
         except AttributeError:
             context["place_of_death"] = None
     else:
         context["place_of_death"] = "Please define place of death variable"
     try:
-        context["profession"] = person_object.profession.all().last().name
+        context["profession"] = ", ".join(
+            person_object.profession.all().values_list("name", flat=True)
+        )
+
     except AttributeError:
         context["profession"] = None
     try:
@@ -104,6 +118,11 @@ def enrich_person_context(person_object, context):
         ] = person_object.personinstitution_set.all().filter_for_user()
     except AttributeError:
         context["related_institutions"] = None
+    context["normdaten"] = []
+    normdaten = person_object.uri_set.filter(uri__contains="d-nb.info")
+    if normdaten.count() > 0:
+        for uri in normdaten:
+            context["normdaten"].append(uri.uri)
     cv_de = person_object.text.filter(
         kind__name=getattr(settings, "PAAS_CV_DE", "Curriculum Vitae (de)")
     )
@@ -125,6 +144,35 @@ def enrich_person_context(person_object, context):
         context["image"] = lst_images[0].split("/")[-1]
     else:
         context["image"] = False
+    context["mitgliedschaften"] = []
+    rel_test = []
+    for rel in person_object.personinstitution_set.filter(
+        related_institution_id__in=[2, 3, 500],
+        relation_type_id__in=[
+            33,
+            34,
+            35,
+            36,
+            45,
+            46,
+            47,
+            48,
+            50,
+            52,
+            53,
+            54,
+            56,
+            57,
+            58,
+            59,
+        ],
+    ).order_by("start_date"):
+        r_lbl = re.search("\((.+)\)", rel.relation_type.label.split(" >> ")[1]).group(1)
+        if r_lbl not in rel_test:
+            context["mitgliedschaften"].append(
+                f"<span title='{rel.relation_type.label.split(' >> ')[1]}' style='text-decoration: underline'>{r_lbl}</span> in <span title='{rel.related_institution}' style='text-decoration: underline'>{abbreviate(rel.related_institution)}</span> ({rel.start_date_written}{'-'+rel.end_date_written if rel.end_date_written else ''})"
+            )
+            rel_test.append(r_lbl)
     context["rel_dict_weg_zur_akademie"] = {
         "herkunft": [
             f'{rel.relation_type.label} <a href="place/{rel.related_place_id}">{rel.related_place}</a> ({rel.start_date_written})'
