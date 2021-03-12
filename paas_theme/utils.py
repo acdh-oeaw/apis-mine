@@ -40,18 +40,25 @@ except AttributeError:
     MAIN_TEXT = None
 
 
-def get_child_classes(objids, obclass):
+def get_child_classes(objids, obclass, labels=False):
     """used to retrieve a list of primary keys of sub classes"""
+    if labels:
+        labels_lst = []
     for obj in objids:
         obj = obclass.objects.get(pk=obj)
         p_class = list(obj.vocabsbaseclass_set.all())
         p = p_class.pop() if len(p_class) > 0 else False
         while p:
             if p.pk not in objids:
+                if labels:
+                    labels_lst.append((p.pk, p.label))
                 objids.append(p.pk)
             p_class += list(p.vocabsbaseclass_set.all())
             p = p_class.pop() if len(p_class) > 0 else False
-    return objids
+    if labels:
+        return (objids, labels_lst)
+    else:
+        return objids
 
 
 def get_main_text(MAIN_TEXT):
@@ -69,6 +76,15 @@ def abbreviate(value):
         return "ph. K."
     else:
         return value
+
+
+promotion_inst_ids, promotion_inst_labels = get_child_classes(
+    [1386], PersonInstitutionRelation, labels=True
+)
+daten_mappings = {1369: "Studium", 1371: "Studienaufenthalt", 1386: "Promotion"}
+
+for i in promotion_inst_labels:
+    daten_mappings[i[0]] = i[1].replace(">>", "in")
 
 
 def enrich_person_context(person_object, context):
@@ -119,10 +135,35 @@ def enrich_person_context(person_object, context):
     except AttributeError:
         context["related_institutions"] = None
     context["normdaten"] = []
-    normdaten = person_object.uri_set.filter(uri__contains="d-nb.info")
-    if normdaten.count() > 0:
-        for uri in normdaten:
-            context["normdaten"].append(uri.uri)
+    normdaten_oebl = person_object.uri_set.filter(uri__contains="apis.acdh.oeaw")
+    if normdaten_oebl.count() == 1:
+        context["normdaten"].append(
+            {
+                "kind": "ÖBL",
+                "uri": normdaten_oebl[0].uri,
+                "identifier": normdaten_oebl[0].uri.split("/")[-1],
+            }
+        )
+    normdaten_wgw = person_object.uri_set.filter(
+        uri__contains="geschichtewiki.wien.gv.at"
+    )
+    if normdaten_wgw.count() == 1:
+        context["normdaten"].append(
+            {
+                "kind": "WGW",
+                "uri": normdaten_wgw[0].uri,
+                "identifier": normdaten_wgw[0].uri.split("/")[-1],
+            }
+        )
+    normdaten_gnd = person_object.uri_set.filter(uri__contains="d-nb.info")
+    if normdaten_gnd.count() == 1:
+        context["normdaten"].append(
+            {
+                "kind": "GND",
+                "uri": normdaten_gnd[0].uri,
+                "identifier": normdaten_gnd[0].uri.split("/")[-1],
+            }
+        )
     cv_de = person_object.text.filter(
         kind__name=getattr(settings, "PAAS_CV_DE", "Curriculum Vitae (de)")
     )
@@ -149,10 +190,10 @@ def enrich_person_context(person_object, context):
     for rel in person_object.personinstitution_set.filter(
         related_institution_id__in=[2, 3, 500],
         relation_type_id__in=[
-            33,
-            34,
-            35,
-            36,
+            38,
+            40,
+            42,
+            43,
             45,
             46,
             47,
@@ -165,31 +206,47 @@ def enrich_person_context(person_object, context):
             57,
             58,
             59,
+            3459,
+            3460,
+            3471,
+            129,
+            130,
+            131,
         ],
     ).order_by("start_date"):
-        r_lbl = re.search("\((.+)\)", rel.relation_type.label.split(" >> ")[1]).group(1)
-        if r_lbl not in rel_test:
-            context["mitgliedschaften"].append(
-                f"<span title='{rel.relation_type.label.split(' >> ')[1]}' style='text-decoration: underline'>{r_lbl}</span> in <span title='{rel.related_institution}' style='text-decoration: underline'>{abbreviate(rel.related_institution)}</span> ({rel.start_date_written}{'-'+rel.end_date_written if rel.end_date_written else ''})"
-            )
-            rel_test.append(r_lbl)
-    context["rel_dict_weg_zur_akademie"] = {
-        "herkunft": [
-            f'{rel.relation_type.label} <a href="place/{rel.related_place_id}">{rel.related_place}</a> ({rel.start_date_written})'
-            for rel in person_object.personplace_set.filter(
-                relation_type_id__in=[64, 152, 3090]
-            )
-        ],
+        context["mitgliedschaften"].append(
+            f"<span title='{rel.relation_type.label.split(' >> ')[1]} in der {rel.related_institution}'>{rel.relation_type.label.split(' >> ')[1].split('(')[0].strip()}</span> {rel.start_date.strftime('%Y')}{'-'+rel.end_date.strftime('%Y') if rel.end_date_written else ''}"
+        )
+    eltern = [
+        p.related_personA
+        for p in person_object.related_personA.filter(relation_type_id=168)
+    ] + [
+        p.related_personB
+        for p in person_object.related_personB.filter(relation_type_id=169)
+    ]
+    eltern = [Person.objects.get(pk=p1) for p1 in eltern]
+    eltern = [f"<a href=/person/{p.pk}>{str(p)}</a>" for p in eltern]
+    kinder = [
+        p.related_personA
+        for p in person_object.related_personA.filter(relation_type_id=169)
+    ] + [
+        p.related_personB
+        for p in person_object.related_personB.filter(relation_type_id=168)
+    ]
+    kinder = [Person.objects.get(pk=p1) for p1 in kinder]
+    kinder = [f"<a href=/person/{p.pk}>{str(p)}</a>" for p in kinder]
+
+    context["daten_akademie"] = {
         "schulbildung": [
-            f'{rel.relation_type.label}: <a href="/institution/{rel.related_institution_id}">{rel.related_institution}</a> ({rel.start_date_written})'
+            f'<a href="/institution/{rel.related_institution_id}">{rel.related_institution}</a>{", Abschluß " + rel.start_date.strftime("%Y") if rel.start_date is not None else ""}'
             for rel in person_object.personinstitution_set.filter(
                 relation_type_id__in=[176]
             )
         ],
         "studium": [
-            f'{rel.relation_type.label}: <a href="/institution/{rel.related_institution_id}">{rel.related_institution}</a> ({rel.start_date_written})'
+            f'<a href="/institution/{rel.related_institution_id}">{rel.related_institution}</a>{", " + daten_mappings[rel.relation_type_id] if rel.relation_type_id in daten_mappings.keys() else ""} {rel.start_date_written if rel.start_date_written and rel.relation_type_id in daten_mappings.keys() else ""}'
             for rel in person_object.personinstitution_set.filter(
-                relation_type_id__in=[1369, 1371, 1389]
+                relation_type_id__in=[1369, 1371] + promotion_inst_ids
             )
         ],
         "berufslaufbahn": [
@@ -273,6 +330,17 @@ def enrich_person_context(person_object, context):
             )
         ],
     }
+    if len(eltern) > 0 or len(kinder) > 0:
+        context["daten_akademie"]["herkunft"] = []
+        if len(eltern) > 0:
+            context["daten_akademie"]["herkunft"].append(
+                f"<b>Eltern</>: {', '.join(eltern)}"
+            )
+        if len(kinder) > 0:
+            context["daten_akademie"]["herkunft"].append(
+                f"<b>Kinder</>: {', '.join(kinder)}"
+            )
+
     return context
 
 

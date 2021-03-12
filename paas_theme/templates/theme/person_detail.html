@@ -4,8 +4,7 @@
 <script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/three@latest/build/three.min.js"></script>
-<script crossorigin
-  src="https://unpkg.com/@acdh/network-visualization@latest/lib/network-visualization.umd.js"></script>
+<script crossorigin src="https://unpkg.com/@acdh/network-visualization@latest/lib/network-visualization.umd.js"></script>
 {% endblock %}
 {% load static %}
 {% load webpage_extras %}
@@ -45,13 +44,10 @@
         <div id="main" class="card-body">
           <div class="row">
             <div class="col-md-4">
-              {% if kurzinfo %}<div class="mt-5 text-secondary">{{ kurzinfo }}</div>{% else %}
               <p class="profession-date-of-birth">
                 {% if profession %}<span style="text-align: left">{{ profession }}</span> <br />{% endif %}
-                <span class="font-weight-normal"><abbr title="geboren">*</abbr> {% if place_of_birth is not None %}{{place_of_birth}}, {% endif %}{{object.start_date_written }}</span><br />
-                {% if object.end_date_written is not None %}<span class="font-weight-normal"><abbr
-                    title='gestorben'>&dagger;</abbr> {% if place_of_death is not None %} {{place_of_death}}, {% endif %}{{object.end_date_written }}{% endif %}</span>
-                {% endif %}
+                <span class="font-weight-normal"><abbr title="geboren">*</abbr>{% if object.start_date_written is not None %} {{object.start_date_written }}{% if place_of_birth is not None %} ({{place_of_birth}}){% endif %}{% else %} -{% endif %}</span><br />
+                <span class="font-weight-normal"><abbr title='gestorben'>&dagger;</abbr> {% if object.end_date_written is not None %} {{object.end_date_written }}{% if place_of_death is not None %} ({{place_of_death}}){% endif %}{% else %} -{% endif %}</span>
               </p>
               {% if image %}
               <div class="mb-5 imgcontainer">
@@ -63,7 +59,7 @@
                 {% if mitgliedschaften %}
               <ul class="relentities">
                 {% for x in mitgliedschaften %}
-                <li class="pl-0 font-weight-normal">
+                <li class="pl-0 font-weight-normal" style="padding-bottom: 0.8em">
                   {{x|safe}}
                 </li>
                 {% endfor %}
@@ -72,9 +68,10 @@
               </p>
               {% if normdaten %}
               <p>
-                <b>Normdaten</b>
-              <ul class="uris pl-0">{% for uri in normdaten %}
-                <li class="pl-0"><a target="_blank" rel="noopener noreferrer" href="{{uri}}">{{uri}}</a></li>
+                <b>Online-Ressourcen</b>
+              <ul class="uris pl-0">
+                {% for nd in normdaten %}
+                <li class="pl-0"><b>{{nd.kind}}</b> <a target="_blank" rel="noopener noreferrer" href="{{nd.uri}}">{{nd.identifier}}</a></li>
                 {% endfor %}
               </ul>
               </p>
@@ -92,8 +89,20 @@
               </p>
             </div>
             <div class="col-md-8">
-              <h3 class="mb-4">Der Weg zur Akademiemitgliedschaft</h3>
-              {% for key, value in rel_dict_weg_zur_akademie.items %}
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+              <li class="nav-item" role="presentation">
+                <a class="nav-link active" data-toggle="tab" id="daten-tab" href="#daten" role="tab" aria-controls="home" aria-selected="true">Daten</a>
+              </li>
+              <li class="nav-item" role="presentation">
+                <a class="nav-link" data-toggle="tab" id="egonet-tab" href="#egonet" role="tab" aria-controls="egonet" aria-selected="false">Ego-Netz</a>
+              </li>
+              <li class="nav-item" role="presentation">
+                <a class="nav-link" data-toggle="tab" id="map-tab" href="#map" role="tab" role="tab" aria-controls="contact" aria-selected="false">Karte</a>
+              </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="daten" role="tabpanel" aria-labelledby="daten-tab">
+              {% for key, value in daten_akademie.items %}
               {% if value|length > 0 %}
               <div class="card mt-2 rounded-0">
                 <div class="card-header p-0" id="heading{{key}}">
@@ -109,7 +118,7 @@
                   <div class="card-body p-2 pl-3 pr-3 show-limited-number">
                     <ul class="pl-0 mb-0">
                       {% for ent in value %}
-                      <li style=list-style-type:none;">{{ent|safe}}</li>
+                      <li style="list-style-type:none;">{{ent|safe}}</li>
                       {% endfor %}
                     </ul>
                   </div>
@@ -118,31 +127,14 @@
               {% endif %}
               {% endfor %}
               <hr />
-              <h3 class="mb-4">Akteur/in in der Akademie</h3>
-              {% for key, value in rel_dict_in_akademie.items %}
-              {% if value|length > 0 %}
-              <div class="card mt-2 rounded-0">
-                <div class="card-header p-0" id="heading{{key}}">
-                  <h5 class="mb-0">
-                    <button type="button" class="btn btn-link collapsebtn w-100 text-left text-uppercase collapsed"
-                      data-toggle="collapse" data-target="#{{key}}" aria-expanded="true" aria-controls="{{key}}">
-                      {% normalize_key key %} ({{value|length}})
-                      <i class="chevron-down" data-feather="chevron-down"></i>
-                    </button>
-                  </h5>
-                </div>
-                <div id="{{key}}" class="collapse" aria-labelledby="heading{{key}}">
-                  <div class="card-body p-2 pl-3 pr-3 show-limited-number">
-                    <ul class="pl-0 mb-0">
-                      {% for ent in value %}
-                      <li style=list-style-type:none;">{{ent|safe}}</li>
-                      {% endfor %}
-                    </ul>
-                  </div>
-                </div>
               </div>
-              {% endif %}
-              {% endfor %}
+              <div class="tab-pane fade" id="egonet" role="tabpanel" aria-labelledby="egonet-tab">
+                <p>egonet</p>
+              </div>
+              <div class="tab-pane fade" id="map" role="tabpanel" aria-labelledby="map-tab">
+                <p>Karte</p>
+              </div>
+              </div>
             </div>
           </div>
         </div>
@@ -165,5 +157,9 @@
     }
     )
   });
+  $('.nav-tabs a').on('shown.bs.tab', function(event){
+  var x = $(event.target).text();         // active tab
+  var y = $(event.relatedTarget).text();  // previous tab
+});
 </script>
 {% endblock %}

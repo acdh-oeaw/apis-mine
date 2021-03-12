@@ -42,7 +42,7 @@ vine = "5.0.0"
 
 [[package]]
 name = "apis-core"
-version = "0.15.4"
+version = "0.15.5"
 description = "Base package for the APIS framework"
 category = "main"
 optional = false
@@ -106,7 +106,7 @@ tests = ["pytest", "pytest-asyncio"]
 
 [[package]]
 name = "astroid"
-version = "2.5"
+version = "2.5.1"
 description = "An abstract syntax tree for Python with inference support."
 category = "dev"
 optional = false
@@ -353,7 +353,7 @@ python-versions = ">=3.6, <3.7"
 
 [[package]]
 name = "defusedxml"
-version = "0.6.0"
+version = "0.7.0"
 description = "XML bomb protection for Python stdlib modules"
 category = "main"
 optional = false
@@ -956,7 +956,7 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 
 [[package]]
 name = "importlib-resources"
-version = "5.1.0"
+version = "5.1.1"
 description = "Read resources from Python packages"
 category = "main"
 optional = false
@@ -967,7 +967,7 @@ zipp = {version = ">=0.4", markers = "python_version < \"3.8\""}
 
 [package.extras]
 docs = ["sphinx", "jaraco.packaging (>=8.2)", "rst.linker (>=1.9)"]
-testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "pytest-enabler", "pytest-black (>=0.3.7)", "pytest-mypy"]
+testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pytest-cov", "pytest-enabler", "pytest-black (>=0.3.7)", "pytest-mypy"]
 
 [[package]]
 name = "inflection"
@@ -1286,25 +1286,25 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "pylint"
-version = "2.7.1"
+version = "2.7.2"
 description = "python code static checker"
 category = "dev"
 optional = false
 python-versions = "~=3.6"
 
 [package.dependencies]
-astroid = "2.5.0"
+astroid = ">=2.5.1,<2.6"
 colorama = {version = "*", markers = "sys_platform == \"win32\""}
 isort = ">=4.2.5,<6"
 mccabe = ">=0.6,<0.7"
 toml = ">=0.7.1"
 
 [package.extras]
-docs = ["sphinx (>=3.2,<4.0)", "python-docs-theme"]
+docs = ["sphinx (==3.5.1)", "python-docs-theme (==2020.12)"]
 
 [[package]]
 name = "pymeeus"
-version = "0.4.2"
+version = "0.5.0"
 description = "Python implementation of Jean Meeus astronomical routines"
 category = "main"
 optional = false
@@ -1659,8 +1659,8 @@ python-versions = "*"
 
 [[package]]
 name = "websocket-client"
-version = "0.57.0"
-description = "WebSocket client for Python. hybi13 is supported."
+version = "0.58.0"
+description = "WebSocket client for Python with low level API options"
 category = "dev"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
@@ -1710,7 +1710,7 @@ typing-extensions = {version = ">=3.7.4", markers = "python_version < \"3.8\""}
 
 [[package]]
 name = "yaspin"
-version = "1.4.0"
+version = "1.4.1"
 description = "Yet Another Terminal Spinner"
 category = "dev"
 optional = false
@@ -1771,8 +1771,8 @@ amqp = [
     {file = "amqp-5.0.5.tar.gz", hash = "sha256:affdd263d8b8eb3c98170b78bf83867cdb6a14901d586e00ddb65bfe2f0c4e60"},
 ]
 apis-core = [
-    {file = "apis-core-0.15.4.tar.gz", hash = "sha256:751be94a8aa11bf2941914c06ef72cfa42ea266e9c947ec8837d4cc28213ea36"},
-    {file = "apis_core-0.15.4-py3-none-any.whl", hash = "sha256:dc7872cd430306bca83d549384a87fa224a7688746d4b44a5b77024df5b13aa2"},
+    {file = "apis-core-0.15.5.tar.gz", hash = "sha256:fb78f622f96a2161269e5aabe631be9aa480645e02a743dc5312179b972c8c21"},
+    {file = "apis_core-0.15.5-py3-none-any.whl", hash = "sha256:542244cb6f6bc9dafe030ddca85267bb7f3c3cf73e98a7d107115658a0a59f4b"},
 ]
 appdirs = [
     {file = "appdirs-1.4.4-py2.py3-none-any.whl", hash = "sha256:a841dacd6b99318a741b166adb07e19ee71a274450e68237b4650ca1055ab128"},
@@ -1783,8 +1783,8 @@ asgiref = [
     {file = "asgiref-3.3.1.tar.gz", hash = "sha256:7162a3cb30ab0609f1a4c95938fd73e8604f63bdba516a7f7d64b83ff09478f0"},
 ]
 astroid = [
-    {file = "astroid-2.5-py3-none-any.whl", hash = "sha256:87ae7f2398b8a0ae5638ddecf9987f081b756e0e9fc071aeebdca525671fc4dc"},
-    {file = "astroid-2.5.tar.gz", hash = "sha256:b31c92f545517dcc452f284bc9c044050862fbe6d93d2b3de4a215a6b384bf0d"},
+    {file = "astroid-2.5.1-py3-none-any.whl", hash = "sha256:21d735aab248253531bb0f1e1e6d068f0ee23533e18ae8a6171ff892b98297cf"},
+    {file = "astroid-2.5.1.tar.gz", hash = "sha256:cfc35498ee64017be059ceffab0a25bedf7548ab76f2bea691c5565896e7128d"},
 ]
 async-timeout = [
     {file = "async-timeout-3.0.1.tar.gz", hash = "sha256:0c3c816a028d47f659d6ff5c745cb2acf1f966da1fe5c19c77a70282b25f4c5f"},
@@ -1852,8 +1852,8 @@ dataclasses = [
     {file = "dataclasses-0.8.tar.gz", hash = "sha256:8479067f342acf957dc82ec415d355ab5edb7e7646b90dc6e2fd1d96ad084c97"},
 ]
 defusedxml = [
-    {file = "defusedxml-0.6.0-py2.py3-none-any.whl", hash = "sha256:6687150770438374ab581bb7a1b327a847dd9c5749e396102de3fad4e8a3ef93"},
-    {file = "defusedxml-0.6.0.tar.gz", hash = "sha256:f684034d135af4c6cbb949b8a4d2ed61634515257a67299e5f940fbaa34377f5"},
+    {file = "defusedxml-0.7.0-py2.py3-none-any.whl", hash = "sha256:a290cad10346ed366c8a0133d868eaf6585ec6afdd0c511286cdb11f5fc3d285"},
+    {file = "defusedxml-0.7.0.tar.gz", hash = "sha256:86b15d9e3c639de79f4cb38aeffea3281f62aff78dde7d798e1352c63bfa6ea0"},
 ]
 dephell = [
     {file = "dephell-0.8.3-py3-none-any.whl", hash = "sha256:3ca3661e2a353b5c67c77034b69b379e360d4c70ce562e8161db32d39064be5a"},
@@ -2032,8 +2032,8 @@ importlib-metadata = [
     {file = "importlib_metadata-3.7.0.tar.gz", hash = "sha256:24499ffde1b80be08284100393955842be4a59c7c16bbf2738aad0e464a8e0aa"},
 ]
 importlib-resources = [
-    {file = "importlib_resources-5.1.0-py3-none-any.whl", hash = "sha256:885b8eae589179f661c909d699a546cf10d83692553e34dca1bf5eb06f7f6217"},
-    {file = "importlib_resources-5.1.0.tar.gz", hash = "sha256:bfdad047bce441405a49cf8eb48ddce5e56c696e185f59147a8b79e75e9e6380"},
+    {file = "importlib_resources-5.1.1-py3-none-any.whl", hash = "sha256:67bcf65e7b9f7f2ea54a342254c7e87607819955469034bc581fae26e1743306"},
+    {file = "importlib_resources-5.1.1.tar.gz", hash = "sha256:563c5579cd40a7d5c6256ea6519b510152b6968103ab540b9771a50093a09056"},
 ]
 inflection = [
     {file = "inflection-0.5.1-py2.py3-none-any.whl", hash = "sha256:f38b2b640938a4f35ade69ac3d053042959b62a0f1076a5bbaa1b9526605a8a2"},
@@ -2358,11 +2358,11 @@ pygments = [
     {file = "Pygments-2.8.0.tar.gz", hash = "sha256:37a13ba168a02ac54cc5891a42b1caec333e59b66addb7fa633ea8a6d73445c0"},
 ]
 pylint = [
-    {file = "pylint-2.7.1-py3-none-any.whl", hash = "sha256:a251b238db462b71d25948f940568bb5b3ae0e37dbaa05e10523f54f83e6cc7e"},
-    {file = "pylint-2.7.1.tar.gz", hash = "sha256:81ce108f6342421169ea039ff1f528208c99d2e5a9c4ca95cfc5291be6dfd982"},
+    {file = "pylint-2.7.2-py3-none-any.whl", hash = "sha256:d09b0b07ba06bcdff463958f53f23df25e740ecd81895f7d2699ec04bbd8dc3b"},
+    {file = "pylint-2.7.2.tar.gz", hash = "sha256:0e21d3b80b96740909d77206d741aa3ce0b06b41be375d92e1f3244a274c1f8a"},
 ]
 pymeeus = [
-    {file = "PyMeeus-0.4.2.tar.gz", hash = "sha256:6b7b3b86e4a8c9065fcf3b2ebb3f1e122d1a819de1a98461c3f873feab550291"},
+    {file = "PyMeeus-0.5.0.tar.gz", hash = "sha256:79e5764017d80f58885889d89767683329d11f3082470163d40a1d4a17558ece"},
 ]
 pymongo = [
     {file = "pymongo-3.11.3-cp27-cp27m-macosx_10_14_intel.whl", hash = "sha256:4d959e929cec805c2bf391418b1121590b4e7d5cb00af7b1ba521443d45a0918"},
@@ -2680,8 +2680,8 @@ webencodings = [
     {file = "webencodings-0.5.1.tar.gz", hash = "sha256:b36a1c245f2d304965eb4e0a82848379241dc04b865afcc4aab16748587e1923"},
 ]
 websocket-client = [
-    {file = "websocket_client-0.57.0-py2.py3-none-any.whl", hash = "sha256:0fc45c961324d79c781bab301359d5a1b00b13ad1b10415a4780229ef71a5549"},
-    {file = "websocket_client-0.57.0.tar.gz", hash = "sha256:d735b91d6d1692a6a181f2a8c9e0238e5f6373356f561bb9dc4c7af36f452010"},
+    {file = "websocket_client-0.58.0-py2.py3-none-any.whl", hash = "sha256:44b5df8f08c74c3d82d28100fdc81f4536809ce98a17f0757557813275fbb663"},
+    {file = "websocket_client-0.58.0.tar.gz", hash = "sha256:63509b41d158ae5b7f67eb4ad20fecbb4eee99434e73e140354dc3ff8e09716f"},
 ]
 whitenoise = [
     {file = "whitenoise-5.2.0-py2.py3-none-any.whl", hash = "sha256:05d00198c777028d72d8b0bbd234db605ef6d60e9410125124002518a48e515d"},
@@ -2734,8 +2734,8 @@ yarl = [
     {file = "yarl-1.6.3.tar.gz", hash = "sha256:8a9066529240171b68893d60dca86a763eae2139dd42f42106b03cf4b426bf10"},
 ]
 yaspin = [
-    {file = "yaspin-1.4.0-py2.py3-none-any.whl", hash = "sha256:faefab3e7c29d8de5be0561105aaaf41eaa9824932151d7b4c94cb0c46a70926"},
-    {file = "yaspin-1.4.0.tar.gz", hash = "sha256:681654848e5cd463e4c1f896ff03165979773a34789cc787276d9d8d0151ae1d"},
+    {file = "yaspin-1.4.1-py2.py3-none-any.whl", hash = "sha256:5b98d7620b8d9b7c74106fa1200c76b261664951a212fc443154c3b6823888a4"},
+    {file = "yaspin-1.4.1.tar.gz", hash = "sha256:53f398eeeff430d9b686ce2f104f6b0fa0e2d165bafc7b7e4aa4432ec8d23582"},
 ]
 zipp = [
     {file = "zipp-3.4.0-py3-none-any.whl", hash = "sha256:102c24ef8f171fd729d46599845e95c7ab894a4cf45f5de11a44cc7444fb1108"},
