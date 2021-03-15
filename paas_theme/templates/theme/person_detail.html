@@ -109,7 +109,7 @@
                   <h5 class="mb-0">
                     <button type="button" class="btn btn-link collapsebtn w-100 text-left text-uppercase collapsed"
                       data-toggle="collapse" data-target="#{{key}}" aria-expanded="true" aria-controls="{{key}}">
-                      {% normalize_key key %} ({{value|length}})
+                      {% normalize_key key %}
                       <i class="chevron-down" data-feather="chevron-down"></i>
                     </button>
                   </h5>
@@ -118,7 +118,7 @@
                   <div class="card-body p-2 pl-3 pr-3 show-limited-number">
                     <ul class="pl-0 mb-0">
                       {% for ent in value %}
-                      <li style="list-style-type:none;">{{ent|safe}}</li>
+                      <li style="list-style-type:none; padding-bottom: 0.5em">{{ent|safe}}</li>
                       {% endfor %}
                     </ul>
                   </div>

@@ -71,11 +71,27 @@ def get_main_text(MAIN_TEXT):
 def abbreviate(value):
     print(value.name)
     if value.name == "MATHEMATISCH-NATURWISSENSCHAFTLICHE KLASSE":
-        return "mn. K."
+        return "mat.-nat. Klasse"
     elif value.name == "PHILOSOPHISCH-HISTORISCHE KLASSE":
-        return "ph. K."
+        return "phil.-hist. Klasse"
     else:
         return value
+
+
+def get_date_range(rel, extended=False, original=False, format="%d.%m.%Y"):
+    res = ""
+    if extended:
+        if rel.start_date_written is not None:
+            res += f"von {rel.start_date_written if original else rel.start_date.strftime(format)}"
+        if rel.end_date_written is not None:
+            res += f" bis {rel.end_date_written if original else rel.end_date.strftime(format)}"
+    else:
+        if rel.start_date is not None:
+            res += f"{rel.start_date.strftime('%Y')}"
+        if rel.end_date_written is not None:
+            res += f"-{rel.end_date.strftime('%Y')}"
+
+    return res.strip()
 
 
 promotion_inst_ids, promotion_inst_labels = get_child_classes(
@@ -255,6 +271,24 @@ def enrich_person_context(person_object, context):
                 relation_type_id__in=[1851, 1385]
             )
         ],
+        "mitglied_in_einer_nationalsozialistischen_vereinigung": [
+            f'Anwärter{"in" if person_object.gender == "female" else ""} der {rel.related_institution} {get_date_range(rel, extended=True)}'
+            for rel in person_object.personinstitution_set.filter(
+                relation_type_id__in=[3470, 3462]
+            )
+        ]
+        + [
+            f"Mitglied der {rel.related_institution} {get_date_range(rel, extended=True)}"
+            for rel in person_object.personinstitution_set.filter(
+                relation_type_id__in=[3452, 3451]
+            )
+        ]
+        + [
+            f"förderndes Mitglied der {rel.related_institution} {get_date_range(rel, extended=True)}"
+            for rel in person_object.personinstitution_set.filter(
+                relation_type_id__in=[3473]
+            )
+        ],
         "wahl_mitgliederstatus": [
             f'{rel.relation_type.label}: <a href="/person/{rel.related_personB_id}">{rel.related_personB}</a> ({rel.start_date_written})'
             for rel in person_object.related_personB.filter(
@@ -284,6 +318,24 @@ def enrich_person_context(person_object, context):
             for rel in person_object.personinstitution_set.filter(
                 relation_type_id__in=get_child_classes([37], PersonInstitutionRelation),
                 related_institution_id__in=[2, 3, 500],
+            )
+        ],
+        "funktionen_in_der_akademie": [
+            f'Zum Präsidenten der Gesamtakademie {rel.relation_type.name} am {rel.start_date_written}{", tätig bis "+rel.end_date_written if rel.end_date_written is not None else ""}'
+            for rel in person_object.personinstitution_set.filter(
+                related_institution_id=500, relation_type_id__in=[103, 106]
+            )
+        ]
+        + [
+            f'Zum Vizepräsidenten der Gesamtakademie {rel.relation_type.name} am {rel.start_date_written}{", tätig bis "+rel.end_date_written if rel.end_date_written is not None else ""}'
+            for rel in person_object.personinstitution_set.filter(
+                related_institution_id=500, relation_type_id__in=[107, 105]
+            )
+        ]
+        + [
+            f'Zum Sekretär der {abbreviate(rel.related_institution)} {rel.relation_type.name} am {rel.start_date_written}{", tätig bis "+rel.end_date_written if rel.end_date_written is not None else ""}'
+            for rel in person_object.personinstitution_set.filter(
+                related_institution_id__in=[2, 3], relation_type_id__in=[119, 118]
             )
         ],
     }
@@ -340,6 +392,22 @@ def enrich_person_context(person_object, context):
             context["daten_akademie"]["herkunft"].append(
                 f"<b>Kinder</>: {', '.join(kinder)}"
             )
+    if person_object.personevent_set.filter(relation_type_id=3454).count() > 0:
+        context["daten_akademie"][
+            "mitglied_in_einer_nationalsozialistischen_vereinigung"
+        ].append("Registrierungspflicht aufgrund des Verbotsgesetzes vom 1.5.1945")
+    if person_object.personinstitution_set.filter(relation_type_id=26).count() > 0:
+        lst_kom = [
+            (rel.related_institution, get_date_range(rel))
+            for rel in person_object.personinstitution_set.filter(relation_type_id=26)
+        ]
+        lst_kom = [
+            f'<a href="/institution/{inst[0].pk}">{inst[0].name}</a> ({inst[1]})'
+            for inst in lst_kom
+        ]
+        context["daten_akademie"]["funktionen_in_der_akademie"].append(
+            f'Mitglied der folgenden Kommission{"en" if len(lst_kom) > 1 else ""}: {", ".join(lst_kom)}'
+        )
 
     return context
 

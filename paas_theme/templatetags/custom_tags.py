@@ -83,21 +83,24 @@ def check_facet_selection(key, val, selectedfacets):
 def filter_params(request, param):
     return request.GET.getlist(param)
 
+
 @register.simple_tag
 def normalize_key(value):
-    new_val = value.replace('_',' ')
+    new_val = value.replace("_", " ")
     return new_val
+
 
 @register.simple_tag
 def election(institutions):
-    return [x for x in institutions if x.relation_type.id in (42,43,46,35,36,33)]
+    return [x for x in institutions if x.relation_type.id in (42, 43, 46, 35, 36, 33)]
+
 
 @register.simple_tag
 def abbreviate(value):
     print(value.name)
     if value.name == "MATHEMATISCH-NATURWISSENSCHAFTLICHE KLASSE":
-        return "mn. K."
+        return "mat.-nat. Klasse"
     elif value.name == "PHILOSOPHISCH-HISTORISCHE KLASSE":
-        return "ph. K."    
-    else: 
-        return value            
+        return "phil.-hist. Klasse"
+    else:
+        return value
