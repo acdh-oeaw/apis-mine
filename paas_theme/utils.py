@@ -8,7 +8,12 @@ from django.db.models import Q
 from apis_core.apis_entities.models import Person
 from apis_core.apis_labels.models import Label
 from apis_core.apis_metainfo.models import Collection
-from apis_core.apis_relations.models import PersonPlace
+from apis_core.apis_relations.models import (
+    PersonPlace,
+    PersonPerson,
+    PersonInstitution,
+    InstitutionInstitution,
+)
 
 from apis_core.apis_vocabularies.models import (
     PersonPersonRelation,
@@ -61,6 +66,19 @@ def get_child_classes(objids, obclass, labels=False):
         return objids
 
 
+def get_child_institutions_from_parent(insts):
+    res = []
+    for i in insts:
+        res.extend(
+            list(
+                InstitutionInstitution.objects.filter(
+                    related_institutionA_id=i
+                ).values_list("related_institutionB_id", flat=True)
+            )
+        )
+    return res
+
+
 def get_main_text(MAIN_TEXT):
     if MAIN_TEXT is not None:
         return MAIN_TEXT
@@ -71,7 +89,7 @@ def get_main_text(MAIN_TEXT):
 def abbreviate(value):
     print(value.name)
     if value.name == "MATHEMATISCH-NATURWISSENSCHAFTLICHE KLASSE":
-        return "mat.-nat. Klasse"
+        return "math.-nat. Klasse"
     elif value.name == "PHILOSOPHISCH-HISTORISCHE KLASSE":
         return "phil.-hist. Klasse"
     else:
@@ -94,6 +112,10 @@ def get_date_range(rel, extended=False, original=False, format="%d.%m.%Y"):
     return res.strip()
 
 
+berufslaufbahn_ids = get_child_classes([1851, 1385], PersonInstitutionRelation)
+
+subs_akademie = get_child_institutions_from_parent([500, 2, 3])
+
 promotion_inst_ids, promotion_inst_labels = get_child_classes(
     [1386], PersonInstitutionRelation, labels=True
 )
@@ -101,6 +123,74 @@ daten_mappings = {1369: "Studium", 1371: "Studienaufenthalt", 1386: "Promotion"}
 
 for i in promotion_inst_labels:
     daten_mappings[i[0]] = i[1].replace(">>", "in")
+
+
+classes = {}
+classes["vorschlag"] = get_child_classes(
+    [3061, 3141], PersonPersonRelation, labels=True
+)
+
+
+def get_mitgliedschaft_from_relation(rel, abbreviate=True):
+    lbl = rel.label.split(">>")[1].strip()
+    if abbreviate:
+        res = re.search(r"\((.+)\)", lbl)
+        return res.group(1)
+    else:
+        return lbl
+
+
+def get_gewaehlt(pers, year):
+    rel = pers.personinstitution_set.filter(
+        related_institution_id__in=[2, 3], start_date_written__contains=year
+    ).order_by("start_date")
+    if rel.count() == 0:
+        return "nicht gewählt"
+    date_vocs = ["Genehmigt", "Ernannt"]
+    vocs = [
+        f"{rel2.relation_type} am {rel2.start_date_written}"
+        if rel2.relation_type.name in date_vocs
+        else str(rel2.relation_type)
+        for rel2 in rel
+    ]
+    return " und ".join(vocs)
+
+
+def get_wahlvorschlag(pers):
+    kls = (
+        pers.personinstitution_set.filter(related_institution_id__in=[2, 3])
+        .first()
+        .related_institution
+    )
+    kls = abbreviate(kls)
+    res = {}
+    umwidm = [56, 57, 58, 59]
+    for pp in pers.related_personB.filter(
+        relation_type_id__in=classes["vorschlag"][0]
+    ).order_by("start_date"):
+        m = get_mitgliedschaft_from_relation(pp.relation_type)
+        date = get_gewaehlt(pers, pp.start_date_written)
+        txt = f"Zur Wahl zum {m} der {kls} {pp.start_date_written} vorgeschlagen von ({date}):"
+        if (txt, pp.start_date) not in res.keys():
+            res[(txt, pp.start_date)] = [
+                pp.related_personA if pp.related_personA != pers else pp.related_personB
+            ]
+        else:
+            res[(txt, pp.start_date)].append(
+                pp.related_personA if pp.related_personA != pers else pp.related_personB
+            )
+    lst_fin = [(key[1], (key[0], value)) for key, value in res.items()]
+    for pp in pers.personinstitution_set.filter(relation_type_id__in=umwidm):
+        if "umgewidmet" in pp.relation_type.name.lower():
+            lst_fin.append(
+                (
+                    pp.start_date,
+                    f"Umgewidmet zum {get_mitgliedschaft_from_relation(pp.relation_type)} der {kls} {'am' if len(pp.start_date_written) > 4 else ''} {pp.start_date_written}",
+                )
+            )
+    lst_fin_sort = sorted(lst_fin, key=lambda tup: tup[0])
+
+    return lst_fin_sort
 
 
 def enrich_person_context(person_object, context):
@@ -266,10 +356,10 @@ def enrich_person_context(person_object, context):
             )
         ],
         "berufslaufbahn": [
-            f'{rel.relation_type.label}: <a href="/institution/{rel.related_institution_id}">{rel.related_institution}</a> ({rel.start_date_written})'
+            f'{rel.relation_type.label}: <a href="/institution/{rel.related_institution_id}">{rel.related_institution}</a> ({rel.start_date_written if rel.start_date_written is not None else "ka"})'
             for rel in person_object.personinstitution_set.filter(
-                relation_type_id__in=[1851, 1385]
-            )
+                relation_type_id__in=berufslaufbahn_ids
+            ).exclude(related_institution_id__in=subs_akademie)
         ],
         "mitglied_in_einer_nationalsozialistischen_vereinigung": [
             f'Anwärter{"in" if person_object.gender == "female" else ""} der {rel.related_institution} {get_date_range(rel, extended=True)}'
@@ -290,35 +380,17 @@ def enrich_person_context(person_object, context):
             )
         ],
         "wahl_mitgliederstatus": [
-            f'{rel.relation_type.label}: <a href="/person/{rel.related_personB_id}">{rel.related_personB}</a> ({rel.start_date_written})'
-            for rel in person_object.related_personB.filter(
-                relation_type_id__in=get_child_classes(
-                    [3061, 3141], PersonPersonRelation
-                )
+            t[1][0]
+            + " "
+            + ", ".join(
+                [
+                    f'<a href="/person/{p2.pk}">{p2.first_name} {p2.name}</a>'
+                    for p2 in t[1][1]
+                ]
             )
-        ]
-        + [
-            f'{rel.relation_type.label_reverse}: <a href="/person/{rel.related_personA_id}">{rel.related_personA}</a> ({rel.start_date_written})'
-            for rel in person_object.related_personA.filter(
-                relation_type_id__in=get_child_classes(
-                    [3061, 3141], PersonPersonRelation
-                )
-            )
-        ]
-        + [
-            f'{rel.relation_type.label_reverse}: <a href="/event/{rel.related_event_id}">{rel.related_event}</a> ({rel.start_date_written})'
-            for rel in person_object.personevent_set.filter(
-                relation_type_id__in=get_child_classes(
-                    [3052, 3053], PersonEventRelation
-                )
-            )
-        ]
-        + [
-            f'{rel.relation_type.label_reverse}: <a href="/institution/{rel.related_institution_id}">{rel.related_institution}</a> ({rel.start_date_written})'
-            for rel in person_object.personinstitution_set.filter(
-                relation_type_id__in=get_child_classes([37], PersonInstitutionRelation),
-                related_institution_id__in=[2, 3, 500],
-            )
+            if isinstance(t[1], tuple)
+            else t[1]
+            for t in get_wahlvorschlag(person_object)
         ],
         "funktionen_in_der_akademie": [
             f'Zum Präsidenten der Gesamtakademie {rel.relation_type.name} am {rel.start_date_written}{", tätig bis "+rel.end_date_written if rel.end_date_written is not None else ""}'
