@@ -129,6 +129,9 @@ classes = {}
 classes["vorschlag"] = get_child_classes(
     [3061, 3141], PersonPersonRelation, labels=True
 )
+classes["mitgliedschaft"] = get_child_classes(
+    [19, 20, 21, 23, 24], PersonInstitutionRelation, labels=True
+)
 
 
 def get_mitgliedschaft_from_relation(rel, abbreviate=True):

@@ -272,7 +272,6 @@ class PersonIndex(indexes.SearchIndex, indexes.Indexable):
         return oebl_persons
 
 
-
 class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
     name = indexes.CharField(boost=2)
@@ -285,7 +284,20 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
     place_of_death = indexes.CharField(null=True, faceted=True, boost=1.5)
     gender = indexes.CharField(null=True, model_attr="gender", faceted=True)
     profession = indexes.MultiValueField(null=True, faceted=True)
+    akademiemitgliedschaft = indexes.MultiValueField(null=True, faceted=True)
 
+    def prepare_akademiemitgliedschaft(self, object):
+        res = object.personinstitution_set.filter(
+            related_institution_id__in=[2, 3, 500],
+            relation_type_id__in=classes["mitgliedschaft"][0],
+        )
+        res_fin = []
+        for mitglied in res:
+            mitgliedschaft = get_mitgliedschaft_from_relation(mitglied.relation_type)
+            res_fin.append(
+                f"{mitgliedschaft}__{str(mitglied.related_institution)}__{mitglied.start_date}__{mitglied.start_date}"
+            )
+        return res_fin
 
     def prepare_profession(self, object):
         return [x.label for x in object.profession.all()]
@@ -307,7 +319,7 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
             return rel[0].related_place.name
         else:
             return None
-    
+
     def prepare_academy_member(self, object):
         mem_types = getattr(settings, "APIS_SEARCH_ACADEMY_MEMBER")
         academy = getattr(settings, "APIS_SEARCH_ACADEMY")
@@ -324,7 +336,7 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
             return True
         else:
             return False
-    
+
     def prepare_name(self, object):
         return str(object)
 
