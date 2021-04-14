@@ -1,4 +1,4 @@
-from rest_framework import serializers
+""" from rest_framework import serializers
 
 
 def get_mitgliedschaft_from_relation(rel, abbreviate=True):
@@ -10,9 +10,8 @@ def get_mitgliedschaft_from_relation(rel, abbreviate=True):
         return lbl
 
 
-
 def get_child_classes(objids, obclass, labels=False):
-    """used to retrieve a list of primary keys of sub classes"""
+    used to retrieve a list of primary keys of sub classes
     if labels:
         labels_lst = []
     for obj in objids:
@@ -89,7 +88,6 @@ classes["vorschlag"] = get_child_classes(
 )
 
 
-
 class PersonMinSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField()
     name = serializers.CharField(null=True)
@@ -136,4 +134,6 @@ class PaasPersonSerializer(serializers.Serializer):
         method_name="add_staatliche_funktionen"
     )
 
-    def add_akademiemitgliedschaft(self, object):
+
+#   def add_akademiemitgliedschaft(self, object):
+ """

@@ -1,5 +1,6 @@
 {% extends "theme/base.html" %}
 {% load static %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 <div class="wrapper" id="wrapper-hero">
@@ -34,6 +35,12 @@
           </button>
         </div>
       </div>
+    </form>
+
+    <form action="/search?" method="get">
+        <div id="search_form">
+        {% crispy search_form search_form.helper %}
+        </div>
     </form>
   </div>
   <div class="wrapper" id="index-wrapper">

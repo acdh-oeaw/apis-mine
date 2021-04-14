@@ -1,0 +1,4 @@
+{{ object.name }}
+{% for x in object.alternative_names %}
+{{ x }}
+{% endfor %}

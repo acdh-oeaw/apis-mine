@@ -81,23 +81,9 @@
     <field name="django_ct" type="string" indexed="true" stored="true" multiValued="false"/>
     <field name="django_id" type="string" indexed="true" stored="true" multiValued="false"/>
     
-    <field name="text" type="text_en" indexed="true" stored="true" multiValued="false" />
+    <field name="text" type="text_de" indexed="true" stored="true" multiValued="false" />
     
-    <field name="person" type="text_en" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="person_id" type="long" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="start_date" type="date" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="end_date" type="date" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="institution_id" type="long" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="institution" type="text_en" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="institution_type" type="text_en" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="name" type="text_en" indexed="true" stored="true" multiValued="false" />
+    <field name="name" type="text_de" indexed="true" stored="true" multiValued="false" />
     
     <field name="academy_member" type="boolean" indexed="true" stored="true" multiValued="false" />
     
@@ -109,81 +95,43 @@
     
     <field name="death_date_exact" type="date" indexed="true" stored="true" multiValued="false" />
     
-    <field name="birth_date_show" type="text_en" indexed="true" stored="true" multiValued="false" />
+    <field name="birth_date_show" type="text_de" indexed="true" stored="true" multiValued="false" />
     
-    <field name="death_date_show" type="text_en" indexed="true" stored="true" multiValued="false" />
+    <field name="death_date_show" type="text_de" indexed="true" stored="true" multiValued="false" />
     
-    <field name="place_of_birth" type="text_en" indexed="true" stored="true" multiValued="false" />
+    <field name="place_of_birth" type="text_de" indexed="true" stored="true" multiValued="false" />
     
     <field name="place_of_birth_exact" type="string" indexed="true" stored="true" multiValued="false" />
     
-    <field name="place_of_death" type="text_en" indexed="true" stored="true" multiValued="false" />
+    <field name="place_of_death" type="text_de" indexed="true" stored="true" multiValued="false" />
     
     <field name="place_of_death_exact" type="string" indexed="true" stored="true" multiValued="false" />
     
-    <field name="gender" type="text_en" indexed="true" stored="true" multiValued="false" />
+    <field name="gender" type="text_de" indexed="true" stored="true" multiValued="false" />
     
     <field name="gender_exact" type="string" indexed="true" stored="true" multiValued="false" />
     
-    <field name="profession" type="text_en" indexed="true" stored="true" multiValued="true" />
+    <field name="profession" type="text_de" indexed="true" stored="true" multiValued="true" />
     
     <field name="profession_exact" type="string" indexed="true" stored="true" multiValued="true" />
     
-    <field name="akademiemitgliedschaft" type="text_en" indexed="true" stored="true" multiValued="true" />
+    <field name="comissions" type="text_de" indexed="true" stored="true" multiValued="true" />
     
-    <field name="akademiemitgliedschaft_exact" type="string" indexed="true" stored="true" multiValued="true" />
+    <field name="comissions_exact" type="string" indexed="true" stored="true" multiValued="true" />
     
-    <field name="funk_praesidentin" type="boolean" indexed="true" stored="true" multiValued="false" />
+    <field name="education" type="text_de" indexed="true" stored="true" multiValued="true" />
     
-    <field name="funk_vizepraesidentin" type="boolean" indexed="true" stored="true" multiValued="false" />
+    <field name="education_exact" type="string" indexed="true" stored="true" multiValued="true" />
     
-    <field name="funk_generalsekretaerin" type="boolean" indexed="true" stored="true" multiValued="false" />
+    <field name="career" type="text_de" indexed="true" stored="true" multiValued="true" />
     
-    <field name="funk_sekretaerin" type="boolean" indexed="true" stored="true" multiValued="false" />
+    <field name="career_exact" type="string" indexed="true" stored="true" multiValued="true" />
     
-    <field name="funk_obfrau" type="boolean" indexed="true" stored="true" multiValued="false" />
+    <field name="comissions_show" type="text_de" indexed="true" stored="true" multiValued="true" />
     
-    <field name="funk_mitgl_kommission" type="boolean" indexed="true" stored="true" multiValued="false" />
+    <field name="education_show" type="text_de" indexed="true" stored="true" multiValued="true" />
     
-    <field name="funk_direkt_forsch_inst" type="boolean" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="funk_obfrau_kurat" type="boolean" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="akademiefunktionen" type="text_en" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="akademiefunktionen_exact" type="string" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="akademiepreise" type="text_en" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="akademiepreise_exact" type="string" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="preisfragen" type="text_en" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="preisfragen_exact" type="string" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="nobelpreis" type="boolean" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="ewk" type="boolean" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="membership_id" type="long" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="membership_type" type="text_en" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="klasse" type="text_en" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="elected" type="boolean" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="elected_person" type="text_en" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="elected_person_id" type="long" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="elected_by" type="text_en" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="elected_by_id" type="long" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="elected_by_gender" type="text_en" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="elected_by_profession" type="text_en" indexed="true" stored="true" multiValued="true" />
+    <field name="career_show" type="text_de" indexed="true" stored="true" multiValued="true" />
     
     <uniqueKey>id</uniqueKey>
 
@@ -806,14 +754,34 @@
     <!-- German -->
     <dynamicField name="*_txt_de" type="text_de"  indexed="true"  stored="true"/>
     <fieldType name="text_de" class="solr.TextField" positionIncrementGap="100">
-        <analyzer>
+
+        <analyzer type="index">
+            <tokenizer class="solr.StandardTokenizerFactory"/>
+            <!-- in this example, we will only use synonyms at query time
+            <filter class="solr.SynonymFilterFactory" synonyms="index_synonyms.txt" ignoreCase="true" expand="false"/>
+            -->
+            <!-- Case insensitive stop word removal.
+            -->
+            <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_de.txt" format="snowball" />
+            <filter class="solr.LowerCaseFilterFactory"/>
+            <filter class="solr.GermanNormalizationFilterFactory"/>
+            <filter class="solr.GermanLightStemFilterFactory"/>
+            <!-- Optionally you may want to use this less aggressive stemmer instead of PorterStemFilterFactory:
+            <filter class="solr.EnglishMinimalStemFilterFactory"/>
+              -->
+        </analyzer>
+        <analyzer type="query">
             <tokenizer class="solr.StandardTokenizerFactory"/>
             <filter class="solr.LowerCaseFilterFactory"/>
+            <filter class="solr.SynonymGraphFilterFactory" synonyms="synonyms.txt"
+             format="solr" ignoreCase="true" expand="true"
+             tokenizerFactory="solr.WhitespaceTokenizerFactory"/>
             <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_de.txt" format="snowball" />
             <filter class="solr.GermanNormalizationFilterFactory"/>
             <filter class="solr.GermanLightStemFilterFactory"/>
-            <!-- less aggressive: <filter class="solr.GermanMinimalStemFilterFactory"/> -->
-            <!-- more aggressive: <filter class="solr.SnowballPorterFilterFactory" language="German2"/> -->
+            <!-- Optionally you may want to use this less aggressive stemmer instead of PorterStemFilterFactory:
+            <filter class="solr.EnglishMinimalStemFilterFactory"/>
+              -->
         </analyzer>
     </fieldType>
 

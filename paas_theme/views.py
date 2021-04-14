@@ -12,7 +12,11 @@ from apis_core.apis_entities.views import set_session_variables
 from browsing.browsing_utils import GenericListView
 from webpage.views import get_imprint_url
 from .filters import PersonListFilter
-from .forms import PersonFilterFormHelper, PersonFacetedSearchForm
+from .forms import (
+    PersonFilterFormHelper,
+    PersonFacetedSearchForm,
+    PersonFacetedSearchFormNew,
+)
 from .tables import PersonTable, SearchResultTable
 from .utils import (
     oebl_persons,
@@ -68,6 +72,7 @@ class IndexView(TemplateView):
         context["featured_pers"] = get_featured_person()
         enriched_context = get_daily_entries(context, oebl_persons)
         enriched_context["random_entries"] = random.sample(list(oebl_persons), 2)
+        enriched_context["search_form"] = PersonFacetedSearchFormNew()
         return enriched_context
 
 
@@ -98,14 +103,14 @@ class PersonListView(GenericListView):
 
 class PersonSearchView(FacetedSearchView):
     queryset = SearchQuerySet()
-    form_class = PersonFacetedSearchForm
+    form_class = PersonFacetedSearchFormNew
     facet_fields = [
         "place_of_birth",
         "place_of_death",
-        "comissions",
+        # "comissions",
         "profession",
-        "education",
-        "career",
+        # "education",
+        # "career",
     ]
 
 
