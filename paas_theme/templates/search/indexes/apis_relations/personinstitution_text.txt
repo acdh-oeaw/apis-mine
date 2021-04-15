@@ -1,0 +1,8 @@
+{{ object }}
+{{ object.related_person }}
+{{ object.related_institution }}
+{{ object.relation_type.label }}
+{{ object.start_date }}
+{{ object.end_date }}
+{{ object.notes }}
+{{ object.references }}

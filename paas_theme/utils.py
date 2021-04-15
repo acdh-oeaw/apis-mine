@@ -5,7 +5,7 @@ import re
 from django.conf import settings
 from django.db.models import Q
 
-from apis_core.apis_entities.models import Person
+from apis_core.apis_entities.models import Person, Institution, Event
 from apis_core.apis_labels.models import Label
 from apis_core.apis_metainfo.models import Collection
 from apis_core.apis_relations.models import (
@@ -13,6 +13,7 @@ from apis_core.apis_relations.models import (
     PersonPerson,
     PersonInstitution,
     InstitutionInstitution,
+    InstitutionEvent,
 )
 
 from apis_core.apis_vocabularies.models import (
@@ -106,7 +107,7 @@ def get_date_range(rel, extended=False, original=False, format="%d.%m.%Y"):
     else:
         if rel.start_date is not None:
             res += f"{rel.start_date.strftime('%Y')}"
-        if rel.end_date_written is not None:
+        if rel.end_date is not None:
             res += f"-{rel.end_date.strftime('%Y')}"
 
     return res.strip()
@@ -121,6 +122,41 @@ promotion_inst_ids, promotion_inst_labels = get_child_classes(
 )
 daten_mappings = {1369: "Studium", 1371: "Studienaufenthalt", 1386: "Promotion"}
 
+
+def get_academy_awards(
+    award_type_id=137, rel_id=139, subs_akademie=subs_akademie + [2, 3, 500]
+):
+    res = []
+    awards = Institution.objects.filter(kind_id=award_type_id).values_list(
+        "pk", flat=True
+    )
+    for instinst in InstitutionInstitution.objects.filter(
+        related_institutionA_id__in=awards,
+        related_institutionB_id__in=subs_akademie,
+        relation_type=rel_id,
+    ):
+        if instinst.related_institutionA_id not in res:
+            res.append(instinst.related_institutionA_id)
+    return res
+
+
+def get_academy_preisaufgaben(
+    preisaufgabe_type_id=123, rel_id=142, subs_akademie=subs_akademie + [2, 3, 500]
+):
+    res = []
+    preisaufgaben = Event.objects.filter(kind_id=preisaufgabe_type_id).values_list(
+        "pk", flat=True
+    )
+    for instevent in InstitutionEvent.objects.filter(
+        related_event_id__in=preisaufgaben,
+        related_institution_id__in=subs_akademie,
+        relation_type=rel_id,
+    ):
+        if instevent.related_event_id not in res:
+            res.append(instevent.related_event_id)
+    return res
+
+
 for i in promotion_inst_labels:
     daten_mappings[i[0]] = i[1].replace(">>", "in")
 
@@ -129,6 +165,29 @@ classes = {}
 classes["vorschlag"] = get_child_classes(
     [3061, 3141], PersonPersonRelation, labels=True
 )
+classes["mitgliedschaft"] = get_child_classes(
+    [19, 20, 21, 23, 24], PersonInstitutionRelation, labels=True
+)
+classes["akad_funktionen"] = {
+    "präsidentin": get_child_classes(
+        [102, 1876], PersonInstitutionRelation, labels=True
+    ),
+    "vizepräsidentin": get_child_classes([104], PersonInstitutionRelation, labels=True),
+    "generalsekretärin": get_child_classes(
+        [112], PersonInstitutionRelation, labels=True
+    ),
+    "sekretärin": get_child_classes([117], PersonInstitutionRelation, labels=True),
+    "obfrau/obmann": get_child_classes([30], PersonInstitutionRelation, labels=True),
+    "mitglied kommission": get_child_classes(
+        [26], PersonInstitutionRelation, labels=True
+    ),
+    "direktorin institut": get_child_classes(
+        [3488, 88], PersonInstitutionRelation, labels=True
+    ),
+    "kuratorium": get_child_classes([94, 95], PersonInstitutionRelation, labels=True),
+}
+classes["akademiepreise"] = get_academy_awards()
+classes["preisaufgaben"] = get_academy_preisaufgaben()
 
 
 def get_mitgliedschaft_from_relation(rel, abbreviate=True):
@@ -296,6 +355,10 @@ def enrich_person_context(person_object, context):
     for rel in person_object.personinstitution_set.filter(
         related_institution_id__in=[2, 3, 500],
         relation_type_id__in=[
+            33,
+            34,
+            35,
+            36,
             38,
             40,
             42,
