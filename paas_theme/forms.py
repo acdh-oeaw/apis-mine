@@ -23,6 +23,12 @@ class PersonFilterFormHelperNew(FormHelper):
                     "Lebensdaten", "birth_date", "death_date", css_id="lebensdaten"
                 ),
                 AccordionGroup(
+                    "Mitgliedschaft",
+                    "mtgld_mitgliedschaft",
+                    "mtgld_klasse",
+                    css_id="mitgliedschaft",
+                ),
+                AccordionGroup(
                     "Akademischer CV",
                     "place_of_birth",
                     "place_of_death",
@@ -39,7 +45,7 @@ class PersonFilterFormHelperNew(FormHelper):
                     "zur Wahl zum Akademiemitglied vorgeschlagen von",
                     "wahl_person",
                     "wahl_beruf",
-                    "wahl_geschlecht",
+                    "wahl_gender",
                     css_id="wahlvorschlag",
                 ),
                 AccordionGroup("Auszeichnungen", "nobelpreis", "ewk"),
@@ -75,12 +81,12 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     )
     gender = forms.ChoiceField(
         required=False,
-        choices=(("male", "Männlich"), ("female", "Weiblich")),
+        choices=(("", "-"), ("male", "Männlich"), ("female", "Weiblich")),
         label="Geschlecht",
     )
     wahl_gender = forms.ChoiceField(
         required=False,
-        choices=(("male", "Männlich"), ("female", "Weiblich")),
+        choices=(("", "-"), ("male", "Männlich"), ("female", "Weiblich")),
         label="Geschlecht",
     )
     wahl_beruf = forms.CharField(required=False, label="Beruf")
@@ -89,6 +95,28 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     place_of_death = forms.CharField(required=False, label="Sterbeort")
     profession = forms.CharField(required=False, label="Beruf")
     nobelpreis = forms.BooleanField(required=False, label="Nobelpreis")
+    mtgld_mitgliedschaft = forms.MultipleChoiceField(
+        required=False,
+        label="Mitgliedschaft",
+        choices=[
+            ("", "-"),
+            ("k. M. I.", "korrespondierendes Mitglied im Inland"),
+            ("k. M. A.", "korrespondierendes Mitglied im Ausland"),
+            ("w. M", "Wirkliches Mitglied"),
+        ],
+    )
+    mtgld_klasse = forms.MultipleChoiceField(
+        required=False,
+        label="Klasse",
+        choices=[
+            ("", "-"),
+            (
+                "MATHEMATISCH-NATURWISSENSCHAFTLICHE",
+                "Mathematisch-Naturwissenschaftliche Klasse",
+            ),
+            ("PHILOSOPHISCH-HISTORISCHE", "Philosophisch-Historische Klasse"),
+        ],
+    )
     ewk = forms.BooleanField(
         required=False, label="Österreichisches Ehrenzeichen für Wissenschaft und Kunst"
     )
@@ -102,12 +130,23 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         if self.cleaned_data["akademiefunktionen"]:
             funk_dict = SQ()
             for funk in self.cleaned_data["akademiefunktionen"]:
-                funk_dict |= SQ(**{funk: True})
+                funk_dict.add(SQ(**{funk: True}), SQ.OR)
             sqs = sqs.filter(funk_dict)
         if self.cleaned_data["gender"]:
             sqs = sqs.filter(gender=AutoQuery(self.cleaned_data["gender"]))
         if self.cleaned_data["profession"]:
             sqs = sqs.filter(profession=AutoQuery(self.cleaned_data["profession"]))
+        if (
+            self.cleaned_data["mtgld_mitgliedschaft"]
+            or self.cleaned_data["mtgld_klasse"]
+        ):
+            mtgld_dic = SQ()
+            for mitgliedschaft in self.cleaned_data["mtgld_mitgliedschaft"]:
+                mtgld_dic.add(SQ(akademiemitgliedschaft=mitgliedschaft), SQ.OR)
+            kls_dict = SQ()
+            for klasse in self.cleaned_data["mtgld_klasse"]:
+                kls_dict.add(SQ(akademiemitgliedschaft=klasse), SQ.OR)
+            sqs = sqs.filter(mtgld_dic & kls_dict)
         if (
             self.cleaned_data["wahl_beruf"]
             or self.cleaned_data["wahl_person"]
@@ -115,13 +154,20 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         ):
             dict_wahl = {"django_ct": "apis_relations.personperson"}
             if self.cleaned_data["wahl_beruf"]:
-                dict_wahl["profession"] = AutoQuery(self.cleaned_data["wahl_beruf"])
+                dict_wahl["elected_by_profession"] = AutoQuery(
+                    self.cleaned_data["wahl_beruf"]
+                )
             if self.cleaned_data["wahl_person"]:
                 dict_wahl["elected_by"] = AutoQuery(self.cleaned_data["wahl_person"])
             if self.cleaned_data["wahl_gender"]:
-                dict_wahl["gender"] = AutoQuery(self.cleaned_data["wahl_gender"])
+                dict_wahl["elected_by_gender"] = AutoQuery(
+                    self.cleaned_data["wahl_gender"]
+                )
             sqs2 = SearchQuerySet().filter(**dict_wahl)
-            pers_ids = [x.elected_person_id for x in sqs2]
+            pers_ids = []
+            for pers2 in sqs2:
+                if pers2.elected_by_id not in pers_ids:
+                    pers_ids.append(pers2.elected_by_id)
             sqs = sqs.filter(django_id__in=pers_ids)
         if self.cleaned_data["ewk"]:
             sqs = sqs.filter(ewk=self.cleaned_data["ewk"])

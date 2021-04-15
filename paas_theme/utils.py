@@ -355,6 +355,10 @@ def enrich_person_context(person_object, context):
     for rel in person_object.personinstitution_set.filter(
         related_institution_id__in=[2, 3, 500],
         relation_type_id__in=[
+            33,
+            34,
+            35,
+            36,
             38,
             40,
             42,
