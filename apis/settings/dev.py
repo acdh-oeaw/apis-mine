@@ -36,14 +36,13 @@ ALLOWED_CIDR_NETS = ["10.0.0.0/8", "127.0.0.0/8"]
 HAYSTACK_CONNECTIONS = {
     "default": {
         "ENGINE": "haystack.backends.solr_backend.SolrEngine",
-        "URL": "http://paas_solr:8983/solr/paas_solr",
-        "ADMIN_URL": "http://paas_solr:8983/solr/admin/cores",
+        "URL": f"http://{os.environ.get('PAAS_HAYSTACK_URL', 'paassolr')}:8983/solr/{os.environ.get('PAAS_HAYSTACK_CORE', 'paas_solr')}",
+        "ADMIN_URL": f"http://{os.environ.get('PAAS_HAYSTACK_URL', 'paassolr')}:8983/solr/admin/cores",
     }
 }
-INSTALLED_APPS += [
-    "haystack",
-    "paas_theme",
-]
+
+# HAYSTACK_DEFAULT_OPERATOR = "OR"
+INSTALLED_APPS += ["haystack", "paas_theme", "django_extensions"]
 
 SECRET_KEY = (
     os.environ.get("APIS_SECRET_KEY", "TO_CHANGE")
