@@ -42,7 +42,7 @@ HAYSTACK_CONNECTIONS = {
 }
 
 # HAYSTACK_DEFAULT_OPERATOR = "OR"
-INSTALLED_APPS += ["haystack", "paas_theme", "django_extensions"]
+INSTALLED_APPS += ["haystack", "paas_theme"]
 
 SECRET_KEY = (
     os.environ.get("APIS_SECRET_KEY", "TO_CHANGE")
