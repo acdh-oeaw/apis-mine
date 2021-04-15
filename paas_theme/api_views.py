@@ -1,6 +1,6 @@
 from rest_framework.generics import ListAPIView
 from haystack.query import SearchQuerySet
-from .forms import PersonFacetedSearchForm
+from .forms import PersonFacetedSearchFormNew
 from apis_core.api_routers import serializers_dict
 from apis_core.apis_relations.models import PersonInstitution
 from apis_core.api_renderers import NetJsonRenderer
@@ -18,7 +18,7 @@ class NetVizTheme(ListAPIView):
         kwargs = {"load_all": True, "searchqueryset": SearchQuerySet()}
         qs_d = self.request.GET.copy()
         network = qs_d.pop("network_type")
-        sqs1 = PersonFacetedSearchForm(qs_d, **kwargs).search()
+        sqs1 = PersonFacetedSearchFormNew(qs_d, **kwargs).search()
         pi = PersonInstitution.objects.filter(
             related_person_id__in=[x.pk for x in sqs1]
         )

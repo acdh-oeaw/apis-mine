@@ -101,7 +101,8 @@ class PersonListView(GenericListView):
         return self.filter.qs
 
 
-class PersonSearchView(FacetedSearchView):
+class PersonSearchView(UserPassesTestMixin, FacetedSearchView):
+    login_url = "/webpage/accounts/login/"
     queryset = SearchQuerySet()
     form_class = PersonFacetedSearchFormNew
     facet_fields = [
@@ -113,8 +114,14 @@ class PersonSearchView(FacetedSearchView):
         # "career",
     ]
 
+    def test_func(self):
+        access = access_for_all(self, viewtype="detail")
+        if access:
+            self.request = set_session_variables(self.request)
+        return access
 
-class SearchView(SingleTableMixin, PersonSearchView):
+
+class SearchView(SingleTableMixin, PersonSearchView, UserPassesTestMixin):
     table_class = SearchResultTable
     template_name = "theme/person_search.html"
 
@@ -175,4 +182,4 @@ class PersonDetailView(UserPassesTestMixin, DetailView):
 
 
 def network_viz(request):
-    return render_to_response("theme/network.html")
+    return render(request, "theme/network.html")
