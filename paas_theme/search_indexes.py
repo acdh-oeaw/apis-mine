@@ -300,7 +300,7 @@ class WahlIndex(indexes.SearchIndex, indexes.Indexable):
 
 
 class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.CharField(document=True, use_template=True)
+    text = indexes.CharField(document=True)
     name = indexes.CharField()
     academy_member = indexes.BooleanField(default=False)
     birth_date = indexes.DateField(model_attr="start_date", null=True, faceted=True)
@@ -364,7 +364,7 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
 
     def prepare_preisaufgaben(self, object):
         res = [
-            pi.related_event.label
+            pi.related_event.name
             for pi in PersonEvent.objects.filter(
                 related_person=object,
                 related_event_id__in=classes["preisaufgaben"],
@@ -534,3 +534,51 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
 
     def prepare_name(self, object):
         return str(object)
+
+    def prepare_text(self, object):
+        lst_fields = [
+            "name",
+            "academy_member",
+            "place_of_death",
+            "place_of_birth",
+            "profession",
+            "akademiemitgliedschaft",
+            "akademiefunktionen",
+            "funk_obfrau_kurat",
+            "funk_direkt_forsch_inst",
+            "funk_mitgl_kommission",
+            "funk_obfrau",
+            "funk_sekretaerin",
+            "funk_generalsekretaerin",
+            "funk_vizepraesidentin",
+            "funk_praesidentin",
+            "preisaufgaben",
+            "akademiepreise",
+            "ewk",
+            "nobelpreis",
+        ]
+        res = []
+        bool_map = {
+            "ewk": "Preisträger Österreichisches Ehrenzeichen für Wissenschaft und Kunst",
+            "nobelpreis": "Nobelpreisträger",
+            "funk_praesidentin": "Präsident",
+            "funk_vizepraesidentin": "Vizepräsident",
+            "funk_generalsekretaerin": "Generalsekretär",
+            "funk_obfrau": "Obmann Obfrau",
+            "funk_mitgl_kommission": "Mitglied Kommission",
+            "funk_direkt_forsch_inst": "Direktor Direktorin Institut",
+            "funk_obfrau_kurat": "Obmann Obfrau",
+            "academy_member": "Mitglied Akademie",
+        }
+        for field in lst_fields:
+            ret = getattr(self, f"prepare_{field}")(object)
+            if isinstance(ret, str):
+                res.append(ret)
+            elif isinstance(ret, list):
+                res.extend(ret)
+            elif isinstance(ret, bool):
+                if field in bool_map.keys():
+                    res.append(bool_map[field])
+                else:
+                    res.append(field)
+        return "\n".join(res)

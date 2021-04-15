@@ -17,10 +17,15 @@ class PersonFilterFormHelperNew(FormHelper):
         self.helper.form_tag = False
         self.add_input(Submit("Filter", "Search"))
         self.layout = Layout(
-            Fieldset("", "name", "gender", css_id="basic_search_fields"),
+            Fieldset("", "q", css_id="basic_search_fields"),
             Accordion(
                 AccordionGroup(
-                    "Lebensdaten", "birth_date", "death_date", css_id="lebensdaten"
+                    "Personendaten",
+                    "name",
+                    "gender",
+                    "birth_date",
+                    "death_date",
+                    css_id="lebensdaten",
                 ),
                 AccordionGroup(
                     "Mitgliedschaft",
@@ -54,6 +59,7 @@ class PersonFilterFormHelperNew(FormHelper):
 
 
 class PersonFacetedSearchFormNew(FacetedSearchForm):
+    q = forms.CharField(required=False, label="Suche")
     start_date_form = forms.CharField(required=False)
     end_date_form = forms.CharField(required=False)
     death_date = forms.DateField(required=False)
@@ -126,7 +132,9 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         if self.cleaned_data["q"] == "":
             sqs = self.searchqueryset.load_all()
         else:
-            sqs = super(PersonFacetedSearchFormNew, self).search()
+            sqs = self.searchqueryset.filter(
+                django_ct="apis_entities.person", academy_member=True
+            ).filter(content=AutoQuery(self.cleaned_data["q"]))
         if self.cleaned_data["akademiefunktionen"]:
             funk_dict = SQ()
             for funk in self.cleaned_data["akademiefunktionen"]:
@@ -134,6 +142,8 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             sqs = sqs.filter(funk_dict)
         if self.cleaned_data["gender"]:
             sqs = sqs.filter(gender=AutoQuery(self.cleaned_data["gender"]))
+        if self.cleaned_data["name"]:
+            sqs = sqs.filter(name=AutoQuery(self.cleaned_data["name"]))
         if self.cleaned_data["profession"]:
             sqs = sqs.filter(profession=AutoQuery(self.cleaned_data["profession"]))
         if (
