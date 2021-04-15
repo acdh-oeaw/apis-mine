@@ -26,18 +26,6 @@
   </div>
   <div class="container startPageSearch">
     <form action="/search?" method="get">
-      <div class="input-group mb-3">
-        <input id="fulltextsearch" class="form-control navbar-search" name="q" id="s" type="text" placeholder="Suche"
-          value="" autocomplete="off">
-        <div class="input-group-append">
-          <button class="btn btn-primary" type="submit">
-            <i data-feather="search" style="width: 20px; height: 20px;"></i>
-          </button>
-        </div>
-      </div>
-    </form>
-
-    <form action="/search?" method="get">
         <div id="search_form">
         {% crispy search_form search_form.helper %}
         </div>
