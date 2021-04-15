@@ -17,7 +17,7 @@ class PersonFilterFormHelperNew(FormHelper):
         self.helper.form_tag = False
         self.add_input(Submit("Filter", "Search"))
         self.layout = Layout(
-            Fieldset("", "id", "name", "gender", css_id="basic_search_fields"),
+            Fieldset("", "name", "gender", css_id="basic_search_fields"),
             Accordion(
                 AccordionGroup(
                     "Lebensdaten", "birth_date", "death_date", css_id="lebensdaten"
