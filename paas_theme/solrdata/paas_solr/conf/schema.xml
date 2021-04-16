@@ -83,11 +83,19 @@
     
     <field name="text" type="text_en" indexed="true" stored="true" multiValued="false" />
     
+    <field name="field" type="text_en" indexed="true" stored="true" multiValued="false" />
+    
     <field name="person" type="text_en" indexed="true" stored="true" multiValued="false" />
     
     <field name="person_id" type="long" indexed="true" stored="true" multiValued="false" />
     
     <field name="start_date" type="date" indexed="true" stored="true" multiValued="false" />
+    
+    <field name="relation_type" type="text_en" indexed="true" stored="true" multiValued="false" />
+    
+    <field name="relation_type_full" type="text_en" indexed="true" stored="true" multiValued="false" />
+    
+    <field name="relation_type_mapped" type="text_en" indexed="true" stored="true" multiValued="true" />
     
     <field name="end_date" type="date" indexed="true" stored="true" multiValued="false" />
     

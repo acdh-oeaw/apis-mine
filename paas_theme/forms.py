@@ -6,6 +6,7 @@ from haystack.forms import FacetedSearchForm, SearchForm
 from haystack.query import SQ, AutoQuery, SearchQuerySet
 from apis_core.helper_functions.DateParser import parse_date
 from apis_core.apis_entities.fields import Select2Multiple, ListSelect2
+from .utils import classes
 
 
 class PersonFilterFormHelperNew(FormHelper):
@@ -38,6 +39,13 @@ class PersonFilterFormHelperNew(FormHelper):
                     "place_of_birth",
                     "place_of_death",
                     "profession",
+                    Fieldset(
+                        "Berufliche Positionen",
+                        "beruf_position",
+                        "beruf_institution",
+                        css_id="beruf_subform",
+                        css_class="form-inline",
+                    ),
                     css_id="akademischer_CV",
                 ),
                 AccordionGroup(
@@ -67,6 +75,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     name = forms.CharField(required=False)
     akademiemitgliedschaft = forms.CharField(required=False)
     akademiefunktionen = forms.MultipleChoiceField(
+        widget=forms.SelectMultiple(attrs={"class": "select2-main"}),
         required=False,
         choices=[
             ("funk_praesidentin", "Präsident/in"),
@@ -101,7 +110,15 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     place_of_death = forms.CharField(required=False, label="Sterbeort")
     profession = forms.CharField(required=False, label="Beruf")
     nobelpreis = forms.BooleanField(required=False, label="Nobelpreis")
+    beruf_position = forms.MultipleChoiceField(
+        widget=forms.SelectMultiple(attrs={"class": "select2-main"}),
+        required=False,
+        label="Position",
+        choices=[(pos, pos) for pos in classes["berufslaufbahn_map"].keys()],
+    )
+    beruf_institution = forms.CharField(required=False, label="Institution")
     mtgld_mitgliedschaft = forms.MultipleChoiceField(
+        widget=forms.SelectMultiple(attrs={"class": "select2-main"}),
         required=False,
         label="Mitgliedschaft",
         choices=[
@@ -112,6 +129,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         ],
     )
     mtgld_klasse = forms.MultipleChoiceField(
+        widget=forms.SelectMultiple(attrs={"class": "select2-main"}),
         required=False,
         label="Klasse",
         choices=[
@@ -157,6 +175,10 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             for klasse in self.cleaned_data["mtgld_klasse"]:
                 kls_dict.add(SQ(akademiemitgliedschaft=klasse), SQ.OR)
             sqs = sqs.filter(mtgld_dic & kls_dict)
+        if self.cleaned_data["ewk"]:
+            sqs = sqs.filter(ewk=self.cleaned_data["ewk"])
+        if self.cleaned_data["nobelpreis"]:
+            sqs = sqs.filter(nobelpreis=self.cleaned_data["nobelpreis"])
         if (
             self.cleaned_data["wahl_beruf"]
             or self.cleaned_data["wahl_person"]
@@ -179,10 +201,40 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
                 if pers2.elected_by_id not in pers_ids:
                     pers_ids.append(pers2.elected_by_id)
             sqs = sqs.filter(django_id__in=pers_ids)
-        if self.cleaned_data["ewk"]:
-            sqs = sqs.filter(ewk=self.cleaned_data["ewk"])
-        if self.cleaned_data["nobelpreis"]:
-            sqs = sqs.filter(nobelpreis=self.cleaned_data["nobelpreis"])
+        if (
+            self.cleaned_data["beruf_position"]
+            or self.cleaned_data["beruf_institution"]
+        ):
+            berufe_dict = SQ()
+            position_dict = SQ()
+            for position in self.cleaned_data["beruf_position"]:
+                position_dict.add(SQ(relation_type_mapped=AutoQuery(position)), SQ.OR)
+            institution_dict = SQ()
+            if isinstance(self.cleaned_data["beruf_institution"], str):
+                self.cleaned_data["beruf_institution"] = [
+                    self.cleaned_data["beruf_institution"]
+                ]
+            for institution in self.cleaned_data["beruf_institution"]:
+                institution_dict.add(SQ(institution=AutoQuery(institution)), SQ.OR)
+            if len(self.cleaned_data["beruf_institution"][0]) > 0:
+                berufe_dict.add(institution_dict, SQ.AND)
+            if len(self.cleaned_data["beruf_position"][0]) > 0:
+                berufe_dict.add(position_dict, SQ.AND)
+
+            sqs3 = (
+                SearchQuerySet()
+                .filter(
+                    django_ct="apis_relations.personinstitution",
+                    field="Berufliche Position",
+                )
+                .filter(berufe_dict)
+            )
+            pers_ids = []
+            for pers2 in sqs3:
+                if pers2.person_id not in pers_ids:
+                    pers_ids.append(pers2.person_id)
+            sqs = sqs.filter(django_id__in=pers_ids)
+
         if len(self.selected_facets) == 0 and "selected_facets" in self.data.keys():
             if len(self.data["selected_facets"]) > 0:
                 self.selected_facets = self.data["selected_facets"]

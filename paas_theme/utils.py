@@ -188,6 +188,27 @@ classes["akad_funktionen"] = {
 }
 classes["akademiepreise"] = get_academy_awards()
 classes["preisaufgaben"] = get_academy_preisaufgaben()
+classes["berufslaufbahn_map"] = {
+    "Professor/in": get_child_classes(
+        [3534, 3404, 179, 180, 181, 182, 183], PersonInstitutionRelation, labels=False
+    ),
+    "o. Professor/in": get_child_classes(
+        [179], PersonInstitutionRelation, labels=False
+    ),
+    "ao. Professor/in": get_child_classes(
+        [180], PersonInstitutionRelation, labels=False
+    ),
+    "Rektor/in": [1874],
+    "Dekan/in": [1873],
+    "Mitarbeiter/in": get_child_classes(
+        [4099, 3530, 3381, 3350], PersonInstitutionRelation, labels=False
+    ),
+    "leitende Mitarbeiter/in": get_child_classes(
+        [3488, 3479, 3423, 3422, 3177, 3077, 1872, 1871],
+        PersonInstitutionRelation,
+        labels=False,
+    ),
+}
 
 
 def get_mitgliedschaft_from_relation(rel, abbreviate=True):

@@ -44,9 +44,13 @@ class InstitutionIndex(indexes.SearchIndex, indexes.Indexable):
 
 class FunktionenAkademieIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
+    field = indexes.CharField()
     person = indexes.CharField(model_attr="related_person")
     person_id = indexes.IntegerField(model_attr="related_person_id")
     start_date = indexes.DateField(model_attr="start_date", null=True)
+    relation_type = indexes.CharField(model_attr="relation_type")
+    relation_type_full = indexes.CharField(model_attr="relation_type")
+    relation_type_mapped = indexes.MultiValueField(null=True)
     end_date = indexes.DateField(model_attr="end_date", null=True)
     institution_id = indexes.IntegerField(model_attr="related_institution_id")
     institution = indexes.CharField(model_attr="related_institution")
@@ -55,8 +59,21 @@ class FunktionenAkademieIndex(indexes.SearchIndex, indexes.Indexable):
     def get_model(self):
         return PersonInstitution
 
+    def prepare_relation_type_mapped(self, object):
+        res = []
+        for key, value in classes["berufslaufbahn_map"].items():
+            if object.relation_type_id in value and key not in res:
+                res.append(key)
+        return res
+
+    def prepare_field(self, object):
+        if object.related_institution_id in subs_akademie:
+            return "Funktionen in Akademieinstitutionen"
+        else:
+            return "Berufliche Position"
+
     def index_queryset(self, using=None):
-        return self.get_model().objects.filter(related_institution_id__in=subs_akademie)
+        return self.get_model().objects.all()
 
 
 class WahlIndex(indexes.SearchIndex, indexes.Indexable):
