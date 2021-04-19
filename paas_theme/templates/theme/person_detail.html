@@ -35,25 +35,32 @@
     <div class="col-md-12 pr-5">
       <article class="bio">
         <div class="entry-header">
-          <div class="row">
+          <!--<div class="row">
             <div class="col">
               <h2>{{ object.name }}{%if object.first_name %}, {{ object.first_name }}{% endif %}</h2>
             </div>
-          </div>
+          </div>-->
         </div>
         <div id="main" class="card-body">
           <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-4 bg-mine border-mine">
+              <div class="row">
+               <h3><!--{{ object.name }}{%if object.first_name %}, {{ object.first_name }}{% endif %}-->
+                {%if object.first_name %}{{ object.first_name }}{% endif %}<br/>
+                {{ object.name }}
+              </h3>  
+                {% if image %}
+                <div class="mb-5 imgcontainer">
+                  <img style="max-height:300px" src="{% static image %}">
+                </div>
+                {% endif %}</div>
+             
               <p class="profession-date-of-birth">
                 {% if profession %}<span style="text-align: left">{{ profession }}</span> <br />{% endif %}
                 <span class="font-weight-normal"><abbr title="geboren">*</abbr>{% if object.start_date_written is not None %} {{object.start_date_written }}{% if place_of_birth is not None %} ({{place_of_birth}}){% endif %}{% else %} -{% endif %}</span><br />
                 <span class="font-weight-normal"><abbr title='gestorben'>&dagger;</abbr> {% if object.end_date_written is not None %} {{object.end_date_written }}{% if place_of_death is not None %} ({{place_of_death}}){% endif %}{% else %} -{% endif %}</span>
               </p>
-              {% if image %}
-              <div class="mb-5 imgcontainer">
-                <img style="max-height:300px" src="{% static image %}">
-              </div>
-              {% endif %}
+              
               <p>
                 <b>Mitgliedschaft</b>
                 {% if mitgliedschaften %}
@@ -88,24 +95,24 @@
               </ul>
               </p>
             </div>
-            <div class="col-md-8">
+            <div class="col-md-7 offset-md-1">
             <ul class="nav nav-tabs" id="myTab" role="tablist">
-              <li class="nav-item" role="presentation">
-                <a class="nav-link active" data-toggle="tab" id="daten-tab" href="#daten" role="tab" aria-controls="home" aria-selected="true">Daten</a>
+              <li class="nav-item p-0" role="presentation">
+                <a class="nav-link rounded-0 active" data-toggle="tab" id="daten-tab" href="#daten" role="tab" aria-controls="home" aria-selected="true">Daten</a>
               </li>
-              <li class="nav-item" role="presentation">
-                <a class="nav-link" data-toggle="tab" id="egonet-tab" href="#egonet" role="tab" aria-controls="egonet" aria-selected="false">Ego-Netz</a>
+              <li class="nav-item p-0" role="presentation">
+                <a class="nav-link rounded-0" data-toggle="tab" id="egonet-tab" href="#egonet" role="tab" aria-controls="egonet" aria-selected="false">Ego-Netz</a>
               </li>
-              <li class="nav-item" role="presentation">
-                <a class="nav-link" data-toggle="tab" id="map-tab" href="#map" role="tab" role="tab" aria-controls="contact" aria-selected="false">Karte</a>
+              <li class="nav-item p-0" role="presentation">
+                <a class="nav-link rounded-0" data-toggle="tab" id="map-tab" href="#map" role="tab" role="tab" aria-controls="contact" aria-selected="false">Karte</a>
               </li>
             </ul>
-            <div class="tab-content" id="myTabContent">
+            <div class="tab-content bg-mine" id="myTabContent">
             <div class="tab-pane fade show active" id="daten" role="tabpanel" aria-labelledby="daten-tab">
               {% for key, value in daten_akademie.items %}
               {% if value|length > 0 %}
               <div class="card mt-2 rounded-0">
-                <div class="card-header p-0" id="heading{{key}}">
+                <div class="card-header p-0 bg-white" id="heading{{key}}">
                   <h5 class="mb-0">
                     <button type="button" class="btn btn-link collapsebtn w-100 text-left text-uppercase collapsed"
                       data-toggle="collapse" data-target="#{{key}}" aria-expanded="true" aria-controls="{{key}}">
@@ -118,7 +125,7 @@
                   <div class="card-body p-2 pl-3 pr-3 show-limited-number">
                     <ul class="pl-0 mb-0">
                       {% for ent in value %}
-                      <li style="list-style-type:none; padding-bottom: 0.5em">{{ent|safe}}</li>
+                      <li class="font-weight-normal" style="list-style-type:none; padding-bottom: 0.5em">{{ent|safe}}</li>
                       {% endfor %}
                     </ul>
                   </div>
