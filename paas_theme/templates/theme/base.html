@@ -89,9 +89,11 @@
     <!-- ******************* The Navbar Area ******************* -->
       <div class="wrapper-fluid wrapper-navbar sticky-navbar" id="wrapper-navbar" itemscope itemtype="http://schema.org/WebSite">
         <a class="skip-link screen-reader-text sr-only" href="#content">Skip to content</a>
-        <nav class="navbar navbar-expand-lg navbar-dark oebl-inverted">
+        <nav class="navbar navbar-expand-lg">
           <div class="container" >
-            <a href="/" class="navbar-brand custom-logo-link" rel="home" itemprop="url"><h3>PAAS</h3></a><!-- end custom logo -->
+            <a href="/" class="navbar-brand custom-logo-link" rel="home" itemprop="url"><!--<h3>PAAS</h3>-->
+            <img src="{%static 'theme/img/paas-logo.png' %}"/>
+            </a><!-- end custom logo -->
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
             </button>
@@ -109,9 +111,14 @@
                     </li>
                   </ul>
                 </li>-->
-                <li class="nav-item"><a title="Suche" href="{% url 'theme:search' %}" class="nav-link">Suche</a></li>
+                <!--<li class="nav-item"><a title="Suche" href="{% url 'theme:search' %}" class="nav-link">Suche</a></li>
                 <li class="nav-item"><a title="UeberOEBL" href="{% url 'theme:about' %}" class="nav-link">Über</a></li>
                 <li class="nav-item"><a title="Kontakt" href="{% url 'theme:contact' %}" class="nav-link">Kontakt</a></li>
+                -->
+                <li class="nav-item"><a title="Mitglieder" href="{% url 'theme:search' %}" class="nav-link">Mitglieder</a></li>
+                <li class="nav-item"><a title="Institutionen" href="{% url 'theme:about' %}" class="nav-link">Institutionen</a></li>
+                <li class="nav-item"><a title="Netzwerke" href="{% url 'theme:contact' %}" class="nav-link">Netzwerke</a></li>
+                <li class="nav-item"><a title="Ereignisse" href="{% url 'theme:contact' %}" class="nav-link">Ereignisse</a></li>
               </ul>
               <form class="form-inline my-2 my-lg-0 navbar-search-form" method="get" action="/search" role="search">
                 <input class="form-control navbar-search" id="s" name="q" type="text" placeholder="Volltextsuche" value="" autocomplete="off">

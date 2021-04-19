@@ -342,10 +342,6 @@ nav.navbar {
   font-size: 0.8rem;
 }
 
-.navbar .navbar-brand img {
-  height: 2rem;
-  max-height: unset;
-}
 
 #logo img {
   width: 80%;
@@ -1393,4 +1389,48 @@ div.leaflet-marker-icon.activated path {
 
 div.leaflet-marker-icon svg.feather-map-pin {
   height: 100%;
+}
+
+.navbar .navbar-brand {
+  height:6rem;
+
+}
+
+.navbar .navbar-collapse .navbar-search {
+  border-radius:0;
+}
+
+.bg-mine {
+  background-color:#f0f0f7;
+}
+
+.border-mine {
+  border-top: 8px solid #c80000;
+}
+
+.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+  border-top: 8px solid #c80000;
+  background-color:#f0f0f7;
+}
+
+.nav-tabs .nav-link {
+  border:none;
+}
+
+
+@media (min-width: 992px) {
+.navbar-expand-lg .navbar-nav {
+    flex-direction: column;
+}
+
+.navbar-expand-lg .navbar-nav .nav-item {
+  padding-left:0;
+}
+
+.navbar-expand-lg .navbar-nav .nav-item .nav-link {
+  line-height:0.8rem;
+  font-size:0.8rem;
+  padding:0.2rem;
+}
+
 }
