@@ -3,7 +3,7 @@ from django_tables2.utils import A
 
 from apis_core.apis_entities.models import Person
 
-from .utils import enrich_person_context
+from .provide_data import enrich_person_context
 
 from haystack.models import SearchResult
 

@@ -4,17 +4,15 @@ from django.conf import settings
 from apis_core.apis_metainfo.models import Text
 from apis_core.apis_vocabularies.models import LabelType
 from apis_core.apis_labels.models import Label
-from .utils import oebl_persons
 from apis_core.apis_entities.models import Person, Institution, Place
 from apis_core.apis_relations.models import PersonInstitution, PersonPerson, PersonEvent
-from .utils import (
+from .provide_data import (
     get_child_classes,
     get_child_institutions_from_parent,
     get_mitgliedschaft_from_relation,
     abbreviate,
-    subs_akademie,
 )
-from .utils import classes
+from .provide_data import classes
 
 
 class InstitutionIndex(indexes.SearchIndex, indexes.Indexable):
@@ -67,7 +65,7 @@ class FunktionenAkademieIndex(indexes.SearchIndex, indexes.Indexable):
         return res
 
     def prepare_field(self, object):
-        if object.related_institution_id in subs_akademie:
+        if object.related_institution_id in classes["subs_akademie"]:
             return "Funktionen in Akademieinstitutionen"
         else:
             return "Berufliche Position"
@@ -496,7 +494,8 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
         for k, rel_types in classes["akad_funktionen"].items():
             rel_type_ids.extend(rel_types[0])
         for rel in object.personinstitution_set.filter(
-            related_institution_id__in=subs_akademie, relation_type_id__in=rel_type_ids
+            related_institution_id__in=classes["subs_akademie"],
+            relation_type_id__in=rel_type_ids,
         ):
             res.append(
                 f"{str(rel.related_institution)}__{rel.relation_type.label}__{rel.start_date}__{rel.end_date}"

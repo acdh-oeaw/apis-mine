@@ -6,7 +6,7 @@ from haystack.forms import FacetedSearchForm, SearchForm
 from haystack.query import SQ, AutoQuery, SearchQuerySet
 from apis_core.helper_functions.DateParser import parse_date
 from apis_core.apis_entities.fields import Select2Multiple, ListSelect2
-from .utils import classes
+from .provide_data import classes
 
 
 class PersonFilterFormHelperNew(FormHelper):
