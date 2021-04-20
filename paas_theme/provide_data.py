@@ -95,23 +95,51 @@ def abbreviate(value):
         return "math.-nat. Klasse"
     elif value.name == "PHILOSOPHISCH-HISTORISCHE KLASSE":
         return "phil.-hist. Klasse"
+    elif value.name == "Nationalsozialistische Deutsche Arbeiterpartei":
+        return "NSDAP"
+    elif value.name == "Nationalsozialistisches Fliegerkorps (NSFK)":
+        return "NSFK"
+    elif value.name == "Nationalsozialistische Volkswohlfahrt":
+        return "NSV"
     else:
         return value
 
 
-def get_date_range(rel, extended=False, original=False, format="%d.%m.%Y"):
+def get_date_range(
+    rel, time_range_ids, extended=False, original=False, format="%d.%m.%Y"
+):
     res = ""
+    start = False
+    end = False
+    if rel.start_date_written:
+        if len(rel.start_date_written) == 4 and extended:
+            extended = False
+    else:
+        extended = False
+    time_span = False
     if extended:
         if rel.start_date_written is not None:
-            res += f"von {rel.start_date_written if original else rel.start_date.strftime(format)}"
+            start = f"{rel.start_date_written if original else rel.start_date.strftime(format)}"
         if rel.end_date_written is not None:
-            res += f" bis {rel.end_date_written if original else rel.end_date.strftime(format)}"
+            end = (
+                f"{rel.end_date_written if original else rel.end_date.strftime(format)}"
+            )
     else:
         if rel.start_date is not None:
-            res += f"{rel.start_date.strftime('%Y')}"
+            start = f"{rel.start_date.strftime('%Y')}"
         if rel.end_date is not None:
-            res += f"-{rel.end_date.strftime('%Y')}"
-
+            end = f"{rel.end_date.strftime('%Y')}"
+    if rel.relation_type_id in time_range_ids:
+        res += "("
+        if start:
+            res += f"ab {start}"
+        if end:
+            res += f" bis {end})"
+    elif start:
+        res += f"({start})"
+    if len(res.strip()) < 4:
+        return ""
+    res = res.replace("( ", "(").replace(" )", ")")
     return res.strip()
 
 
@@ -191,6 +219,43 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
         daten_mappings[i[0]] = i[1].replace(">>", "in")
 
     classes = {}
+    classes["time_ranges_ids"] = [
+        19,
+        26,
+        30,
+        88,
+        89,
+        90,
+        91,
+        92,
+        93,
+        94,
+        95,
+        96,
+        97,
+        102,
+        104,
+        112,
+        117,
+        135,
+        136,
+        162,
+        164,
+        1369,
+        1371,
+        1376,
+        3260,
+        3488,
+        4178,
+    ]
+    classes["time_ranges_ids"].extend(
+        [
+            x
+            for x in get_child_classes([1851], PersonInstitutionRelation)
+            if x not in classes["time_ranges_ids"]
+        ]
+    )
+    classes["habilitation"] = get_child_classes([1385], PersonInstitutionRelation)
     classes["berufslaufbahn_ids"] = berufslaufbahn_ids
     classes["subs_akademie"] = subs_akademie
     classes["promotion_inst_ids"] = promotion_inst_ids
@@ -298,6 +363,18 @@ def get_wahlvorschlag(pers):
     lst_fin_sort = sorted(lst_fin, key=lambda tup: tup[0])
 
     return lst_fin_sort
+
+
+def create_text_berufslaufbahn(rel):
+    lst_rels = rel.relation_type.label.split(">>")
+    if rel.relation_type_id in classes["berufslaufbahn_map"]["Professor/in"]:
+        return f"{lst_rels[1]} für {lst_rels[2]}"
+    elif rel.relation_type_id in classes["habilitation"]:
+        return f"Habilitation in {lst_rels[1]}"
+    elif rel.relation_type_id == 3088:
+        return "Ehrendoktorat von"
+    else:
+        return lst_rels[-1]
 
 
 def enrich_person_context(person_object, context):
@@ -441,25 +518,27 @@ def enrich_person_context(person_object, context):
                 )
             ],
             "Berufslaufbahn": [
-                f'{rel.relation_type.label}: <a href="/institution/{rel.related_institution_id}">{rel.related_institution}</a> ({rel.start_date_written if rel.start_date_written is not None else "ka"})'
+                f'{create_text_berufslaufbahn(rel)}: <a href="/institution/{rel.related_institution_id}">{rel.related_institution}</a> {get_date_range(rel, classes["time_ranges_ids"], extended=True)}'
                 for rel in person_object.personinstitution_set.filter(
                     relation_type_id__in=classes["berufslaufbahn_ids"]
-                ).exclude(related_institution_id__in=classes["subs_akademie"])
+                ).exclude(
+                    related_institution_id__in=classes["subs_akademie"] + [2, 3, 500]
+                )
             ],
             "Mitglied in einer nationalsozialistischen Vereinigung": [
-                f'Anwärter{"in" if person_object.gender == "female" else ""} der {rel.related_institution} {get_date_range(rel, extended=True)}'
+                f'Anwärter{"in" if person_object.gender == "female" else ""} der {rel.related_institution} {get_date_range(rel, classes["time_ranges_ids"], extended=True)}'
                 for rel in person_object.personinstitution_set.filter(
                     relation_type_id__in=[3470, 3462]
                 )
             ]
             + [
-                f"Mitglied der {rel.related_institution} {get_date_range(rel, extended=True)}"
+                f"Mitglied der <span data-toggle='tooltip' title='{rel.related_institution}'>{abbreviate(rel.related_institution)}</span> {get_date_range(rel, classes['time_ranges_ids'], extended=True)}"
                 for rel in person_object.personinstitution_set.filter(
                     relation_type_id__in=[3452, 3451]
                 )
             ]
             + [
-                f"förderndes Mitglied der {rel.related_institution} {get_date_range(rel, extended=True)}"
+                f"förderndes Mitglied der <span data-toggle='tooltip' title='{rel.related_institution}'>{abbreviate(rel.related_institution)}</span> {get_date_range(rel, classes['time_ranges_ids'], extended=True)}"
                 for rel in person_object.personinstitution_set.filter(
                     relation_type_id__in=[3473]
                 )
@@ -514,11 +593,13 @@ def enrich_person_context(person_object, context):
         ].append("Registrierungspflicht aufgrund des Verbotsgesetzes vom 1.5.1945")
     if person_object.personinstitution_set.filter(relation_type_id=26).count() > 0:
         lst_kom = [
-            (rel.related_institution, get_date_range(rel))
-            for rel in person_object.personinstitution_set.filter(relation_type_id=26)
+            (rel.related_institution, get_date_range(rel, classes["time_ranges_ids"]))
+            for rel in person_object.personinstitution_set.filter(
+                relation_type_id=26
+            ).order_by("start_date")
         ]
         lst_kom = [
-            f'<a href="/institution/{inst[0].pk}">{inst[0].name}</a> ({inst[1]})'
+            f'<a href="/institution/{inst[0].pk}">{inst[0].name}</a> {inst[1]}'
             for inst in lst_kom
         ]
         context["daten_akademie"]["Funktionen in der Akademie"].append(
