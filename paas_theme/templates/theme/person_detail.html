@@ -43,27 +43,29 @@
         </div>
         <div id="main" class="card-body">
           <div class="row">
-            <div class="col-md-4 bg-mine border-mine">
-              <div class="row">
-               <h3><!--{{ object.name }}{%if object.first_name %}, {{ object.first_name }}{% endif %}-->
+            <div class="col-md-4 bg-mine border-mine p-0">
+               <h3 class="font-weight-normal float-md-left pt-1 pb-4" style="width:calc(100% - 100px)"><!--{{ object.name }}{%if object.first_name %}, {{ object.first_name }}{% endif %}-->
                 {%if object.first_name %}{{ object.first_name }}{% endif %}<br/>
                 {{ object.name }}
               </h3>  
-                {% if image %}
-                <div class="mb-5 imgcontainer">
-                  <img style="max-height:300px" src="{% static image %}">
+                
+                <div class="imgcontainer">
+                  {% if image %}
+                  <img class="float-md-right" style="max-width:100px;" src="{% static image %}">
+                  {% endif %}
+                  <img class="float-md-right" style="max-width:100px;" src="https://via.placeholder.com/100x120">
                 </div>
-                {% endif %}</div>
              
               <p class="profession-date-of-birth">
-                {% if profession %}<span style="text-align: left">{{ profession }}</span> <br />{% endif %}
+                {% if profession %}<span class="font-weight-bold">{{ profession }}</span> <br />{% endif %}
                 <span class="font-weight-normal"><abbr title="geboren">*</abbr>{% if object.start_date_written is not None %} {{object.start_date_written }}{% if place_of_birth is not None %} ({{place_of_birth}}){% endif %}{% else %} -{% endif %}</span><br />
                 <span class="font-weight-normal"><abbr title='gestorben'>&dagger;</abbr> {% if object.end_date_written is not None %} {{object.end_date_written }}{% if place_of_death is not None %} ({{place_of_death}}){% endif %}{% else %} -{% endif %}</span>
               </p>
               
-              <p>
-                <b>Mitgliedschaft</b>
+              
                 {% if mitgliedschaften %}
+                <div class="section">
+                  <span  class="font-weight-bold">Mitgliedschaft</span>
               <ul class="relentities">
                 {% for x in mitgliedschaften %}
                 <li class="pl-0 font-weight-normal" style="padding-bottom: 0.8em">
@@ -71,8 +73,9 @@
                 </li>
                 {% endfor %}
               </ul>
+            </div>
+              
               {% endif %}
-              </p>
               {% if normdaten %}
               <p>
                 <b>Online-Ressourcen</b>
