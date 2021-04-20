@@ -52,8 +52,9 @@
                 <div class="imgcontainer">
                   {% if image %}
                   <img class="float-md-right" style="max-width:100px;" src="{% static image %}">
-                  {% endif %}
+                  {% else %}
                   <img class="float-md-right" style="max-width:100px;" src="https://via.placeholder.com/100x120">
+                  {% endif %}
                 </div>
              
               <p class="profession-date-of-birth">
