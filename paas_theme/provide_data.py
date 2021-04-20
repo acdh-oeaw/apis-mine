@@ -428,25 +428,25 @@ def enrich_person_context(person_object, context):
 
     context["daten_akademie"] = OrderedDict(
         {
-            "schulbildung": [
+            "Schulbildung": [
                 f'<a href="/institution/{rel.related_institution_id}">{rel.related_institution}</a>{", Abschluß " + rel.start_date.strftime("%Y") if rel.start_date is not None else ""}'
                 for rel in person_object.personinstitution_set.filter(
                     relation_type_id__in=[176]
                 )
             ],
-            "studium": [
+            "Studium": [
                 f'<a href="/institution/{rel.related_institution_id}">{rel.related_institution}</a>{", " + classes["daten_mappings"][rel.relation_type_id] if rel.relation_type_id in classes["daten_mappings"].keys() else ""} {rel.start_date_written if rel.start_date_written and rel.relation_type_id in classes["daten_mappings"].keys() else ""}'
                 for rel in person_object.personinstitution_set.filter(
                     relation_type_id__in=[1369, 1371] + classes["promotion_inst_ids"]
                 )
             ],
-            "berufslaufbahn": [
+            "Berufslaufbahn": [
                 f'{rel.relation_type.label}: <a href="/institution/{rel.related_institution_id}">{rel.related_institution}</a> ({rel.start_date_written if rel.start_date_written is not None else "ka"})'
                 for rel in person_object.personinstitution_set.filter(
                     relation_type_id__in=classes["berufslaufbahn_ids"]
                 ).exclude(related_institution_id__in=classes["subs_akademie"])
             ],
-            "mitglied_in_einer_nationalsozialistischen_vereinigung": [
+            "Mitglied in einer nationalsozialistischen Vereinigung": [
                 f'Anwärter{"in" if person_object.gender == "female" else ""} der {rel.related_institution} {get_date_range(rel, extended=True)}'
                 for rel in person_object.personinstitution_set.filter(
                     relation_type_id__in=[3470, 3462]
@@ -464,7 +464,7 @@ def enrich_person_context(person_object, context):
                     relation_type_id__in=[3473]
                 )
             ],
-            "wahl_mitgliederstatus": [
+            "Wahl und Mitgliedschaft": [
                 t[1][0]
                 + " "
                 + ", ".join(
@@ -477,7 +477,7 @@ def enrich_person_context(person_object, context):
                 else t[1]
                 for t in get_wahlvorschlag(person_object)
             ],
-            "funktionen_in_der_akademie": [
+            "Funktionen in der Akademie": [
                 f'Zum Präsidenten der Gesamtakademie {rel.relation_type.name} am {rel.start_date_written}{", tätig bis "+rel.end_date_written if rel.end_date_written is not None else ""}'
                 for rel in person_object.personinstitution_set.filter(
                     related_institution_id=500, relation_type_id__in=[103, 106]
@@ -510,7 +510,7 @@ def enrich_person_context(person_object, context):
         context["daten_akademie"].move_to_end("Eltern und Kinder", last=False)
     if person_object.personevent_set.filter(relation_type_id=3454).count() > 0:
         context["daten_akademie"][
-            "mitglied_in_einer_nationalsozialistischen_vereinigung"
+            "Mitglied in einer nationalsozialistischen Vereinigung"
         ].append("Registrierungspflicht aufgrund des Verbotsgesetzes vom 1.5.1945")
     if person_object.personinstitution_set.filter(relation_type_id=26).count() > 0:
         lst_kom = [
@@ -521,15 +521,15 @@ def enrich_person_context(person_object, context):
             f'<a href="/institution/{inst[0].pk}">{inst[0].name}</a> ({inst[1]})'
             for inst in lst_kom
         ]
-        context["daten_akademie"]["funktionen_in_der_akademie"].append(
+        context["daten_akademie"]["Funktionen in der Akademie"].append(
             f'Mitglied der folgenden Kommission{"en" if len(lst_kom) > 1 else ""}: {", ".join(lst_kom)}'
         )
     if (
-        "mitglied_in_einer_nationalsozialistischen_vereinigung"
+        "Mitglied in einer nationalsozialistischen Vereinigung"
         in context["daten_akademie"].keys()
     ):
         context["daten_akademie"].move_to_end(
-            "mitglied_in_einer_nationalsozialistischen_vereinigung"
+            "Mitglied in einer nationalsozialistischen Vereinigung"
         )
 
     return context
