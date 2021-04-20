@@ -337,6 +337,8 @@ def get_wahlvorschlag(pers):
     kls = abbreviate(kls)
     res = {}
     umwidm = [56, 57, 58, 59]
+    ruhend = [3457, 3456, 3374, 3373]
+    reaktiviert = [3471, 3460, 3459]
     for pp in pers.related_personB.filter(
         relation_type_id__in=classes["vorschlag"][0]
     ).order_by("start_date"):
@@ -358,6 +360,22 @@ def get_wahlvorschlag(pers):
                 (
                     pp.start_date,
                     f"Umgewidmet zum {get_mitgliedschaft_from_relation(pp.relation_type)} der {kls} {'am' if len(pp.start_date_written) > 4 else ''} {pp.start_date_written}",
+                )
+            )
+    for pp in pers.personinstitution_set.filter(relation_type_id__in=ruhend):
+        if "ruhend gestellt" in pp.relation_type.name.lower():
+            lst_fin.append(
+                (
+                    pp.start_date,
+                    f"Ruhend gestellt als {get_mitgliedschaft_from_relation(pp.relation_type)} der {kls} {'am' if len(pp.start_date_written) > 4 else ''} {pp.start_date_written}",
+                )
+            )
+    for pp in pers.personinstitution_set.filter(relation_type_id__in=reaktiviert):
+        if "reaktiviert" in pp.relation_type.name.lower():
+            lst_fin.append(
+                (
+                    pp.start_date,
+                    f"Reaktiviert als {get_mitgliedschaft_from_relation(pp.relation_type)} der {kls} {'am' if len(pp.start_date_written) > 4 else ''} {pp.start_date_written}",
                 )
             )
     lst_fin_sort = sorted(lst_fin, key=lambda tup: tup[0])
