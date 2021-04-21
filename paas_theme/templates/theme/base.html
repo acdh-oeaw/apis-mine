@@ -85,23 +85,27 @@
 </head>
 
 <body id="body" data-searchtype="erw" class="oebl-background-grey">
-<div class="hfeed site" id="page">
+<div class="hfeed site bg-white" id="page">
     <!-- NAVBAR
 ================================================== -->
     <!-- ******************* The Navbar Area ******************* -->
       <div class="wrapper-fluid wrapper-navbar sticky-navbar" id="wrapper-navbar" itemscope itemtype="http://schema.org/WebSite">
         <a class="skip-link screen-reader-text sr-only" href="#content">Skip to content</a>
         <nav class="navbar navbar-expand-lg">
-          <div class="container" >
+          <div class="container">
+            <div class="row">
+              <div class="col-md-5">
             <a href="/" class="navbar-brand custom-logo-link" rel="home" itemprop="url"><!--<h3>PAAS</h3>-->
-            <img src="{%static 'theme/img/paas-logo.png' %}"/>
+            <img src="{%static 'theme/img/MINE_logo.svg' %}"/>
             </a><!-- end custom logo -->
+          </div>
+          <div class="col-md-7">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+            <div class="collapse navbar-collapse align-items-start justify-content-start" id="navbarNavDropdown">
               <!-- Your menu goes here -->
-              <ul id="main-menu" class="navbar-nav">
+              <ul id="main-menu" class="navbar-nav mr-0 font-weight-bold">
                 <!--<li class="nav-item dropdown">
                   <a title="Dropdown" href="#" data-toggle="dropdown" class="nav-link dropdown-toggle">Entities <span class="caret"></span></a>
                   <ul class=" dropdown-menu" role="menu">
@@ -122,15 +126,22 @@
                 <li class="nav-item"><a title="Netzwerke" href="{% url 'theme:contact' %}" class="nav-link">Netzwerke</a></li>
                 <li class="nav-item"><a title="Ereignisse" href="{% url 'theme:contact' %}" class="nav-link">Ereignisse</a></li>
               </ul>
-              <form class="form-inline my-2 my-lg-0 navbar-search-form" method="get" action="/search" role="search">
-                <input class="form-control navbar-search" id="s" name="q" type="text" placeholder="Volltextsuche" value="" autocomplete="off">
-                <button type="submit" class="navbar-search-icon">
+              <form class="form-inline my-2 my-lg-0 pt-1 navbar-search-form" method="get" action="/search" role="search">
+                <input class="form-control navbar-search bg-mine border-0" id="s" name="q" type="text" placeholder="" value="" autocomplete="off">
+                <button type="submit" class="navbar-search-icon pt-1">
                   <i data-feather="search"></i>
                 </button>
               </form>
+              <ul id="second-menu" class="navbar-nav mr-0 align-top pl-5">
+                <li class="nav-item"><a title="Über" href="{% url 'theme:search' %}" class="nav-link">Über</a></li>
+                <li class="nav-item"><a title="Kontakt" href="{% url 'theme:search' %}" class="nav-link">Kontakt</a></li>
+              </ul>
             </div>
             <!-- .collapse navbar-collapse -->
           </div>
+        </div>
+          </div>
+
           <!-- .container -->
         </nav>
         <!-- .site-navigation -->
@@ -140,19 +151,20 @@
     {% block content %}{% endblock %}
       </div>
 <div>
-    <div class="footer oebl-inverted">
+    <div class="footer border-mine">
         <div>
             <div class="container">
                 <footer>
-                  <div class="row pt-3 pb-3 align-items-center">
-                    <div class="col-sm-4 col-md-4 col-lg-4 col-12 footermenu">
-                    <ul class="mb-0 pl-0">
-                      <li class="pb-1 pl-0"><a title="Impressum" href="{% url 'theme:imprint' %}" class="nav-link">Impressum</a></li>
-                      <li class=" pl-0"><small>&#xa9; Österreichische Akademie der Wissenschaften</small></li>
+                  <div class="row">
+                    <div class="col-8 footermenu">
+                    <ul class="nav list-inline justify-content-between">
+                      <li class="pb-1 pl-0 list-inline-item"><small><a title="Impressum" href="{% url 'theme:imprint' %}">Impressum</a></small></li>
+                      <li class="pb-1 pl-0 list-inline-item"><small><a title="Impressum" href="{% url 'theme:imprint' %}">Datenschutz</a></small></li>
+                      <li class=" pl-0 list-inline-item"><small class="text-oeaw-blau">&#xa9; Österreichische Akademie der Wissenschaften</small></li>
                     </ul>
                   </div>
-                  <div class="col-sm-4 col-md-4 col-lg-4 col-12" style="text-align:right">
-                      <i onclick="scrollToTop()" data-feather="arrow-up"></i>
+                  <div class="col-4">
+                    <i onclick="scrollToTop()" data-feather="arrow-up"></i>
                   </div>
                   </div>
                 </footer>

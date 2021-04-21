@@ -598,11 +598,11 @@ def enrich_person_context(person_object, context):
         context["daten_akademie"]["Eltern und Kinder"] = []
         if len(eltern) > 0:
             context["daten_akademie"]["Eltern und Kinder"].append(
-                f"<b>Eltern</>: {', '.join(eltern)}"
+                f"<span>Eltern</>:<br/> {', '.join(eltern)}"
             )
         if len(kinder) > 0:
             context["daten_akademie"]["Eltern und Kinder"].append(
-                f"<b>Kinder</>: {', '.join(kinder)}"
+                f"<span>Kinder</>: {', '.join(kinder)}"
             )
         context["daten_akademie"].move_to_end("Eltern und Kinder", last=False)
     if person_object.personevent_set.filter(relation_type_id=3454).count() > 0:

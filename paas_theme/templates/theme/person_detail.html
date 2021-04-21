@@ -11,10 +11,10 @@
 {% load custom_tags %}
 {% block title %}{{ object }}{% endblock %}
 {% block content %}
-<div id="contentDetails" class="container pt-5">
-  <div class="row bio-outer p-5">
+<div id="contentDetails" class="container">
+  <div class="row bio-outer">
     <div class="col-md-12 pb-4">
-      <div class="row justify-content-between">
+      <div class="row justify-content-between pt-3">
         <div class="col-md-auto">
           {% if prev.id %}
           <a class="card-link preventity" href="{% url 'theme:person-detail' pk=prev.id %}" title="{{ prev }}">
@@ -32,7 +32,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-12 pr-5">
+    <div class="col-md-12">
       <article class="bio">
         <div class="entry-header">
           <!--<div class="row">
@@ -43,7 +43,7 @@
         </div>
         <div id="main" class="card-body">
           <div class="row">
-            <div class="col-md-4 bg-mine border-mine p-0">
+            <div class="col-md-5 bg-mine border-mine pl-1 pr-0">
                <h3 class="font-weight-normal float-md-left pt-1 pb-4" style="width:calc(100% - 100px)"><!--{{ object.name }}{%if object.first_name %}, {{ object.first_name }}{% endif %}-->
                 {%if object.first_name %}{{ object.first_name }}{% endif %}<br/>
                 {{ object.name }}
@@ -66,10 +66,10 @@
               
                 {% if mitgliedschaften %}
                 <div class="section">
-                  <span  class="font-weight-bold">Mitgliedschaft</span>
+                  <span class="font-weight-bold">Mitgliedschaft</span>
               <ul class="relentities">
                 {% for x in mitgliedschaften %}
-                <li class="pl-0 font-weight-normal" style="padding-bottom: 0.8em">
+                <li class="pl-0 font-weight-normal pb-0" style="padding-bottom: 0.8em">
                   {{x|safe}}
                 </li>
                 {% endfor %}
@@ -78,58 +78,58 @@
               
               {% endif %}
               {% if normdaten %}
-              <p>
-                <b>Online-Ressourcen</b>
+              <div class="section">
+                <span class="font-weight-bold">Online-Ressourcen</span>
               <ul class="uris pl-0">
                 {% for nd in normdaten %}
-                <li class="pl-0"><b>{{nd.kind}}</b> <a target="_blank" rel="noopener noreferrer" href="{{nd.uri}}">{{nd.identifier}}</a></li>
+                <li class="pl-0 font-weight-normal">{{nd.kind}} <a target="_blank" rel="noopener noreferrer" href="{{nd.uri}}">{{nd.identifier}}</a></li>
                 {% endfor %}
               </ul>
-              </p>
+            </div>
               {% endif %}
-              <p>
-                <b>Downloads</b>
+              <div class="section">
+                <span class="font-weight-bold">Downloads</span>
               <ul class="uris pl-0">
-                <li class="pl-0"><a target="_blank" rel="noopener noreferrer"
+                <li class="pl-0 font-weight-normal"><a target="_blank" rel="noopener noreferrer"
                     href="/apis/api/entities/person/{{object.pk}}/?format=json">Json</a></li>
-                <li class="pl-0"><a target="_blank" rel="noopener noreferrer"
+                <li class="pl-0 font-weight-normal"><a target="_blank" rel="noopener noreferrer"
                     href="/apis/api2/entity/{{object.pk}}/?format=rdf%2Bturtle">RDF/Turtle</a></li>
-                <li class="pl-0"><a target="_blank" rel="noopener noreferrer"
+                <li class="pl-0 font-weight-normal"><a target="_blank" rel="noopener noreferrer"
                     href="/apis/api2/entity/{{object.pk}}/?format=tei">TEI</a></li>
               </ul>
-              </p>
             </div>
-            <div class="col-md-7 offset-md-1">
-            <ul class="nav nav-tabs" id="myTab" role="tablist">
-              <li class="nav-item p-0" role="presentation">
-                <a class="nav-link rounded-0 active" data-toggle="tab" id="daten-tab" href="#daten" role="tab" aria-controls="home" aria-selected="true">Daten</a>
+          </div>
+            <div class="col-md-7">
+            <ul class="nav nav-tabs border-0" id="myTab" role="tablist">
+              <li class="nav-item p-0 font-weight-bold" role="presentation">
+                <a class="nav-link rounded-0 active text-uppercase" data-toggle="tab" id="daten-tab" href="#daten" role="tab" aria-controls="home" aria-selected="true">Biographie</a>
               </li>
-              <li class="nav-item p-0" role="presentation">
-                <a class="nav-link rounded-0" data-toggle="tab" id="egonet-tab" href="#egonet" role="tab" aria-controls="egonet" aria-selected="false">Ego-Netz</a>
+              <li class="nav-item p-0 font-weight-bold" role="presentation">
+                <a class="nav-link rounded-0 text-uppercase align-bottom" data-toggle="tab" id="egonet-tab" href="#egonet" role="tab" aria-controls="egonet" aria-selected="false">Egonetzwerk</a>
               </li>
-              <li class="nav-item p-0" role="presentation">
-                <a class="nav-link rounded-0" data-toggle="tab" id="map-tab" href="#map" role="tab" role="tab" aria-controls="contact" aria-selected="false">Karte</a>
+              <li class="nav-item p-0 font-weight-bold" role="presentation">
+                <a class="nav-link rounded-0 text-uppercase" data-toggle="tab" id="map-tab" href="#map" role="tab" role="tab" aria-controls="contact" aria-selected="false">Karte</a>
               </li>
             </ul>
             <div class="tab-content bg-mine" id="myTabContent">
             <div class="tab-pane fade show active" id="daten" role="tabpanel" aria-labelledby="daten-tab">
               {% for key, value in daten_akademie.items %}
               {% if value|length > 0 %}
-              <div class="card mt-2 rounded-0">
+              <div class="card mt-2 mb-4 rounded-0">
                 <div class="card-header p-0 bg-white" id="heading{{key}}">
                   <h5 class="mb-0">
-                    <button type="button" class="btn btn-link collapsebtn w-100 text-left collapsed"
+                    <button type="button" class="btn btn-link collapsebtn w-100 text-left collapsed p-0 pl-1 text-09"
                       data-toggle="collapse" data-target="#{{key}}" aria-expanded="true" aria-controls="{{key}}">
-                      {{ key }}
-                      <i class="chevron-down" data-feather="chevron-down"></i>
+                      <b>{{ key }}</b>
+                      <i class="chevron-up" data-feather="chevron-up"></i>
                     </button>
                   </h5>
                 </div>
                 <div id="{{key}}" class="collapse" aria-labelledby="heading{{key}}">
-                  <div class="card-body p-2 pl-3 pr-3 show-limited-number">
+                  <div class="card-body p-2 pl-3 pr-3 show-limited-number text-09">
                     <ul class="pl-0 mb-0">
                       {% for ent in value %}
-                      <li class="font-weight-normal" style="list-style-type:none; padding-bottom: 0.5em">{{ent|safe}}</li>
+                      <li class="font-weight-normal pb-0" style="list-style-type:none; padding-bottom: 0.5em">{{ent|safe}}</li>
                       {% endfor %}
                     </ul>
                   </div>
@@ -137,7 +137,6 @@
               </div>
               {% endif %}
               {% endfor %}
-              <hr />
               </div>
               <div class="tab-pane fade" id="egonet" role="tabpanel" aria-labelledby="egonet-tab">
                 <p>egonet</p>
