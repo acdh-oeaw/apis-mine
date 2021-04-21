@@ -135,6 +135,8 @@ def get_date_range(
             res += f"ab {start}"
         if end:
             res += f" bis {end})"
+        else:
+            res += ")"
     elif start:
         res += f"({start})"
     if len(res.strip()) < 4:
@@ -597,9 +599,7 @@ def enrich_person_context(person_object, context):
     if len(eltern) > 0:
         context["daten_akademie"]["Eltern"] = []
         if len(eltern) > 0:
-            context["daten_akademie"]["Eltern"].append(
-                f" {', '.join(eltern)}"
-            )
+            context["daten_akademie"]["Eltern"].append(f" {', '.join(eltern)}")
         context["daten_akademie"].move_to_end("Eltern", last=False)
     if person_object.personevent_set.filter(relation_type_id=3454).count() > 0:
         context["daten_akademie"][
