@@ -160,7 +160,12 @@ def get_gewaehlt(pers, year):
     ).order_by("start_date")
     if rel.count() == 0:
         return "nicht gewählt"
-    date_vocs = ["Genehmigt", "Ernannt"]
+    date_vocs = [
+        "Genehmigt",
+        "Ernannt",
+        "gewählt und bestätigt",
+        "gewählt und genehmigt",
+    ]
     vocs = [
         f"{rel2.relation_type} am {rel2.start_date_written}"
         if rel2.relation_type.name in date_vocs
@@ -341,12 +346,13 @@ def get_wahlvorschlag(pers):
     umwidm = [56, 57, 58, 59]
     ruhend = [3457, 3456, 3374, 3373]
     reaktiviert = [3471, 3460, 3459]
+    lst_gew = []
     for pp in pers.related_personB.filter(
         relation_type_id__in=classes["vorschlag"][0]
     ).order_by("start_date"):
         m = get_mitgliedschaft_from_relation(pp.relation_type)
         date = get_gewaehlt(pers, pp.start_date_written)
-        txt = f"Zur Wahl zum {m} der {kls} {pp.start_date_written} vorgeschlagen von ({date}):"
+        txt = f"Zur Wahl zum {m} der {kls} {pp.start_date_written} vorgeschlagen von:"
         if (txt, pp.start_date) not in res.keys():
             res[(txt, pp.start_date)] = [
                 pp.related_personA if pp.related_personA != pers else pp.related_personB
@@ -355,7 +361,12 @@ def get_wahlvorschlag(pers):
             res[(txt, pp.start_date)].append(
                 pp.related_personA if pp.related_personA != pers else pp.related_personB
             )
+        if date:
+            if (pp.start_date, date) not in lst_gew:
+                lst_gew.append((pp.start_date, date))
     lst_fin = [(key[1], (key[0], value)) for key, value in res.items()]
+    if len(lst_gew) > 0:
+        lst_fin += lst_gew
     for pp in pers.personinstitution_set.filter(relation_type_id__in=umwidm):
         if "umgewidmet" in pp.relation_type.name.lower():
             lst_fin.append(
@@ -619,11 +630,11 @@ def enrich_person_context(person_object, context):
                     get_date_range(rel, classes["time_ranges_ids"])[1:-1]
                 )
         lst_kom = [
-            f'<a href="/institution/{inst.pk}">{inst.name}</a> ({", ".join(dates)})'
+            f'<li><a href="/institution/{inst.pk}">{inst.name}</a> ({", ".join(dates)})</li>'
             for inst, dates in lst_kom.items()
         ]
         context["daten_akademie"]["Funktionen in der Akademie"].append(
-            f'Mitglied der folgenden Kommission{"en" if len(lst_kom) > 1 else ""}: {", ".join(lst_kom)}'
+            f'Mitglied der folgenden Kommission{"en" if len(lst_kom) > 1 else ""}: <ul>{"".join(lst_kom)}</ul>'
         )
     if (
         "Mitglied in einer nationalsozialistischen Vereinigung"
