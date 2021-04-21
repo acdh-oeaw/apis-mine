@@ -594,17 +594,13 @@ def enrich_person_context(person_object, context):
             ],
         }
     )
-    if len(eltern) > 0 or len(kinder) > 0:
-        context["daten_akademie"]["Eltern und Kinder"] = []
+    if len(eltern) > 0:
+        context["daten_akademie"]["Eltern"] = []
         if len(eltern) > 0:
-            context["daten_akademie"]["Eltern und Kinder"].append(
-                f"<span>Eltern</>:<br/> {', '.join(eltern)}"
+            context["daten_akademie"]["Eltern"].append(
+                f" {', '.join(eltern)}"
             )
-        if len(kinder) > 0:
-            context["daten_akademie"]["Eltern und Kinder"].append(
-                f"<span>Kinder</>: {', '.join(kinder)}"
-            )
-        context["daten_akademie"].move_to_end("Eltern und Kinder", last=False)
+        context["daten_akademie"].move_to_end("Eltern", last=False)
     if person_object.personevent_set.filter(relation_type_id=3454).count() > 0:
         context["daten_akademie"][
             "Mitglied in einer nationalsozialistischen Vereinigung"

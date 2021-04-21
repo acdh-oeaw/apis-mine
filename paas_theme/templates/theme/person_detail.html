@@ -44,16 +44,16 @@
         <div id="main" class="card-body">
           <div class="row">
             <div class="col-md-5 bg-mine border-mine pl-1 pr-0">
-               <h3 class="font-weight-normal float-md-left pt-1 pb-4" style="width:calc(100% - 100px)"><!--{{ object.name }}{%if object.first_name %}, {{ object.first_name }}{% endif %}-->
+               <h3 class="font-weight-normal float-md-left pt-1 pb-4" style="width:calc(100% - 110px)"><!--{{ object.name }}{%if object.first_name %}, {{ object.first_name }}{% endif %}-->
                 {%if object.first_name %}{{ object.first_name }}{% endif %}<br/>
                 {{ object.name }}
               </h3>  
                 
                 <div class="imgcontainer">
                   {% if image %}
-                  <img class="float-md-right" style="max-width:100px;" src="{% static image %}">
+                  <img class="float-md-right" style="max-width:110px;" src="{% static image %}">
                   {% else %}
-                  <img class="float-md-right" style="max-width:100px;" src="https://via.placeholder.com/100x120">
+                  <img class="float-md-right" style="max-width:110px;" src="https://via.placeholder.com/110x134">
                   {% endif %}
                 </div>
              
@@ -99,7 +99,7 @@
               </ul>
             </div>
           </div>
-            <div class="col-md-7">
+            <div class="col-md-7 pr-0  mine-pl-30">
             <ul class="nav nav-tabs border-0" id="myTab" role="tablist">
               <li class="nav-item p-0 font-weight-bold" role="presentation">
                 <a class="nav-link rounded-0 active text-uppercase" data-toggle="tab" id="daten-tab" href="#daten" role="tab" aria-controls="home" aria-selected="true">Biographie</a>
@@ -119,13 +119,13 @@
                 <div class="card-header p-0 bg-white" id="heading{{key}}">
                   <h5 class="mb-0">
                     <button type="button" class="btn btn-link collapsebtn w-100 text-left collapsed p-0 pl-1 text-09"
-                      data-toggle="collapse" data-target="#{{key}}" aria-expanded="true" aria-controls="{{key}}">
+                      data-toggle="collapse" data-target="#{{ key | cut:' '}}" aria-expanded="true" aria-controls="{{key | cut:' '}}">
                       <b>{{ key }}</b>
                       <i class="chevron-up" data-feather="chevron-up"></i>
                     </button>
                   </h5>
                 </div>
-                <div id="{{key}}" class="collapse" aria-labelledby="heading{{key}}">
+                <div id="{{key | cut:' '}}" class="collapse" aria-labelledby="heading{{key | cut:' '}}">
                   <div class="card-body p-2 pl-3 pr-3 show-limited-number text-09">
                     <ul class="pl-0 mb-0">
                       {% for ent in value %}

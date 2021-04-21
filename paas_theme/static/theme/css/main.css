@@ -12,6 +12,11 @@ a {
   color:var(--oeaw-blau);
 }
 
+.container {
+  padding-left:30px;
+  padding-right:30px;
+}
+
 .text-oeaw-blau {
   color:var(--oeaw-blau);
 }
@@ -20,8 +25,16 @@ a {
   padding-top:45px;
 }
 
+.mine-pl-30 {
+  padding-left:30px;
+}
+
 .text-09 {
   font-size:0.9rem;
+}
+
+.navbar-light .navbar-nav .nav-link {
+  color:var(--oeaw-blau)
 }
 
 .site {
@@ -1453,10 +1466,20 @@ div.leaflet-marker-icon svg.feather-map-pin {
   width:unset;
 }
 
+@media (max-width: 991px) {
+.navbar .navbar-collapse {
+  border:0;
+}
+.navbar-expand-lg .navbar-nav .nav-item .nav-link {
+  line-height:1rem;
+  font-size:1rem;
+}
 
+ #second-menu {
+   padding-left:0 !important;
+ }
 
-
-
+}
 @media (min-width: 992px) {
 .navbar-expand-lg .navbar-nav {
     flex-direction: column;
@@ -1472,4 +1495,10 @@ div.leaflet-marker-icon svg.feather-map-pin {
   padding:0.2rem;
 }
 
+}
+
+@media (max-width: 1199px) {
+.navbar .navbar-brand {
+    max-width: unset;
+}
 }
