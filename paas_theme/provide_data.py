@@ -527,16 +527,21 @@ def enrich_person_context(person_object, context):
         for p in person_object.related_personB.filter(relation_type_id=169)
     ]
     eltern = [Person.objects.get(pk=p1) for p1 in eltern]
-    eltern = [f"<a href=/person/{p.pk}>{str(p)}</a>" for p in eltern]
-    kinder = [
+    eltern = [
+        f"Mutter: <a href=/person/{p.pk}>{str(p)}</a>"
+        if p.gender == "female"
+        else f"Vater: <a href=/person/{p.pk}>{str(p)}</a>"
+        for p in eltern
+    ]
+    """     kinder = [
         p.related_personA
         for p in person_object.related_personA.filter(relation_type_id=169)
     ] + [
         p.related_personB
         for p in person_object.related_personB.filter(relation_type_id=168)
-    ]
-    kinder = [Person.objects.get(pk=p1) for p1 in kinder]
-    kinder = [f"<a href=/person/{p.pk}>{str(p)}</a>" for p in kinder]
+    ] """
+    # kinder = [Person.objects.get(pk=p1) for p1 in kinder]
+    # kinder = [f"<a href=/person/{p.pk}>{str(p)}</a>" for p in kinder]
 
     context["daten_akademie"] = OrderedDict(
         {
