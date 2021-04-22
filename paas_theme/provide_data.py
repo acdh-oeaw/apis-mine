@@ -352,7 +352,7 @@ def get_wahlvorschlag(pers):
     ).order_by("start_date"):
         m = get_mitgliedschaft_from_relation(pp.relation_type)
         date = get_gewaehlt(pers, pp.start_date_written)
-        txt = f"Zur Wahl zum {m} der {kls} {pp.start_date_written} vorgeschlagen von:"
+        txt = f"{pp.start_date_written} zur Wahl zum {m} der {kls} vorgeschlagen von:"
         if (txt, pp.start_date) not in res.keys():
             res[(txt, pp.start_date)] = [
                 pp.related_personA if pp.related_personA != pers else pp.related_personB
@@ -364,6 +364,7 @@ def get_wahlvorschlag(pers):
         if date:
             if (pp.start_date, date) not in lst_gew:
                 lst_gew.append((pp.start_date, date))
+                lst_gew.append((pp.start_date, "<hr/>"))
     lst_fin = [(key[1], (key[0], value)) for key, value in res.items()]
     if len(lst_gew) > 0:
         lst_fin += lst_gew
@@ -372,28 +373,31 @@ def get_wahlvorschlag(pers):
             lst_fin.append(
                 (
                     pp.start_date,
-                    f"Umgewidmet zum {get_mitgliedschaft_from_relation(pp.relation_type)} der {kls} {'am' if len(pp.start_date_written) > 4 else ''} {pp.start_date_written}",
+                    f"{'Am' if len(pp.start_date_written) > 4 else ''} {pp.start_date_written} umgewidmet zum {get_mitgliedschaft_from_relation(pp.relation_type)} der {kls}",
                 )
             )
+            lst_fin.append((pp.start_date, "<hr/>"))
     for pp in pers.personinstitution_set.filter(relation_type_id__in=ruhend):
         if "ruhend gestellt" in pp.relation_type.name.lower():
             lst_fin.append(
                 (
                     pp.start_date,
-                    f"Ruhend gestellt als {get_mitgliedschaft_from_relation(pp.relation_type)} der {kls} {'am' if len(pp.start_date_written) > 4 else ''} {pp.start_date_written}",
+                    f"{'Am' if len(pp.start_date_written) > 4 else ''} {pp.start_date_written} ruhend gestellt als {get_mitgliedschaft_from_relation(pp.relation_type)} der {kls}",
                 )
             )
+            lst_fin.append((pp.start_date, "<hr/>"))
     for pp in pers.personinstitution_set.filter(relation_type_id__in=reaktiviert):
         if "reaktiviert" in pp.relation_type.name.lower():
             lst_fin.append(
                 (
                     pp.start_date,
-                    f"Reaktiviert als {get_mitgliedschaft_from_relation(pp.relation_type)} der {kls} {'am' if len(pp.start_date_written) > 4 else ''} {pp.start_date_written}",
+                    f"{'Am' if len(pp.start_date_written) > 4 else ''} {pp.start_date_written} reaktiviert als {get_mitgliedschaft_from_relation(pp.relation_type)} der {kls}",
                 )
             )
+            lst_fin.append((pp.start_date, "<hr/>"))
     lst_fin_sort = sorted(lst_fin, key=lambda tup: tup[0])
 
-    return lst_fin_sort
+    return lst_fin_sort[:-1]
 
 
 def create_text_berufslaufbahn(rel):
