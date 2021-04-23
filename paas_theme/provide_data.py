@@ -131,12 +131,15 @@ def get_date_range(
             end = f"{rel.end_date.strftime('%Y')}"
     if rel.relation_type_id in time_range_ids:
         res += "("
-        if start:
-            res += f"ab {start}"
-        if end:
-            res += f" bis {end})"
+        if start and end:
+            res += f"{start}-{end})"
         else:
-            res += ")"
+            if start:
+                res += f"ab {start}"
+            if end:
+                res += f" bis {end})"
+            else:
+                res += ")"
     elif start:
         res += f"({start})"
     if len(res.strip()) < 4:
@@ -485,6 +488,7 @@ def enrich_person_context(person_object, context):
         context["image"] = False
     context["mitgliedschaften"] = []
     rel_test = []
+    mitgliedschaften = []
     for rel in person_object.personinstitution_set.filter(
         related_institution_id__in=[2, 3, 500],
         relation_type_id__in=[
@@ -516,8 +520,28 @@ def enrich_person_context(person_object, context):
             131,
         ],
     ).order_by("start_date"):
+        mitgliedschaften.append(
+            (
+                rel.start_date.strftime("%Y"),
+                rel.end_date.strftime("%Y") if rel.end_date_written else None,
+                rel.relation_type.label.split(" >> ")[1].split("(")[0].strip(),
+                rel.relation_type.label.split(" >> ")[1],
+                rel.related_institution,
+            )
+        )
         context["mitgliedschaften"].append(
             f"<span title='{rel.relation_type.label.split(' >> ')[1]} in der {rel.related_institution}'>{rel.relation_type.label.split(' >> ')[1].split('(')[0].strip()}</span> {rel.start_date.strftime('%Y')}{'-'+rel.end_date.strftime('%Y') if rel.end_date_written else ''}"
+        )
+    context["mitgliedschaften"] = []
+    for idx, mit in enumerate(mitgliedschaften):
+        if idx < len(mitgliedschaften) - 1:
+            if mit[1] != mitgliedschaften[idx + 1][0]:
+                context["mitgliedschaften"].append(
+                    f"{mit[0]}-{mit[1]} <span title='{mit[2]} in der {mit[3]}'>{mit[2]}</span>"
+                )
+                continue
+        context["mitgliedschaften"].append(
+            f"{mit[0]} <span title='{mit[2]} in der {mit[3]}'>{mit[2]}</span>"
         )
     eltern = [
         p.related_personA
@@ -552,7 +576,7 @@ def enrich_person_context(person_object, context):
                 )
             ],
             "Studium": [
-                f'<a href="/institution/{rel.related_institution_id}">{rel.related_institution}</a>{", " + classes["daten_mappings"][rel.relation_type_id] if rel.relation_type_id in classes["daten_mappings"].keys() else ""} {rel.start_date_written if rel.start_date_written and rel.relation_type_id in classes["daten_mappings"].keys() else ""}'
+                f'<a href="/institution/{rel.related_institution_id}">{rel.related_institution}</a>{", " + classes["daten_mappings"][rel.relation_type_id] if rel.relation_type_id in classes["daten_mappings"].keys() else ""} {get_date_range(rel, classes["time_ranges_ids"], extended=True)}'
                 for rel in person_object.personinstitution_set.filter(
                     relation_type_id__in=[1369, 1371] + classes["promotion_inst_ids"]
                 )
