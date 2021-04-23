@@ -486,6 +486,19 @@ def enrich_person_context(person_object, context):
         context["image"] = lst_images[0].split("/")[-1]
     else:
         context["image"] = False
+    preise = []
+    for nobel in person_object.personinstitution_set.filter(
+        relation_type_id=138, related_institution_id__in=[45721, 44859, 51502]
+    ):
+        preise.append(
+            f"{nobel.related_institution.name}, {get_date_range(nobel, classes['time_ranges_ids'])[1:-1]}"
+        )
+    for ewk in person_object.personinstitution_set.filter(
+        relation_type_id=138, related_institution_id=29953
+    ):
+        preise.append(
+            f"{ewk.related_institution.name}{', '+get_date_range(ewk, classes['time_ranges_ids'])[1:-1] if len(get_date_range(ewk, classes['time_ranges_ids'])) > 0 else ''}"
+        )
     context["mitgliedschaften"] = []
     rel_test = []
     mitgliedschaften = []
@@ -537,11 +550,11 @@ def enrich_person_context(person_object, context):
         if idx < len(mitgliedschaften) - 1:
             if mit[1] != mitgliedschaften[idx + 1][0]:
                 context["mitgliedschaften"].append(
-                    f"{mit[0]}-{mit[1]} <span title='{mit[2]} in der {mit[3]}'>{mit[2]}</span>"
+                    f"{mit[0]}-{mit[1]} <span title='{mit[2]} in der {mit[4]}'>{mit[2]}</span>"
                 )
                 continue
         context["mitgliedschaften"].append(
-            f"{mit[0]} <span title='{mit[2]} in der {mit[3]}'>{mit[2]}</span>"
+            f"{mit[0]} <span title='{mit[2]} in der {mit[4]}'>{mit[2]}</span>"
         )
     eltern = [
         p.related_personA
@@ -551,12 +564,14 @@ def enrich_person_context(person_object, context):
         for p in person_object.related_personB.filter(relation_type_id=169)
     ]
     eltern = [Person.objects.get(pk=p1) for p1 in eltern]
-    eltern = [
-        f"Mutter: <a href=/person/{p.pk}>{str(p)}</a>"
-        if p.gender == "female"
-        else f"Vater: <a href=/person/{p.pk}>{str(p)}</a>"
-        for p in eltern
-    ]
+    if len(eltern) > 0:
+        eltern_dict = {"Vater": "ka", "Mutter": "ka"}
+        for p in eltern:
+            if p.gender == "female":
+                eltern_dict["Mutter"] = f"<a href=/person/{p.pk}>{str(p)}</a>"
+            else:
+                eltern_dict["Vater"] = f"<a href=/person/{p.pk}>{str(p)}</a>"
+        eltern = [f"{key}: {value}" for key, value in eltern_dict.items()]
     """     kinder = [
         p.related_personA
         for p in person_object.related_personA.filter(relation_type_id=169)
@@ -638,12 +653,18 @@ def enrich_person_context(person_object, context):
                     related_institution_id__in=[2, 3], relation_type_id__in=[119, 118]
                 )
             ],
+            "Mitgliedschaften in anderen Akademien": [
+                f'<a href="/institution/{rel.related_institution_id}">{rel.related_institution}<a/>, {rel.relation_type.name} {get_date_range(rel, classes["time_ranges_ids"])}'
+                for rel in person_object.personinstitution_set.filter(
+                    related_institution__kind_id=3378
+                ).order_by("related_institution__name")
+            ],
+            "Auszeichnungen und Preisaufgaben": preise,
         }
     )
     if len(eltern) > 0:
         context["daten_akademie"]["Eltern"] = []
-        if len(eltern) > 0:
-            context["daten_akademie"]["Eltern"].append(f" {', '.join(eltern)}")
+        context["daten_akademie"]["Eltern"].append(f" {'<br/>'.join(eltern)}")
         context["daten_akademie"].move_to_end("Eltern", last=False)
     if person_object.personevent_set.filter(relation_type_id=3454).count() > 0:
         context["daten_akademie"][
