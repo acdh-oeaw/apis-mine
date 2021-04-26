@@ -255,6 +255,11 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
         1371,
         1376,
         3260,
+        3470,
+        3462,
+        3452,
+        3451,
+        3473,
         3488,
         4178,
     ]
@@ -499,6 +504,24 @@ def enrich_person_context(person_object, context):
         preise.append(
             f"{ewk.related_institution.name}{', '+get_date_range(ewk, classes['time_ranges_ids'])[1:-1] if len(get_date_range(ewk, classes['time_ranges_ids'])) > 0 else ''}"
         )
+    akad_preise = ""
+    for akadp in person_object.personinstitution_set.filter(
+        related_institution_id__in=classes["akademiepreise"], relation_type_id=138
+    ).exclude(relation_type_id=3501):
+        akad_preise += f"<li><a href='/institution/{akadp.related_institution_id}'>{akadp.related_institution}</a>{' '+get_date_range(akadp, classes['time_ranges_ids'])[1:-1] if len(get_date_range(akadp, classes['time_ranges_ids'])) > 0 else ''}</li>"
+    if len(akad_preise) > 0:
+        akad_preise = (
+            "Ausgezeichnet mit folgenden Akademiepreisen:<ul>" + akad_preise + "</ul>"
+        )
+        preise.append(akad_preise)
+    preis_auf = ""
+    for preisauf in person_object.personevent_set.filter(
+        related_event_id__in=classes["preisaufgaben"], relation_type_id=143
+    ):
+        preis_auf += f"<li><a href='/event/{preisauf.related_event_id}'>{preisauf.related_event}</a></li>"
+    if len(preis_auf) > 0:
+        akad_preisauf = "Gewann folgende Preisaufgaben:<ul>" + preis_auf + "</ul>"
+        preise.append(akad_preisauf)
     context["mitgliedschaften"] = []
     rel_test = []
     mitgliedschaften = []
@@ -528,6 +551,10 @@ def enrich_person_context(person_object, context):
             3459,
             3460,
             3471,
+            3457,
+            3456,
+            3374,
+            3373,
             129,
             130,
             131,
@@ -540,21 +567,16 @@ def enrich_person_context(person_object, context):
                 rel.relation_type.label.split(" >> ")[1].split("(")[0].strip(),
                 rel.relation_type.label.split(" >> ")[1],
                 rel.related_institution,
+                rel.relation_type.label.split(" >> ")[-1],
             )
         )
         context["mitgliedschaften"].append(
             f"<span title='{rel.relation_type.label.split(' >> ')[1]} in der {rel.related_institution}'>{rel.relation_type.label.split(' >> ')[1].split('(')[0].strip()}</span> {rel.start_date.strftime('%Y')}{'-'+rel.end_date.strftime('%Y') if rel.end_date_written else ''}"
         )
     context["mitgliedschaften"] = []
-    for idx, mit in enumerate(mitgliedschaften):
-        if idx < len(mitgliedschaften) - 1:
-            if mit[1] != mitgliedschaften[idx + 1][0]:
-                context["mitgliedschaften"].append(
-                    f"{mit[0]}-{mit[1]} <span title='{mit[2]} in der {mit[4]}'>{mit[2]}</span>"
-                )
-                continue
+    for mit in mitgliedschaften:
         context["mitgliedschaften"].append(
-            f"{mit[0]} <span title='{mit[2]} in der {mit[4]}'>{mit[2]}</span>"
+            f"{mit[0]} <span title='{mit[2]} in der {mit[4]}'>{mit[2]}</span> ({mit[5]})"
         )
     eltern = [
         p.related_personA
@@ -565,7 +587,7 @@ def enrich_person_context(person_object, context):
     ]
     eltern = [Person.objects.get(pk=p1) for p1 in eltern]
     if len(eltern) > 0:
-        eltern_dict = {"Vater": "ka", "Mutter": "ka"}
+        eltern_dict = {"Vater": "kA", "Mutter": "kA"}
         for p in eltern:
             if p.gender == "female":
                 eltern_dict["Mutter"] = f"<a href=/person/{p.pk}>{str(p)}</a>"
@@ -605,22 +627,54 @@ def enrich_person_context(person_object, context):
                 )
             ],
             "Mitglied in einer nationalsozialistischen Vereinigung": [
-                f'Anwärter{"in" if person_object.gender == "female" else ""} der {rel.related_institution} {get_date_range(rel, classes["time_ranges_ids"], extended=True)}'
-                for rel in person_object.personinstitution_set.filter(
+                f'Anwärter{"in" if person_object.gender == "female" else ""} folgender nationalsozialistischer Vereinigungen: <ul>'
+                + "".join(
+                    [
+                        f'{rel.related_institution} {get_date_range(rel, classes["time_ranges_ids"], extended=True)}'
+                        for rel in person_object.personinstitution_set.filter(
+                            relation_type_id__in=[3470, 3462]
+                        )
+                    ]
+                )
+                + "</ul><hr/>"
+                if person_object.personinstitution_set.filter(
                     relation_type_id__in=[3470, 3462]
-                )
+                ).count()
+                > 0
+                else ""
             ]
             + [
-                f"Mitglied der <span data-toggle='tooltip' title='{rel.related_institution}'>{abbreviate(rel.related_institution)}</span> {get_date_range(rel, classes['time_ranges_ids'], extended=True)}"
-                for rel in person_object.personinstitution_set.filter(
+                "Mitglied folgender nationalsozialistischer Vereinigungen: <ul>"
+                + "".join(
+                    [
+                        f"<li>{rel.related_institution} {get_date_range(rel, classes['time_ranges_ids'], extended=True)}"
+                        for rel in person_object.personinstitution_set.filter(
+                            relation_type_id__in=[3452, 3451]
+                        )
+                    ]
+                )
+                + "</ul><hr/>"
+                if person_object.personinstitution_set.filter(
                     relation_type_id__in=[3452, 3451]
-                )
+                ).count()
+                > 0
+                else ""
             ]
             + [
-                f"förderndes Mitglied der <span data-toggle='tooltip' title='{rel.related_institution}'>{abbreviate(rel.related_institution)}</span> {get_date_range(rel, classes['time_ranges_ids'], extended=True)}"
-                for rel in person_object.personinstitution_set.filter(
-                    relation_type_id__in=[3473]
+                f"förderndes Mitglied folgender nationalsozialistischer Vereinigungen: <ul>"
+                + "".join(
+                    [
+                        f"<{rel.related_institution} {get_date_range(rel, classes['time_ranges_ids'], extended=True)}"
+                        for rel in person_object.personinstitution_set.filter(
+                            relation_type_id__in=[3473]
+                        )
+                    ]
                 )
+                if person_object.personinstitution_set.filter(
+                    relation_type_id__in=[3473]
+                ).count()
+                > 0
+                else ""
             ],
             "Wahl und Mitgliedschaft": [
                 t[1][0]
@@ -659,7 +713,10 @@ def enrich_person_context(person_object, context):
                     related_institution__kind_id=3378
                 ).order_by("related_institution__name")
             ],
-            "Auszeichnungen und Preisaufgaben": preise,
+            "Auszeichnungen und Preisaufgaben": [
+                f"{p}<hr/>" if idx < len(preise) - 1 else p
+                for idx, p in enumerate(preise)
+            ],
         }
     )
     if len(eltern) > 0:
@@ -670,6 +727,17 @@ def enrich_person_context(person_object, context):
         context["daten_akademie"][
             "Mitglied in einer nationalsozialistischen Vereinigung"
         ].append("Registrierungspflicht aufgrund des Verbotsgesetzes vom 1.5.1945")
+    test_ns = False
+    for t in context["daten_akademie"][
+        "Mitglied in einer nationalsozialistischen Vereinigung"
+    ]:
+        if len(t) > 0:
+            test_ns = True
+            break
+    if not test_ns:
+        del context["daten_akademie"][
+            "Mitglied in einer nationalsozialistischen Vereinigung"
+        ]
     if person_object.personinstitution_set.filter(relation_type_id=26).count() > 0:
         lst_kom = dict()
         for rel in person_object.personinstitution_set.filter(
