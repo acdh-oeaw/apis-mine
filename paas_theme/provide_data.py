@@ -420,6 +420,14 @@ def create_text_berufslaufbahn(rel):
         return lst_rels[-1]
 
 
+def get_references_tooltip(rel):
+    if len(rel.references) > 0:
+        res = f"<span class='tooltip-mine'>R<span class='tooltiptext'>{rel.references}</span></span>"
+        return res
+    else:
+        return ""
+
+
 def enrich_person_context(person_object, context):
     if BIRTH_REL_NAME is not None:
         try:
@@ -619,7 +627,7 @@ def enrich_person_context(person_object, context):
                 )
             ],
             "Berufslaufbahn": [
-                f'{create_text_berufslaufbahn(rel)}: <a href="/institution/{rel.related_institution_id}">{rel.related_institution}</a> {get_date_range(rel, classes["time_ranges_ids"], extended=True)}'
+                f'{create_text_berufslaufbahn(rel)}: <a href="/institution/{rel.related_institution_id}">{rel.related_institution}</a>{get_references_tooltip(rel)} {get_date_range(rel, classes["time_ranges_ids"], extended=True)}'
                 for rel in person_object.personinstitution_set.filter(
                     relation_type_id__in=classes["berufslaufbahn_ids"]
                 ).exclude(

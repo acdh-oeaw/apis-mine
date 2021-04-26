@@ -29,6 +29,36 @@ a {
   padding-left:30px;
 }
 
+.tooltip-mine {
+  position: relative;
+  display: inline-block;
+  vertical-align:super;
+  font-size: 0.6em; 
+  color:rgba(0, 0, 0, 0.5)
+}
+
+.tooltip-mine .tooltiptext {
+  visibility: hidden;
+  width: 150px;
+  background-color: black;
+  font-size: 1.4em;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -60px;
+}
+
+.tooltip-mine:hover .tooltiptext {
+  visibility: visible;
+}
+
 .text-09 {
   font-size:0.9rem;
 }
