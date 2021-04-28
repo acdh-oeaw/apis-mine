@@ -171,6 +171,7 @@ def get_gewaehlt(pers, year):
         "gewählt und bestätigt",
         "gewählt und genehmigt",
         "gewählt und ernannt",
+        "gewählt",
     ]
     vocs = [
         f"{rel2.relation_type} am {rel2.start_date_written}"
@@ -285,6 +286,7 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
     classes["mitgliedschaft"] = get_child_classes(
         [19, 20, 21, 23, 24], PersonInstitutionRelation, labels=True
     )
+    classes["ausschluss"] = [4170, 4171, 3458, 3464, 3474]
     classes["akad_funktionen"] = {
         "präsidentin": get_child_classes(
             [102, 1876], PersonInstitutionRelation, labels=True
@@ -377,7 +379,7 @@ def get_wahlvorschlag(pers, mitgliedschaften):
             )
         if date:
             if funk is not None:
-                txt_1 = f"Als {', '.join(funk)} {date[0].lower()+date[1:]}"
+                txt_1 = f"als {', '.join(funk)} {date[0].lower()+date[1:]}"
             else:
                 txt_1 = date
             if (pp.start_date, txt_1) not in lst_gew:
@@ -391,7 +393,7 @@ def get_wahlvorschlag(pers, mitgliedschaften):
             lst_fin.append(
                 (
                     pp.start_date,
-                    f"{'Am' if len(pp.start_date_written) > 4 else ''} {pp.start_date_written} umgewidmet zum {get_mitgliedschaft_from_relation(pp.relation_type)} der {kls}",
+                    f"{'am' if len(pp.start_date_written) > 4 else ''} {pp.start_date_written} umgewidmet zum {get_mitgliedschaft_from_relation(pp.relation_type)} der {kls}",
                 )
             )
             lst_fin.append((pp.start_date, "<hr/>"))
@@ -400,7 +402,7 @@ def get_wahlvorschlag(pers, mitgliedschaften):
             lst_fin.append(
                 (
                     pp.start_date,
-                    f"{'Am' if len(pp.start_date_written) > 4 else ''} {pp.start_date_written} ruhend gestellt als {get_mitgliedschaft_from_relation(pp.relation_type)} der {kls}",
+                    f"{'am' if len(pp.start_date_written) > 4 else ''} {pp.start_date_written} ruhend gestellt als {get_mitgliedschaft_from_relation(pp.relation_type)} der {kls}",
                 )
             )
             lst_fin.append((pp.start_date, "<hr/>"))
@@ -409,7 +411,7 @@ def get_wahlvorschlag(pers, mitgliedschaften):
             lst_fin.append(
                 (
                     pp.start_date,
-                    f"{'Am' if len(pp.start_date_written) > 4 else ''} {pp.start_date_written} reaktiviert als {get_mitgliedschaft_from_relation(pp.relation_type)} der {kls}",
+                    f"{'am' if len(pp.start_date_written) > 4 else ''} {pp.start_date_written} reaktiviert als {get_mitgliedschaft_from_relation(pp.relation_type)} der {kls}",
                 )
             )
             lst_fin.append((pp.start_date, "<hr/>"))
@@ -419,12 +421,27 @@ def get_wahlvorschlag(pers, mitgliedschaften):
             not in [
                 x[0] if isinstance(x[0], str) else x[0].strftime("%Y") for x in lst_fin
             ]
-            and mit[-1].lower()
+            and mit[-1]
+            and mit[5].relation_type_id in classes["ausschluss"]
         ):
             lst_fin.append(
                 (
                     datetime.strptime(mit[0], "%Y").date(),
-                    f"{mit[0]} Als {mit[2]} der {abbreviate(mit[4])} {mit[-1].lower()}",
+                    f"{mit[0]} {mit[2]}",
+                )
+            )
+            lst_fin.append((datetime.strptime(mit[0], "%Y").date(), "<hr/>"))
+        elif (
+            mit[0]
+            not in [
+                x[0] if isinstance(x[0], str) else x[0].strftime("%Y") for x in lst_fin
+            ]
+            and mit[-1]
+        ):
+            lst_fin.append(
+                (
+                    datetime.strptime(mit[0], "%Y").date(),
+                    f"{mit[0]} zum {mit[2]} der {abbreviate(mit[4])} {mit[-1].lower()}",
                 )
             )
             lst_fin.append((datetime.strptime(mit[0], "%Y").date(), "<hr/>"))
@@ -596,7 +613,8 @@ def enrich_person_context(person_object, context):
             129,
             130,
             131,
-        ],
+        ]
+        + classes["ausschluss"],
     ).order_by("start_date"):
         mitgliedschaften.append(
             (
@@ -605,6 +623,7 @@ def enrich_person_context(person_object, context):
                 rel.relation_type.label.split(" >> ")[1].split("(")[0].strip(),
                 rel.relation_type.label.split(" >> ")[1],
                 rel.related_institution,
+                rel,
                 rel.relation_type.label.split(" >> ")[-1],
             )
         )
@@ -613,9 +632,16 @@ def enrich_person_context(person_object, context):
         ) """
     context["mitgliedschaften"] = []
     for mit in mitgliedschaften:
-        context["mitgliedschaften"].append(
-            f"{mit[0]} <span title='{mit[2]} in der {mit[4]}'>{mit[2]}</span> ({mit[5]})"
-        )
+        if mit[5].relation_type_id in classes["ausschluss"]:
+            context["mitgliedschaften"].append(f"{mit[0]} {mit[3]}")
+        elif mit[6].lower() == "ruhend gestellt":
+            context["mitgliedschaften"].append(
+                f"{mit[0]} <span title='{mit[2]} in der {mit[4]}'>{mit[2]}</span> ({mit[6]})"
+            )
+        else:
+            context["mitgliedschaften"].append(
+                f"{mit[0]} <span title='{mit[2]} in der {mit[4]}'>{mit[2]}</span>"
+            )
     eltern = [
         p.related_personA
         for p in person_object.related_personA.filter(relation_type_id=168)
@@ -625,7 +651,7 @@ def enrich_person_context(person_object, context):
     ]
     eltern = [Person.objects.get(pk=p1) for p1 in eltern]
     if len(eltern) > 0:
-        eltern_dict = {"Vater": "kA", "Mutter": "kA"}
+        eltern_dict = {"Vater": "k. A.", "Mutter": "k. A."}
         for p in eltern:
             if p.gender == "female":
                 eltern_dict["Mutter"] = f"<a href=/person/{p.pk}>{str(p)}</a>"
@@ -730,20 +756,24 @@ def enrich_person_context(person_object, context):
             "Funktionen in der Akademie": [
                 f'Zum Präsidenten der Gesamtakademie {rel.relation_type.name} am {rel.start_date_written}{", tätig bis "+rel.end_date_written if rel.end_date_written is not None else ""}'
                 for rel in person_object.personinstitution_set.filter(
-                    related_institution_id=500, relation_type_id__in=[103, 106]
+                    related_institution_id=500,
+                    relation_type_id__in=classes["akad_funktionen"]["präsidentin"][0],
                 )
             ]
             + [
                 f'Zum Vizepräsidenten der Gesamtakademie {rel.relation_type.name} am {rel.start_date_written}{", tätig bis "+rel.end_date_written if rel.end_date_written is not None else ""}'
                 for rel in person_object.personinstitution_set.filter(
-                    related_institution_id=500, relation_type_id__in=[107, 105]
+                    related_institution_id=500,
+                    relation_type_id__in=classes["akad_funktionen"]["vizepräsidentin"][
+                        0
+                    ],
                 )
             ]
             + [
                 f'Zum Sekretär der {abbreviate(rel.related_institution)} {rel.relation_type.name} am {rel.start_date_written}{", tätig bis "+rel.end_date_written if rel.end_date_written is not None else ""}'
                 for rel in person_object.personinstitution_set.filter(
                     related_institution_id__in=[2, 3, 500],
-                    relation_type_id__in=[119, 118, 117, 120, 121],
+                    relation_type_id__in=classes["akad_funktionen"]["sekretärin"][0],
                 )
             ],
             "Mitgliedschaften in anderen Akademien": [
