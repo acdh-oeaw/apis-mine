@@ -1,6 +1,6 @@
 from crispy_forms.bootstrap import Accordion, AccordionGroup
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit, Layout, Fieldset
+from crispy_forms.layout import Submit, Layout, Fieldset, Div
 from django import forms
 from haystack.forms import FacetedSearchForm, SearchForm
 from haystack.query import SQ, AutoQuery, SearchQuerySet
@@ -16,52 +16,64 @@ class PersonFilterFormHelperNew(FormHelper):
         self.form_class = "genericFilterForm"
         self.form_method = "GET"
         self.helper.form_tag = False
+        # self.template = "forms/template_person_form.html"
         self.add_input(Submit("Filter", "Search"))
         self.layout = Layout(
             Fieldset("", "q", css_id="basic_search_fields"),
-            Accordion(
-                AccordionGroup(
-                    "Personendaten",
-                    "name",
-                    "gender",
-                    "birth_date",
-                    "death_date",
-                    css_id="lebensdaten",
-                ),
-                AccordionGroup(
-                    "Mitgliedschaft",
-                    "mtgld_mitgliedschaft",
-                    "mtgld_klasse",
-                    css_id="mitgliedschaft",
-                ),
-                AccordionGroup(
-                    "Akademischer CV",
-                    "place_of_birth",
-                    "place_of_death",
-                    "profession",
-                    Fieldset(
-                        "Berufliche Positionen",
-                        "beruf_position",
-                        "beruf_institution",
-                        css_id="beruf_subform",
-                        css_class="form-inline",
+            Div(
+                Div(
+                    Accordion(
+                        AccordionGroup(
+                            "Personendaten",
+                            "name",
+                            "gender",
+                            "birth_date",
+                            "death_date",
+                            css_id="lebensdaten",
+                        ),
+                        AccordionGroup(
+                            "Mitgliedschaft",
+                            "mtgld_mitgliedschaft",
+                            "mtgld_klasse",
+                            css_id="mitgliedschaft",
+                        ),
+                        AccordionGroup(
+                            "Akademischer CV",
+                            "place_of_birth",
+                            "place_of_death",
+                            "profession",
+                            Fieldset(
+                                "Berufliche Positionen",
+                                "beruf_position",
+                                "beruf_institution",
+                                css_id="beruf_subform",
+                                css_class="form-inline",
+                            ),
+                            css_id="akademischer_CV",
+                        ),
                     ),
-                    css_id="akademischer_CV",
+                    css_class="col-md-6",
                 ),
-                AccordionGroup(
-                    "In der Akademie",
-                    "akademiemitgliedschaft",
-                    "akademiefunktionen",
-                    css_id="in_der_akademie",
+                Div(
+                    Accordion(
+                        AccordionGroup(
+                            "In der Akademie",
+                            "akademiemitgliedschaft",
+                            "akademiefunktionen",
+                            css_id="in_der_akademie",
+                        ),
+                        AccordionGroup(
+                            "zur Wahl zum Akademiemitglied vorgeschlagen von",
+                            "wahl_person",
+                            "wahl_beruf",
+                            "wahl_gender",
+                            css_id="wahlvorschlag",
+                        ),
+                        AccordionGroup("Auszeichnungen", "nobelpreis", "ewk"),
+                    ),
+                    css_class="col-md-6",
                 ),
-                AccordionGroup(
-                    "zur Wahl zum Akademiemitglied vorgeschlagen von",
-                    "wahl_person",
-                    "wahl_beruf",
-                    "wahl_gender",
-                    css_id="wahlvorschlag",
-                ),
-                AccordionGroup("Auszeichnungen", "nobelpreis", "ewk"),
+                css_class="row",
             ),
         )
 
