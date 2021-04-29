@@ -8,50 +8,42 @@
 
 
   <!-- ******************* The Hero Area ******************* -->
-  <div class="wrapper" id="wrapper-hero-content">
+  <div class="wrapper  pb-0" id="wrapper-hero-content">
     <div class="container hero-light" id="wrapper-hero-inner" tabindex="-1">
 
 
-      <div>
+      <div class="row m-0 bg-mine border-mine p-1">
 
-        <h1>Geschichte der Akademie</h1>
-        <p>Teaser text...</p>
+        <h1 class="w-50">MITGLIEDER DER ÖSTERREICHISCHEN AKADEMIE DER WISSENSCHAFTEN</h1>
+        <div class="w-75 mx-auto">
+        <p class="font-weight-normal">Die Österreichische Akademie der Wissenschaften besteht aus
+          zwei Klassen, der mathematisch-naturwissenschaftlichen und
+          der philosophisch-historischen Klasse. Die Gelehrtengesellschaft
+          ergänzt sich selbst durch die Wahl neuer Mitglieder.</p>
       </div>
-
+      </div>
     </div><!-- #wrapper-hero-content -->
 
   </div>
-  <div class="container pt-3">
-    {% include "theme/stats.html" %}
-  </div>
-  <div class="container startPageSearch">
-    <form action="/search?" method="get">
+  <div class="wrapper pt-0" id="index-wrapper">
+    <div class="container" id="content" tabindex="-1">
+      <form action="/search?" class="w-100" method="get">
         <div id="search_form">
         {% crispy search_form search_form.helper %}
         </div>
     </form>
-  </div>
-  <div class="wrapper" id="index-wrapper">
-    <div class="container" id="content" tabindex="-1">
-      <div class="row">
-        <!-- Do the left sidebar check and opens the primary div -->
-        <div class="col-md-12 content-area" id="primary">
-
-          {% include "theme/random_entries.html" %}
-        </div>
-      </div>
     </div>
   </div>
-  <div class="wrapper" id="partners-wrapper">
+  <!--<div class="wrapper" id="partners-wrapper">
     <div class="container" id="content" tabindex="-1">
       <div class="row">
-        <!-- Do the left sidebar check and opens the primary div -->
-        <div class="col-md-12 content-area" id="primary">
+        <!-/- Do the left sidebar check and opens the primary div -/->
+       <div class="col-md-12 content-area" id="primary">
           {% include "theme/partners.html" %}
         </div>
       </div>
     </div>
-  </div>
+  </div>-->
 </div>
 {% endblock %}
 
