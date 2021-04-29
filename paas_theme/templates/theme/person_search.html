@@ -147,11 +147,9 @@
   </a>
 
   <div class="dropdown-menu" aria-labelledby="dropdownNetworksLink">
-    <a class="dropdown-item" href="/network/${window.location.search}&network_type=kommissionen">Kommissionen</a>
-    <a class="dropdown-item" href="/network/${window.location.search}&network_type=universitaeten">Universitäten</a>
-    <a class="dropdown-item" href="/network/${window.location.search}&network_type=andere_akademien">andere Akademien</a>
-    <a class="dropdown-item" href="/network/${window.location.search}&network_type=ausbildung">Ausbildung</a>
-    <a class="dropdown-item" href="/network/${window.location.search}&network_type=karierre">Karierre</a>
+  {% for network in network_buttons %}
+    <a class="dropdown-item" href="/network/${window.location.search}&network_type={{network.key}}">{{network.label}}</a>
+  {% endfor %}
   </div>
 </div>`
     

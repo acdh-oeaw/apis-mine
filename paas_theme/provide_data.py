@@ -340,6 +340,19 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
             labels=False,
         ),
     }
+    classes["netzwerk"] = {
+        "Kommissionen": {
+            "related_institution__kind_id": 82,
+            "relation_type_id__in": get_child_classes(
+                [26, 162], PersonInstitutionRelation, labels=False
+            ),
+        },
+        "Universitäten": {
+            "label": "Prof. an Universitäten",
+            "related_institution__kind_id": 3383,
+            "relation_type_id__in": classes["berufslaufbahn_map"]["Professor/in"],
+        },
+    }
 
     with open(cache_path, "wb") as outp:
         pickle.dump(classes, outp)
