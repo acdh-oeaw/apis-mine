@@ -1,0 +1,18 @@
+<div class="card  mb-4 rounded-0">
+    <div class="card-header p-0 bg-white" role="tab">
+        <h5 class="mb-0">
+            <button type="button" class="btn btn-link collapsebtn w-100 text-left collapsed p-0 pl-1 text-09"
+                      data-toggle="collapse" data-target="#{{ div.css_id }}" aria-expanded="false" aria-controls="{{ div.css_id }}">
+                      <b>{{ div.name }}</b>
+                      <i class="chevron-up" data-feather="chevron-up"></i>
+                    </button>
+        </h5>
+    </div>
+
+    <div id="{{ div.css_id }}" class="collapse{% if div.active %} hide{% endif %}" role="tabpanel"
+         aria-labelledby="{{ div.css_id }}" data-parent="#{{ div.data_parent }}">
+        <div class="card-body">
+            {{ fields|safe }}
+        </div>
+    </div>
+</div>

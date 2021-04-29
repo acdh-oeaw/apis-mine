@@ -17,9 +17,9 @@ class PersonFilterFormHelperNew(FormHelper):
         self.form_method = "GET"
         self.helper.form_tag = False
         # self.template = "forms/template_person_form.html"
-        self.add_input(Submit("Filter", "Search"))
+        # self.add_input(Submit("Filter", "Search"))
         self.layout = Layout(
-            Fieldset("", "q", css_id="basic_search_fields"),
+            Fieldset("", "q",css_class="bg-mine", css_id="basic_search_fields"),
             Div(
                 Div(
                     Accordion(
@@ -52,7 +52,7 @@ class PersonFilterFormHelperNew(FormHelper):
                             css_id="akademischer_CV",
                         ),
                     ),
-                    css_class="col-md-6",
+                    css_class="col-md-6 pt-30 pr-0 pr-md-15 pl-0",
                 ),
                 Div(
                     Accordion(
@@ -63,7 +63,7 @@ class PersonFilterFormHelperNew(FormHelper):
                             css_id="in_der_akademie",
                         ),
                         AccordionGroup(
-                            "zur Wahl zum Akademiemitglied vorgeschlagen von",
+                            "zur Wahl vorgeschlagen von",
                             "wahl_person",
                             "wahl_beruf",
                             "wahl_gender",
@@ -71,15 +71,15 @@ class PersonFilterFormHelperNew(FormHelper):
                         ),
                         AccordionGroup("Auszeichnungen", "nobelpreis", "ewk"),
                     ),
-                    css_class="col-md-6",
+                    css_class="col-md-6 pt-30 pr-0 pl-0 pl-md-15",
                 ),
-                css_class="row",
+                css_class="row ml-0 mr-0 mt-4",
             ),
         )
 
 
 class PersonFacetedSearchFormNew(FacetedSearchForm):
-    q = forms.CharField(required=False, label="Suche")
+    q = forms.CharField(widget=forms.TextInput(attrs={'placeholder':'Mitgliedersuche','class':'border-0 rounded-0 d-block mx-auto w-75'}),required=False, label="")
     start_date_form = forms.CharField(required=False)
     end_date_form = forms.CharField(required=False)
     death_date = forms.DateField(required=False)
