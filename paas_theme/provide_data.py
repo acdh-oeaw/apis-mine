@@ -342,15 +342,22 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
     }
     classes["netzwerk"] = {
         "Kommissionen": {
+            "relation": "PersonInstitution",
             "related_institution__kind_id": 82,
             "relation_type_id__in": get_child_classes(
                 [26, 162], PersonInstitutionRelation, labels=False
             ),
         },
         "Universitäten": {
+            "relation": "PersonInstitution",
             "label": "Prof. an Universitäten",
             "related_institution__kind_id": 3383,
             "relation_type_id__in": classes["berufslaufbahn_map"]["Professor/in"],
+        },
+        "Orte": {
+            "relation": "PersonPlace",
+            "label": "Geburts- und Sterbeorte",
+            "relation_type_id__in": [64, 3090, 152, 153, 3054, 3091],
         },
     }
 
