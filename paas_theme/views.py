@@ -18,10 +18,7 @@ from .forms import (
     PersonFacetedSearchFormNew,
 )
 from .tables import PersonTable, SearchResultTable
-from .provide_data import (
-    oebl_persons,
-    enrich_person_context,
-)
+from .provide_data import oebl_persons, enrich_person_context, classes
 
 from apis_core.helper_functions.utils import access_for_all
 
@@ -101,6 +98,7 @@ class PersonSearchView(UserPassesTestMixin, FacetedSearchView):
     queryset = SearchQuerySet()
     form_class = PersonFacetedSearchFormNew
     facet_fields = [
+        # "akademiemitgliedschaft",
         "place_of_birth",
         "place_of_death",
         # "comissions",
@@ -108,6 +106,16 @@ class PersonSearchView(UserPassesTestMixin, FacetedSearchView):
         # "education",
         # "career",
     ]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["network_buttons"] = [
+            {"key": k, "label": v["label"]}
+            if "label" in v.keys()
+            else {"key": k, "label": k}
+            for k, v in classes["netzwerk"].items()
+        ]
+        return context
 
     def test_func(self):
         access = access_for_all(self, viewtype="detail")

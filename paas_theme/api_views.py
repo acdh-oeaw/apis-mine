@@ -6,6 +6,8 @@ from apis_core.apis_relations.models import PersonInstitution
 from apis_core.api_renderers import NetJsonRenderer
 from django.conf import settings
 
+from .provide_data import classes
+
 
 class NetVizTheme(ListAPIView):
     action = "list"
@@ -22,17 +24,8 @@ class NetVizTheme(ListAPIView):
         pi = PersonInstitution.objects.filter(
             related_person_id__in=[x.pk for x in sqs1]
         )
-        if "kommissionen" in network:
-            rel_names = getattr(settings, "APIS_SEARCH_COMISSIONS", [])
-            pi = pi.filter(relation_type__name__in=rel_names)
-        elif "universitaeten" in network:
-            pi = pi.filter(related_institution__kind__name="Universität")
-        elif "andere_akademien" in network:
-            pi = pi.filter(related_institution__kind__name="Akademie (Ausland)")
-        elif "ausbildung" in network:
-            rel_names = getattr(settings, "APIS_SEARCH_EDUCATION", [])
-            pi = pi.filter(relation_type__name__in=rel_names)
-        elif "karierre" in network:
-            rel_names = getattr(settings, "APIS_SEARCH_CAREER", [])
-            pi = pi.filter(relation_type__name__in=rel_names)
+        query_dict = classes["netzwerk"][network[0]]
+        if "label" in query_dict.keys():
+            del query_dict["label"]
+        pi = pi.filter(**query_dict)
         return pi
