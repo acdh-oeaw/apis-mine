@@ -41,6 +41,9 @@ HAYSTACK_CONNECTIONS = {
     }
 }
 
+CRISPY_TEMPLATE_PACK = "acdh_mine"
+CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap", "acdh_mine")
+
 # HAYSTACK_DEFAULT_OPERATOR = "OR"
 INSTALLED_APPS += ["haystack", "paas_theme"]
 
