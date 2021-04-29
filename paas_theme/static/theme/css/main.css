@@ -2,6 +2,7 @@ body {
   font-weight: 300;
   color:black;
   --oeaw-blau: #0047bb;
+  --mine-grey: #f0f0f7;
 }
 
 * {
@@ -306,6 +307,16 @@ h6 {
   color: #333;
 }
 
+.bootstrap-select.btn-group .dropdown-menu li a:hover {
+  background-color:var(--mine-grey)
+}
+/* Notlösung */
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+  background:var(--mine-grey) !important;
+  border:none !important;
+  color:black;
+}
+
 .card-wrapper .card .partnercard.card-inner {
   border: none;
 }
@@ -316,7 +327,7 @@ h6 {
 }
 
 .basecard.card .card-inner {
-  background: #f0f0f7;
+  background: var(--mine-grey);
 }
 
 .oeblredcard.card .card-inner {
@@ -1481,7 +1492,7 @@ div.leaflet-marker-icon svg.feather-map-pin {
 .navbar .navbar-collapse .navbar-search {
   border-radius:0;
   width:15rem;
-  background-color:#f0f0f7;
+  background-color:var(--mine-grey);
 }
 
 .navbar button.navbar-search-icon {
@@ -1493,7 +1504,7 @@ div.leaflet-marker-icon svg.feather-map-pin {
 }
 
 .bg-mine {
-  background-color:#f0f0f7;
+  background-color:var(--mine-grey);
 }
 
 .border-mine {
@@ -1512,8 +1523,7 @@ div.leaflet-marker-icon svg.feather-map-pin {
 .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
   
   border-color:#c80000;
-
-  background-color:#f0f0f7;
+  background-color:var(--mine-grey);
 }
 
  svg.feather.feather-chevron-up {

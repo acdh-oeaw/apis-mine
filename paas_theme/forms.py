@@ -17,7 +17,7 @@ class PersonFilterFormHelperNew(FormHelper):
         self.form_method = "GET"
         self.helper.form_tag = False
         # self.template = "forms/template_person_form.html"
-        # self.add_input(Submit("Filter", "Search"))
+        self.add_input(Submit("Filter", "Suche",css_class='rounded-0 mt-1'))
         self.layout = Layout(
             Fieldset("", "q",css_class="bg-mine", css_id="basic_search_fields"),
             Div(
@@ -107,6 +107,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         ],
     )
     gender = forms.ChoiceField(
+        widget=forms.Select(attrs={'class':'bootstrap-select rounded-0'}),
         required=False,
         choices=(("", "-"), ("male", "Männlich"), ("female", "Weiblich")),
         label="Geschlecht",
