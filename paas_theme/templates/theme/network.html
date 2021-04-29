@@ -84,8 +84,32 @@
                   const edges = {}
                   const nodes = {}
                   const types = {edges: {}, nodes: {}}
+                  let type_source
+                  let type_target
+                      const type_definitions = {
+                          "Person": {
+                              id: "Person",
+                              label: "Person",
+                              color: "#c80000"
+                          },
+                          "Place": {
+                          id: 'Place',
+                          label: 'Ort',
+                          color: 'rebeccapurple',},
+                          
+                          "Institution": {
+                          id: 'Institution',
+                          label: 'Institution',
+                          color: 'green',
+                      }
+                      }
+                  var match_entities = /entities\/(\w+)/;
                   data.results.forEach(relation => {
                       const {id, source, target, relation_type: relationType} = relation
+                      type_source = match_entities.exec(source.url)[1]
+                      type_target = match_entities.exec(target.url)[1]
+                      type_source = type_source.charAt(0).toUpperCase() + type_source.slice(1)
+                      type_target = type_target.charAt(0).toUpperCase() + type_target.slice(1)
                       edges[id] = {
                           id,
                           source: source.id,
@@ -95,40 +119,31 @@
                       nodes[source.id] = {
                           id: source.id,
                           label: source.label,
-                          type: 'Person',
+                          type: type_source
                       }
                       nodes[target.id] = {
                           id: target.id,
                           label: target.label,
-                          type: 'Institution',
+                          type: type_target
                       }
                       types.edges[relationType.id] = {
                           id: relationType.id,
                           label: relationType.label,
                       }
-                      types.nodes['Person'] = {
-                          id: 'Person',
-                          label: 'Person',
-                          color: 'hotpink',
-                      }
-                      types.nodes['Place'] = {
-                          id: 'Place',
-                          label: 'Place',
-                          color: 'rebeccapurple',
-                      }
-                      types.nodes['Institution'] = {
-                          id: 'Institution',
-                          label: 'Institution',
-                          color: 'green',
-                      }
                   })
+                  types.nodes[type_source] = type_definitions[type_source]
+                  types.nodes[type_target] = type_definitions[type_target]
                   ReactDOM.render(
-                      React.createElement(NetworkVisualization.Visualization, {
+                      React.createElement(NetworkVisualization.SelectionControls, {
                           graph: {
                               edges,
                               nodes,
                               types,
                           },
+                          children: props => [
+            React.createElement(NetworkVisualization.ExportButton, props),
+            React.createElement(NetworkVisualization.Legend, props),
+          ],
                       }),
                       document.getElementById('visualization')
                   );
