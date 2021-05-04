@@ -1577,3 +1577,11 @@ div.leaflet-marker-icon svg.feather-map-pin {
   padding-right:15px !important;
 }
 }
+
+/*** print ***/
+
+@media print {
+  .collapse {
+    display:block;
+  }
+}
