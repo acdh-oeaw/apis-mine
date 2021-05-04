@@ -45,7 +45,7 @@ CRISPY_TEMPLATE_PACK = "acdh_mine"
 CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap", "acdh_mine")
 
 # HAYSTACK_DEFAULT_OPERATOR = "OR"
-INSTALLED_APPS += ["haystack", "paas_theme"]
+INSTALLED_APPS += ["haystack","leaflet", "paas_theme"]
 
 SECRET_KEY = (
     os.environ.get("APIS_SECRET_KEY", "TO_CHANGE")
