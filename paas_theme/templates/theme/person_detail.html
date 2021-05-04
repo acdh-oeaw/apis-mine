@@ -1,10 +1,13 @@
 {% extends "theme/base.html" %}
+{% load leaflet_tags %}
 {% block scriptHeader %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
 <script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/three@latest/build/three.min.js"></script>
 <script crossorigin src="https://unpkg.com/@acdh/network-visualization@latest/lib/network-visualization.umd.js"></script>
+{% leaflet_js %}
+{% leaflet_css %}
 {% endblock %}
 {% load static %}
 {% load webpage_extras %}
@@ -108,7 +111,7 @@
                 <a class="nav-link rounded-0 text-uppercase align-bottom" data-toggle="tab" id="egonet-tab" href="#egonet" role="tab" aria-controls="egonet" aria-selected="false">Egonetzwerk</a>
               </li>
               <li class="nav-item p-0 font-weight-bold" role="presentation">
-                <a class="nav-link rounded-0 text-uppercase" data-toggle="tab" id="map-tab" href="#map" role="tab" role="tab" aria-controls="contact" aria-selected="false">Karte</a>
+                <a class="nav-link rounded-0 text-uppercase" data-toggle="tab" id="map-tab" href="#map" role="tab" role="tab" aria-controls="map" aria-selected="false">Karte</a>
               </li>
             </ul>
             <div class="tab-content bg-mine" id="myTabContent">
@@ -142,7 +145,18 @@
                 <p>egonet</p>
               </div>
               <div class="tab-pane fade" id="map" role="tabpanel" aria-labelledby="map-tab">
-                <p>Karte</p>
+               <div class="row m-0">
+                <div class="col-md-7">
+                  <div id="map-container" class="inline-map">
+                  <a class="leaflet-control-zoom-in" role="button" onClick="move_map()">
+                      <i data-feather="maximize-2"></i>
+                  </a>
+                    {% leaflet_map "map-container" %}
+                  </div>
+                </div>
+          <div class="col-md-5 p-0">
+            {% include "theme/spacetime_graph.html" %}
+        </div>
               </div>
               </div>
             </div>
@@ -155,21 +169,16 @@
 
 {% endblock content %}
 {% block scripts %}
-<script>
 
-  document.addEventListener("DOMContentLoaded", function () {
-    const urlParams = new URLSearchParams(window.location.search);
-    const mapview = urlParams.get('mapview', false);
-    window.eventBus.on('apismap.marker.loaded', function () {
-      if (mapview) {
-        move_map();
-      }
-    }
-    )
-  });
-  $('.nav-tabs a').on('shown.bs.tab', function(event){
-  var x = $(event.target).text();         // active tab
-  var y = $(event.relatedTarget).text();  // previous tab
-});
+<script type="text/javascript" src="{%static 'theme/js/map.js' %}"></script>
+<script>
+  var personPk = "{{object.pk}}";
+  var baseURL = "{% url 'apis:apis_api2:GetRelatedPlaces' %}";
+  initMap(baseURL, personPk);
+  $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+    console.log(e.target);
+    adjustSize();
+})
 </script>
+
 {% endblock %}

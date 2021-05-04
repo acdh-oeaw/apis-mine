@@ -1,6 +1,5 @@
 {% load custom_tags %}
 <div id="spacetime-graph-content">
-  <h4>Lifeline</h4>
   <div id="spacetime-graph_person_{{ object.pk }}" class="spacetime-graph"></div>
 </div>
 <script type="module">
@@ -136,7 +135,7 @@
           .attr('cy', d => yScale(d.data.year))
           .attr('apis:relid', d => d.data.id)
           .attr('r', 15)
-          .style('fill', '#69b3a2')
+          .style('fill', 'var(--oeaw-blau)')
           .style('opacity', 0.3)
           .style('stroke', 'white')
           .on('mouseover', (...e) => {
@@ -186,7 +185,7 @@
 <style>
   .spacetime-graph path.lifeline {
     fill: none;
-    stroke: #ed3700;
+    stroke: #c80000;
     stroke-width: 4px;
   }
   .tooltip {
@@ -208,7 +207,7 @@
     opacity: 1;
   }
   .circle-label:hover circle, .circle-label circle.hover {
-    fill: red !important;
+    fill: #c80000 !important;
     transform: scale(2);
     opacity: 1;
   }
