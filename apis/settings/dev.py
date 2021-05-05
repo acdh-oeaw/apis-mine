@@ -14,8 +14,9 @@ APIS_LIST_VIEWS_ALLOWED = False
 APIS_DETAIL_VIEWS_ALLOWED = False
 FEATURED_COLLECTION_NAME = "FEATURED"
 # MAIN_TEXT_NAME = "ÖBL Haupttext"
-BIRTH_REL_NAME = [64, 152, 3090]
-DEATH_REL_NAME = [153, 3054, 3091]
+BIRTH_REL_NAME = "geboren in"
+DEATH_REL_NAME = "verstorben in"
+APIS_LOCATED_IN_ATTR = ["located in"]
 APIS_BASE_URI = "https://paas.acdh.oeaw.ac.at/"
 # APIS_OEBL_BIO_COLLECTION = "ÖBL Biographie"
 
@@ -41,6 +42,12 @@ HAYSTACK_CONNECTIONS = {
     }
 }
 
+REST_FRAMEWORK["DEFAULT_PERMISSION_CLASSES"] = (
+    # "rest_framework.permissions.DjangoModelPermissions",
+    "rest_framework.permissions.IsAuthenticated",
+    # "rest_framework.permissions.DjangoObjectPermissions",
+    # use IsAuthenticated for every logged in user to have global edit rights
+)
 CRISPY_TEMPLATE_PACK = "acdh_mine"
 CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap", "acdh_mine")
 
