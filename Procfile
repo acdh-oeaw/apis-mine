@@ -1,2 +1,2 @@
 release: python manage.py migrate
-web: gunicorn apis.wsgi
+web: bash start.sh

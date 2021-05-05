@@ -2,7 +2,7 @@ from haystack import indexes
 from django.conf import settings
 
 from apis_core.apis_metainfo.models import Text
-from apis_core.apis_vocabularies.models import LabelType
+from apis_core.apis_vocabularies.models import LabelType, PersonPlaceRelation
 from apis_core.apis_labels.models import Label
 from apis_core.apis_entities.models import Person, Institution, Place
 from apis_core.apis_relations.models import PersonInstitution, PersonPerson, PersonEvent
@@ -327,6 +327,7 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
     gender = indexes.CharField(null=True, model_attr="gender", faceted=True)
     profession = indexes.MultiValueField(null=True, faceted=True)
     akademiemitgliedschaft = indexes.MultiValueField(null=True, faceted=True)
+    mitgliedschaft_short = indexes.CharField(null=True, faceted=True)
     funk_praesidentin = indexes.BooleanField(default=False)
     funk_vizepraesidentin = indexes.BooleanField(default=False)
     funk_generalsekretaerin = indexes.BooleanField(default=False)
@@ -515,22 +516,42 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
             )
         return res_fin
 
+    def prepare_mitgliedschaft_short(self, object):
+        res = object.personinstitution_set.filter(
+            related_institution_id__in=[2, 3, 500],
+            relation_type_id__in=classes["mitgliedschaft"][0],
+        )
+        res_fin = []
+        for mitglied in res:
+            mitgliedschaft = get_mitgliedschaft_from_relation(mitglied.relation_type)
+            res_fin.append(mitgliedschaft)
+        for m in classes["mitgliedschaft sortiert"]:
+            if m in res_fin:
+                return m
+        return None
+
     def prepare_profession(self, object):
         return [x.label for x in object.profession.all()]
 
     def prepare_place_of_birth(self, object):
-        rel = object.personplace_set.filter(
-            relation_type_id__in=getattr(settings, "BIRTH_REL_NAME", [])
-        )
+        birth_rel = getattr(settings, "BIRTH_REL_NAME", [])
+        if isinstance(birth_rel, str):
+            birth_rel = PersonPlaceRelation.objects.filter(name=birth_rel).values_list(
+                "pk", flat=True
+            )
+        rel = object.personplace_set.filter(relation_type_id__in=birth_rel)
         if rel.count() == 1:
             return rel[0].related_place.name
         else:
             return None
 
     def prepare_place_of_death(self, object):
-        rel = object.personplace_set.filter(
-            relation_type_id__in=getattr(settings, "DEATH_REL_NAME", [])
-        )
+        death_rel = getattr(settings, "DEATH_REL_NAME", [])
+        if isinstance(death_rel, str):
+            death_rel = PersonPlaceRelation.objects.filter(name=death_rel).values_list(
+                "pk", flat=True
+            )
+        rel = object.personplace_set.filter(relation_type_id__in=death_rel)
         if rel.count() == 1:
             return rel[0].related_place.name
         else:

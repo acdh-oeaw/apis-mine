@@ -23,12 +23,10 @@ class PersonTable(tables.Table):
 
 class SearchResultTable(tables.Table):
 
-    wm = tables.TemplateColumn(
-        template_code='{% if record.academy_member %}<i data-feather="check-circle"></i>{% else %}<i data-feather="circle"></i>{% endif %}'
-    )
+    mitgliedschaft = tables.Column(accessor="mitgliedschaft_short", verbose_name="Mgl.")
 
     name = tables.TemplateColumn(
-        template_code='<a class="oebl-font-red semi-bold" href="person/{{record.pk}}?mapview=true">{{record.name}}</a>',
+        template_code='<a class="oebl-font-red semi-bold" href="person/{{record.pk}}">{{record.name}}</a>',
         verbose_name="Name",
         attrs={"a": {"class": "oebl-font-red semi-bold"}},
     )
@@ -60,7 +58,7 @@ class SearchResultTable(tables.Table):
     class Meta:
         model = Person
         fields = (
-            "wm",
+            "mitgliedschaft",
             "name",
             "birth_date",
             "birth_place",

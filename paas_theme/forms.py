@@ -4,6 +4,7 @@ from crispy_forms.layout import Submit, Layout, Fieldset, Div
 from django import forms
 from haystack.forms import FacetedSearchForm, SearchForm
 from haystack.query import SQ, AutoQuery, SearchQuerySet
+from haystack.inputs import Raw
 from apis_core.helper_functions.DateParser import parse_date
 from apis_core.apis_entities.fields import Select2Multiple, ListSelect2
 from .provide_data import classes
@@ -17,9 +18,9 @@ class PersonFilterFormHelperNew(FormHelper):
         self.form_method = "GET"
         self.helper.form_tag = False
         # self.template = "forms/template_person_form.html"
-        self.add_input(Submit("Filter", "Suche",css_class='rounded-0 mt-1'))
+        self.add_input(Submit("Filter", "Suche", css_class="rounded-0 mt-1"))
         self.layout = Layout(
-            Fieldset("", "q",css_class="bg-mine", css_id="basic_search_fields"),
+            Fieldset("", "q", css_class="bg-mine", css_id="basic_search_fields"),
             Div(
                 Div(
                     Accordion(
@@ -79,7 +80,16 @@ class PersonFilterFormHelperNew(FormHelper):
 
 
 class PersonFacetedSearchFormNew(FacetedSearchForm):
-    q = forms.CharField(widget=forms.TextInput(attrs={'placeholder':'Mitgliedersuche','class':'border-0 rounded-0 d-block mx-auto w-75'}),required=False, label="")
+    q = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "Mitgliedersuche",
+                "class": "border-0 rounded-0 d-block mx-auto w-75",
+            }
+        ),
+        required=False,
+        label="",
+    )
     start_date_form = forms.CharField(required=False)
     end_date_form = forms.CharField(required=False)
     death_date = forms.DateField(required=False)
@@ -107,7 +117,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         ],
     )
     gender = forms.ChoiceField(
-        widget=forms.Select(attrs={'class':'bootstrap-select rounded-0'}),
+        widget=forms.Select(attrs={"class": "bootstrap-select rounded-0"}),
         required=False,
         choices=(("", "-"), ("male", "Männlich"), ("female", "Weiblich")),
         label="Geschlecht",
@@ -136,9 +146,10 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         label="Mitgliedschaft",
         choices=[
             ("", "-"),
-            ("k. M. I.", "korrespondierendes Mitglied im Inland"),
-            ("k. M. A.", "korrespondierendes Mitglied im Ausland"),
-            ("w. M", "Wirkliches Mitglied"),
+            ("kM I", "korrespondierendes Mitglied im Inland"),
+            ("kM A", "korrespondierendes Mitglied im Ausland"),
+            ("wM", "Wirkliches Mitglied"),
+            ("em", "Ehrenmitglied"),
         ],
     )
     mtgld_klasse = forms.MultipleChoiceField(
@@ -183,7 +194,9 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         ):
             mtgld_dic = SQ()
             for mitgliedschaft in self.cleaned_data["mtgld_mitgliedschaft"]:
-                mtgld_dic.add(SQ(akademiemitgliedschaft=mitgliedschaft), SQ.OR)
+                mtgld_dic.add(
+                    SQ(akademiemitgliedschaft=Raw(f"{mitgliedschaft}*")), SQ.OR
+                )
             kls_dict = SQ()
             for klasse in self.cleaned_data["mtgld_klasse"]:
                 kls_dict.add(SQ(akademiemitgliedschaft=klasse), SQ.OR)

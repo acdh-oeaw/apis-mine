@@ -286,6 +286,7 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
     classes["mitgliedschaft"] = get_child_classes(
         [19, 20, 21, 23, 24], PersonInstitutionRelation, labels=True
     )
+    classes["mitgliedschaft sortiert"] = ["wM", "kM I", "kM A", "EM"]
     classes["ausschluss"] = [4170, 4171, 3458, 3464, 3474]
     classes["akad_funktionen"] = {
         "präsidentin": get_child_classes(
