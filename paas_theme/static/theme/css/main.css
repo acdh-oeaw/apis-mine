@@ -1532,6 +1532,11 @@ div.leaflet-marker-icon svg.feather-map-pin {
   width:unset;
 }
 
+#maplifelinebtn {
+  float:right;
+  cursor: pointer;
+}
+
 @media (max-width: 991px) {
 .navbar .navbar-collapse {
   border:0;
