@@ -16,6 +16,7 @@ urlpatterns = [
     url(r"search/?$", views.SearchView.as_view(), name="search"),
     url(r"^network/?$", views.network_viz),
     url(r"^api/network/$", api_views.NetVizTheme.as_view()),
+    url(r"^api/egonetwork/$", api_views.EgoNetwork.as_view()),
     url(
         r"^person/(?P<pk>[0-9]+)$",
         views.PersonDetailView.as_view(),
