@@ -12,6 +12,27 @@ from apis_core.apis_entities.fields import Select2Multiple, ListSelect2
 from .provide_data import classes
 
 
+class MultiSolrField(forms.MultipleChoiceField):
+    def to_python(self, value):
+        """Normalize data to a list of strings."""
+        # Return an empty list if no input was given.
+        if not value:
+            return []
+        return [int(x) for x in value]
+
+    def validate(self, value):
+        """Check if value consists only of valid emails."""
+        # Use the parent's handling of required fields, etc.
+        if value:
+            for x in value:
+                if not isinstance(x, int):
+                    return False
+            return True
+        elif value is None:
+            return True
+        return False
+
+
 class PersonFilterFormHelperNew(FormHelper):
     def __init__(self, *args, **kwargs):
         super(PersonFilterFormHelperNew, self).__init__(*args, **kwargs)
@@ -157,14 +178,14 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     place_of_death = forms.CharField(required=False, label="Sterbeort")
     profession = forms.CharField(required=False, label="Beruf")
     nobelpreis = forms.BooleanField(required=False, label="Nobelpreis")
-    beruf_position = forms.MultipleChoiceField(
+    beruf_position = MultiSolrField(
         required=False,
         label="Position",
         widget=autocomplete.Select2Multiple(
             url="paas_theme:paas_position_autocomplete",
         ),
     )
-    beruf_institution = forms.MultipleChoiceField(
+    beruf_institution = MultiSolrField(
         required=False,
         label="Institution",
         widget=autocomplete.Select2Multiple(
@@ -202,9 +223,19 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     )
     wiss_austausch = forms.CharField(required=False, label="Land")
     schule = forms.CharField(required=False, label="Schule")
-    uni = forms.CharField(required=False, label="Universität")
+    uni = MultiSolrField(
+        required=False,
+        label="Universität",
+        widget=autocomplete.Select2Multiple(
+            url="paas_theme:paas_institution_uni_autocomplete",
+        ),
+    )
     uni_habil = forms.CharField(required=False, label="Universität Habilitation")
     fach_habilitation = forms.CharField(required=False, label="Habilitationsfach")
+
+    def is_valid(self) -> bool:
+        val = super().is_valid()
+        return val
 
     def search(self):
         super().search()
@@ -222,13 +253,17 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             "gender",
             "profession",
             "wiss_austausch",
-            "uni",
             "uni_habil",
             "fach_habilitation",
         ]:
             if self.cleaned_data[feld]:
                 f_dict_for = {feld: AutoQuery(self.cleaned_data[feld])}
                 sqs = sqs.filter(**f_dict_for)
+        for feld in [("uni", "universitaet_id__in")]:
+            if len(self.cleaned_data[feld[0]]) > 0:
+                sqs = sqs.filter(
+                    **{feld[1]: [str(x) for x in self.cleaned_data[feld[0]]]}
+                )
         if self.cleaned_data["mgld_nsdap"]:
             sqs = sqs.filter(mitglied_nsdap=self.cleaned_data["mgld_nsdap"])
         if self.cleaned_data["pres_funktionen"]:
@@ -277,30 +312,14 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             self.cleaned_data["beruf_position"]
             or self.cleaned_data["beruf_institution"]
         ):
-            berufe_dict = SQ()
-            position_dict = SQ()
-            for position in self.cleaned_data["beruf_position"]:
-                position_dict.add(SQ(relation_type_mapped=AutoQuery(position)), SQ.OR)
-            institution_dict = SQ()
-            if isinstance(self.cleaned_data["beruf_institution"], str):
-                self.cleaned_data["beruf_institution"] = [
-                    self.cleaned_data["beruf_institution"]
-                ]
-            for institution in self.cleaned_data["beruf_institution"]:
-                institution_dict.add(SQ(institution=AutoQuery(institution)), SQ.OR)
-            if len(self.cleaned_data["beruf_institution"][0]) > 0:
-                berufe_dict.add(institution_dict, SQ.AND)
-            if len(self.cleaned_data["beruf_position"][0]) > 0:
-                berufe_dict.add(position_dict, SQ.AND)
-
-            sqs3 = (
-                SearchQuerySet()
-                .filter(
-                    django_ct="apis_relations.personinstitution",
-                    field="Berufliche Position",
-                )
-                .filter(berufe_dict)
-            )
+            q_dict3 = {
+                "django_ct": "apis_relations.personinstitution",
+            }
+            if len(self.cleaned_data["beruf_position"]) > 0:
+                q_dict3["relation_type_id__in"] = self.cleaned_data["beruf_position"]
+            if len(self.cleaned_data["beruf_institution"]) > 0:
+                q_dict3["institution_id__in"] = self.cleaned_data["beruf_institution"]
+            sqs3 = SearchQuerySet().filter(**q_dict3)
             pers_ids = []
             for pers2 in sqs3:
                 if pers2.person_id not in pers_ids:

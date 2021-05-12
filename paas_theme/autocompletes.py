@@ -19,6 +19,8 @@ def get_date_label(item):
 
 
 class PaasInstitutionAutocomplete(autocomplete.Select2QuerySetView):
+    f = {"django_ct": "apis_entities.institution", "academy": False}
+
     def get_result_label(self, item):
         lbl = item.name
         date = get_date_label(item)
@@ -27,32 +29,39 @@ class PaasInstitutionAutocomplete(autocomplete.Select2QuerySetView):
         return lbl
 
     def get_queryset(self):
-        f = {"django_ct": "apis_entities.institution", "academy": False}
         # sqs = SearchQuerySet().filter(django_ct="apis_entities.institution")
         if self.q:
-            f["name_auto"] = self.q
+            self.f["name_auto"] = self.q
         if "beruf_position" in self.forwarded.keys():
             position_dict = SQ()
             if isinstance(self.forwarded["beruf_position"], str):
                 self.forwarded["beruf_position"] = [self.forwarded["beruf_position"]]
             for pos in self.forwarded["beruf_position"]:
                 position_dict.add(SQ(relation_types_person_id=pos), SQ.OR)
-            sqs = SearchQuerySet().filter(SQ(**f) & position_dict)
+            sqs = SearchQuerySet().filter(SQ(**self.f) & position_dict)
         else:
-            sqs = SearchQuerySet().filter(**f)
+            sqs = SearchQuerySet().filter(**self.f)
         return sqs
 
 
 class PaasPersonInstitutionPositionAutocomplete(autocomplete.Select2QuerySetView):
+    f = {
+        "django_ct": "apis_vocabularies.personinstitutionrelation",
+        "kind": "Beruf",
+    }
+
     def get_result_label(self, result):
         return result.text
 
     def get_queryset(self):
-        f = {
-            "django_ct": "apis_vocabularies.personinstitutionrelation",
-            "kind": "Beruf",
-        }
         if self.q:
-            f["name_auto"] = self.q
-        sqs = SearchQuerySet().filter(**f)
+            self.f["name_auto"] = self.q
+        sqs = SearchQuerySet().filter(**self.f)
         return sqs
+
+
+class PaasInstitutionUniAutocomplete(PaasInstitutionAutocomplete):
+    f = {
+        "django_ct": "apis_entities.institution",
+        "relation_types_person_id__in": [1369, 1371],
+    }

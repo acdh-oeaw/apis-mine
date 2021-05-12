@@ -101,6 +101,7 @@ class FunktionenAkademieIndex(indexes.SearchIndex, indexes.Indexable):
     person = indexes.CharField(model_attr="related_person")
     person_id = indexes.IntegerField(model_attr="related_person_id")
     start_date = indexes.DateField(model_attr="start_date", null=True)
+    relation_type_id = indexes.IntegerField(model_attr="relation_type_id")
     relation_type = indexes.CharField(model_attr="relation_type")
     relation_type_full = indexes.CharField(model_attr="relation_type")
     relation_type_mapped = indexes.MultiValueField(null=True)
@@ -404,6 +405,7 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
     ewk = indexes.BooleanField(default=False)
     schule = indexes.MultiValueField(null=True, faceted=True)
     universitaet = indexes.MultiValueField(null=True, faceted=True)
+    universitaet_id = indexes.MultiValueField(null=True, faceted=True)
     uni_habilitation = indexes.MultiValueField(null=True, faceted=True)
     fach_habilitation = indexes.MultiValueField(null=True, faceted=True)
     w_austausch = indexes.MultiValueField(null=True, faceted=True)
@@ -428,6 +430,15 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
                 object.personinstitution_set.filter(
                     relation_type_id__in=[1369, 1371] + classes["promotion_inst_ids"]
                 ).values_list("related_institution__name", flat=True)
+            )
+        )
+
+    def prepare_universitaet_id(self, object):
+        return list(
+            set(
+                object.personinstitution_set.filter(
+                    relation_type_id__in=[1369, 1371] + classes["promotion_inst_ids"]
+                ).values_list("related_institution_id", flat=True)
             )
         )
 

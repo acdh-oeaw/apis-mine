@@ -24,6 +24,11 @@ urlpatterns = [
         name="paas_institution_autocomplete",
     ),
     url(
+        r"^paas/autocompletes/universitaet/$",
+        autocompletes.PaasInstitutionUniAutocomplete.as_view(),
+        name="paas_institution_uni_autocomplete",
+    ),
+    url(
         r"^paas/autocompletes/position/$",
         autocompletes.PaasPersonInstitutionPositionAutocomplete.as_view(),
         name="paas_position_autocomplete",
