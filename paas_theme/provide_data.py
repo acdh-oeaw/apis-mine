@@ -69,16 +69,22 @@ def get_child_classes(objids, obclass, labels=False):
         return objids
 
 
-def get_child_institutions_from_parent(insts):
+def get_child_institutions_from_parent(insts, vocab_id=2):
     res = []
-    for i in insts:
-        res.extend(
-            list(
-                InstitutionInstitution.objects.filter(
-                    related_institutionA_id=i
-                ).values_list("related_institutionB_id", flat=True)
-            )
-        )
+    i = insts.pop()
+    while i:
+        for ii in InstitutionInstitution.objects.filter(
+            related_institutionB_id=i, relation_type_id=vocab_id
+        ):
+            if ii.related_institutionA_id not in res:
+                res.append(ii.related_institutionA_id)
+                if ii.related_institutionA_id not in insts:
+                    insts.append(ii.related_institutionA_id)
+        if len(insts) > 0:
+            i = insts.pop()
+        else:
+            i = False
+
     return res
 
 
@@ -277,7 +283,7 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
     )
     classes["habilitation"] = get_child_classes([1385], PersonInstitutionRelation)
     classes["berufslaufbahn_ids"] = berufslaufbahn_ids
-    classes["subs_akademie"] = subs_akademie
+    classes["subs_akademie"] = subs_akademie + [2, 3, 500]
     classes["promotion_inst_ids"] = promotion_inst_ids
     classes["daten_mappings"] = daten_mappings
     classes["vorschlag"] = get_child_classes(

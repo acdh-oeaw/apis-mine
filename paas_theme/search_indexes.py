@@ -1,8 +1,12 @@
 from haystack import indexes
 from django.conf import settings
 
-from apis_core.apis_metainfo.models import Text
-from apis_core.apis_vocabularies.models import LabelType, PersonPlaceRelation
+from apis_core.apis_metainfo.models import Collection, Text
+from apis_core.apis_vocabularies.models import (
+    LabelType,
+    PersonInstitutionRelation,
+    PersonPlaceRelation,
+)
 from apis_core.apis_labels.models import Label
 from apis_core.apis_entities.models import Person, Institution, Place
 from apis_core.apis_relations.models import PersonInstitution, PersonPerson, PersonEvent
@@ -14,18 +18,66 @@ from .provide_data import (
 )
 from .provide_data import classes
 
+coll_id = 16
+
+map_classes_pr_labels = {
+    "Habilitation": classes["habilitation"],
+    "Promotion": classes["promotion_inst_ids"],
+    "Akademieinstitution": classes["akad_funktionen"]["obfrau/obmann"][0]
+    + classes["akad_funktionen"]["mitglied kommission"][0]
+    + classes["akad_funktionen"]["direktorin institut"][0]
+    + classes["akad_funktionen"]["kuratorium"][0],
+    "Beruf": [
+        item for sublist in classes["berufslaufbahn_map"].values() for item in sublist
+    ],
+}
+
+
+class PersonInstitutionRelationIndex(indexes.SearchIndex, indexes.Indexable):
+    text = indexes.CharField(document=True, model_attr="label")
+    label_auto = indexes.EdgeNgramField()
+    name = indexes.CharField(model_attr="name")
+    name_auto = indexes.EdgeNgramField(model_attr="name")
+    kind = indexes.CharField(null=True)
+
+    def get_model(self):
+        return PersonInstitutionRelation
+
+    def prepare_label_auto(self, object):
+        return " ".join([x.strip() for x in object.label.split(">>")])
+
+    def prepare_kind(self, object):
+        for k, v in map_classes_pr_labels.items():
+            if object.pk in v:
+                return k
+        return None
+
 
 class InstitutionIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
     name = indexes.CharField(model_attr="name")
+    academy = indexes.BooleanField(default=False)
+    kind = indexes.CharField(model_attr="kind__label", null=True)
     start_date = indexes.DateField(model_attr="start_date", null=True)
     end_date = indexes.DateField(model_attr="end_date", null=True)
+    name_auto = indexes.EdgeNgramField(model_attr="name")
+    relation_types_person_id = indexes.MultiValueField(null=True)
     # located_in = indexes.CharField(null=True)
     # located_in_id = indexes.IntegerField(null=True)
     # located_at = indexes.LocationField(null=True)
 
     def get_model(self):
         return Institution
+
+    def prepare_relation_types_person_id(self, object):
+        res = []
+        for pi in object.personinstitution_set.all():
+            if pi.relation_type_id not in res:
+                res.append(pi.relation_type_id)
+        return res
+
+    def prepare_academy(self, object):
+        return object.pk in classes["subs_akademie"]
 
     def prepare_text(self, object):
         res = {"name": object.name}
@@ -38,6 +90,9 @@ class InstitutionIndex(indexes.SearchIndex, indexes.Indexable):
             )
         ]
         return res
+
+    def index_queryset(self, using=None):
+        return self.get_model().objects.all()
 
 
 class FunktionenAkademieIndex(indexes.SearchIndex, indexes.Indexable):
@@ -71,7 +126,7 @@ class FunktionenAkademieIndex(indexes.SearchIndex, indexes.Indexable):
             return "Berufliche Position"
 
     def index_queryset(self, using=None):
-        return self.get_model().objects.all()
+        return self.get_model().objects.filter(related_person__collection__id=coll_id)
 
 
 class WahlIndex(indexes.SearchIndex, indexes.Indexable):
@@ -95,7 +150,8 @@ class WahlIndex(indexes.SearchIndex, indexes.Indexable):
 
     def index_queryset(self, using=None):
         return self.get_model().objects.filter(
-            relation_type_id__in=classes["vorschlag"][0]
+            relation_type_id__in=classes["vorschlag"][0],
+            related_personA__collection__id=coll_id,
         )
 
     def prepare_elected_by_profession(self, object):
@@ -324,6 +380,8 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
     death_date_show = indexes.CharField(model_attr="end_date_written", null=True)
     place_of_birth = indexes.CharField(null=True, faceted=True)
     place_of_death = indexes.CharField(null=True, faceted=True)
+    place_of_death = indexes.CharField(null=True, faceted=True)
+    klasse_person = indexes.CharField(null=True, faceted=True)
     gender = indexes.CharField(null=True, model_attr="gender", faceted=True)
     profession = indexes.MultiValueField(null=True, faceted=True)
     akademiemitgliedschaft = indexes.MultiValueField(null=True, faceted=True)
@@ -331,6 +389,9 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
     funk_praesidentin = indexes.BooleanField(default=False)
     funk_vizepraesidentin = indexes.BooleanField(default=False)
     funk_generalsekretaerin = indexes.BooleanField(default=False)
+    funk_sekretaerin = indexes.BooleanField(default=False)
+    funk_klassenpres_math_nat = indexes.BooleanField(default=False)
+    funk_klassenpres_phils_hist = indexes.BooleanField(default=False)
     funk_sekretaerin = indexes.BooleanField(default=False)
     funk_obfrau = indexes.BooleanField(default=False)
     funk_mitgl_kommission = indexes.BooleanField(default=False)
@@ -341,9 +402,72 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
     preisfragen = indexes.MultiValueField(null=True, faceted=True)
     nobelpreis = indexes.BooleanField(default=False)
     ewk = indexes.BooleanField(default=False)
+    schule = indexes.MultiValueField(null=True, faceted=True)
+    universitaet = indexes.MultiValueField(null=True, faceted=True)
+    uni_habilitation = indexes.MultiValueField(null=True, faceted=True)
+    fach_habilitation = indexes.MultiValueField(null=True, faceted=True)
+    w_austausch = indexes.MultiValueField(null=True, faceted=True)
+    mitglied_nsdap = indexes.BooleanField(default=False)
 
     def get_model(self):
         return Person
+
+    def index_queryset(self, using=None):
+        return self.get_model().objects.filter(collection__id=coll_id)
+
+    def prepare_schule(self, object):
+        return list(
+            object.personinstitution_set.filter(relation_type_id__in=[176]).values_list(
+                "related_institution__name", flat=True
+            )
+        )
+
+    def prepare_universitaet(self, object):
+        return list(
+            set(
+                object.personinstitution_set.filter(
+                    relation_type_id__in=[1369, 1371] + classes["promotion_inst_ids"]
+                ).values_list("related_institution__name", flat=True)
+            )
+        )
+
+    def prepare_uni_habilitation(self, object):
+        return list(
+            (
+                object.personinstitution_set.filter(
+                    relation_type_id__in=classes["habilitation"]
+                ).values_list("related_institution__name", flat=True)
+            )
+        )
+
+    def prepare_fach_habilitation(self, object):
+        return list(
+            set(
+                [
+                    x.relation_type.label.split(">>")[-1].strip()
+                    for x in object.personinstitution_set.filter(
+                        relation_type_id__in=classes["habilitation"]
+                    )
+                ]
+            )
+        )
+
+    def prepare_w_austausch(self, object):
+        return list(
+            set(
+                object.personplace_set.filter(relation_type_id=3375).values_list(
+                    "related_place__name", flat=True
+                )
+            )
+        )
+
+    def prepare_mitglied_nsdap(self, object):
+        return (
+            object.personinstitution_set.filter(
+                relation_type_id=3451, related_institution_id=49596
+            ).count()
+            == 1
+        )
 
     def prepare_nobelpreis(self, object):
         if (
@@ -489,6 +613,24 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
         else:
             return False
 
+    def prepare_funk_klassenpres_math_nat(self, object):
+        return (
+            object.personinstitution_set.filter(
+                relation_type_id__in=classes["akad_funktionen"]["präsidentin"][0],
+                related_institution_id=3,
+            ).count()
+            > 0
+        )
+
+    def prepare_funk_klassenpres_phils_hist(self, object):
+        return (
+            object.personinstitution_set.filter(
+                relation_type_id__in=classes["akad_funktionen"]["präsidentin"][0],
+                related_institution_id=2,
+            ).count()
+            > 0
+        )
+
     def prepare_akademiefunktionen(self, object):
         res = []
         rel_type_ids = []
@@ -511,10 +653,15 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
         res_fin = []
         for mitglied in res:
             mitgliedschaft = get_mitgliedschaft_from_relation(mitglied.relation_type)
-            res_fin.append(
-                f"{mitgliedschaft}__{str(mitglied.related_institution)}__{mitglied.start_date}__{mitglied.end_date}"
-            )
-        return res_fin
+            res_fin.append(mitgliedschaft)
+        return list(set(res_fin))
+
+    def prepare_klasse_person(self, object):
+        res = object.personinstitution_set.filter(
+            related_institution_id__in=[2, 3, 500],
+            relation_type_id__in=classes["mitgliedschaft"][0],
+        )
+        return str(res[0].related_institution)
 
     def prepare_mitgliedschaft_short(self, object):
         res = object.personinstitution_set.filter(

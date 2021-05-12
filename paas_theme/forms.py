@@ -1,7 +1,9 @@
 from crispy_forms.bootstrap import Accordion, AccordionGroup
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout, Fieldset, Div
+from dal import autocomplete
 from django import forms
+from django.forms.fields import MultipleChoiceField
 from haystack.forms import FacetedSearchForm, SearchForm
 from haystack.query import SQ, AutoQuery, SearchQuerySet
 from haystack.inputs import Raw
@@ -25,23 +27,29 @@ class PersonFilterFormHelperNew(FormHelper):
                 Div(
                     Accordion(
                         AccordionGroup(
-                            "Personendaten",
-                            "name",
-                            "gender",
-                            "birth_date",
-                            "death_date",
-                            css_id="lebensdaten",
-                        ),
-                        AccordionGroup(
                             "Mitgliedschaft",
                             "mtgld_mitgliedschaft",
                             "mtgld_klasse",
                             css_id="mitgliedschaft",
                         ),
                         AccordionGroup(
-                            "Akademischer CV",
+                            "Funktionen im Präsidium",
+                            "pres_funktionen",
+                            css_id="praesidium",
+                        ),
+                        AccordionGroup(
+                            "Geschlecht",
+                            "gender",
+                            css_id="geschlecht",
+                        ),
+                        AccordionGroup(
+                            "Lebenslauf",
                             "place_of_birth",
                             "place_of_death",
+                            "schule",
+                            "uni",
+                            "uni_habil",
+                            "fach_habilitation",
                             "profession",
                             Fieldset(
                                 "Berufliche Positionen",
@@ -50,6 +58,7 @@ class PersonFilterFormHelperNew(FormHelper):
                                 css_id="beruf_subform",
                                 css_class="form-inline",
                             ),
+                            "mgld_nsdap",
                             css_id="akademischer_CV",
                         ),
                     ),
@@ -58,8 +67,7 @@ class PersonFilterFormHelperNew(FormHelper):
                 Div(
                     Accordion(
                         AccordionGroup(
-                            "In der Akademie",
-                            "akademiemitgliedschaft",
+                            "Funktionen in der Akademie",
                             "akademiefunktionen",
                             css_id="in_der_akademie",
                         ),
@@ -69,6 +77,9 @@ class PersonFilterFormHelperNew(FormHelper):
                             "wahl_beruf",
                             "wahl_gender",
                             css_id="wahlvorschlag",
+                        ),
+                        AccordionGroup(
+                            "Wissenschaftler/innen/austausch", "wiss_austausch"
                         ),
                         AccordionGroup("Auszeichnungen", "nobelpreis", "ewk"),
                     ),
@@ -116,6 +127,19 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             ),
         ],
     )
+    pres_funktionen = forms.MultipleChoiceField(
+        required=False,
+        label="Funktionen",
+        widget=forms.CheckboxSelectMultiple(),
+        choices=[
+            ("funk_praesidentin", "Präsident/in"),
+            ("funk_vizepraesidentin", "Vizepräsident/in"),
+            ("funk_generalsekretaerin", "Generalsekretär/in"),
+            ("funk_sekretaerin", "Sekretär/in"),
+            ("funk_klassenpres_math_nat", "Klassenpräsident/in math.-nat. Klasse"),
+            ("funk_klassenpres_phil_hist", "Klassenpräsident/in phil.-hist. Klasse"),
+        ],
+    )
     gender = forms.ChoiceField(
         widget=forms.Select(attrs={"class": "bootstrap-select rounded-0"}),
         required=False,
@@ -134,12 +158,20 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     profession = forms.CharField(required=False, label="Beruf")
     nobelpreis = forms.BooleanField(required=False, label="Nobelpreis")
     beruf_position = forms.MultipleChoiceField(
-        widget=forms.SelectMultiple(attrs={"class": "select2-main"}),
         required=False,
         label="Position",
-        choices=[(pos, pos) for pos in classes["berufslaufbahn_map"].keys()],
+        widget=autocomplete.Select2Multiple(
+            url="paas_theme:paas_position_autocomplete",
+        ),
     )
-    beruf_institution = forms.CharField(required=False, label="Institution")
+    beruf_institution = forms.MultipleChoiceField(
+        required=False,
+        label="Institution",
+        widget=autocomplete.Select2Multiple(
+            url="paas_theme:paas_institution_autocomplete", forward=["beruf_position"]
+        ),
+    )
+    mgld_nsdap = forms.BooleanField(required=False, label="Mitglied der NSDAP")
     mtgld_mitgliedschaft = forms.MultipleChoiceField(
         widget=forms.SelectMultiple(attrs={"class": "select2-main"}),
         required=False,
@@ -168,38 +200,52 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     ewk = forms.BooleanField(
         required=False, label="Österreichisches Ehrenzeichen für Wissenschaft und Kunst"
     )
+    wiss_austausch = forms.CharField(required=False, label="Land")
+    schule = forms.CharField(required=False, label="Schule")
+    uni = forms.CharField(required=False, label="Universität")
+    uni_habil = forms.CharField(required=False, label="Universität Habilitation")
+    fach_habilitation = forms.CharField(required=False, label="Habilitationsfach")
 
     def search(self):
         super().search()
-        if self.cleaned_data["q"] == "":
-            sqs = self.searchqueryset.load_all()
-        else:
-            sqs = self.searchqueryset.filter(
-                django_ct="apis_entities.person", academy_member=True
-            ).filter(content=AutoQuery(self.cleaned_data["q"]))
+        sqs = self.searchqueryset.filter(
+            django_ct="apis_entities.person", academy_member=True
+        )
+        if self.cleaned_data["q"] != "":
+            sqs = sqs.filter(content=AutoQuery(self.cleaned_data["q"]))
         if self.cleaned_data["akademiefunktionen"]:
             funk_dict = SQ()
             for funk in self.cleaned_data["akademiefunktionen"]:
                 funk_dict.add(SQ(**{funk: True}), SQ.OR)
             sqs = sqs.filter(funk_dict)
-        if self.cleaned_data["gender"]:
-            sqs = sqs.filter(gender=AutoQuery(self.cleaned_data["gender"]))
-        if self.cleaned_data["name"]:
-            sqs = sqs.filter(name=AutoQuery(self.cleaned_data["name"]))
-        if self.cleaned_data["profession"]:
-            sqs = sqs.filter(profession=AutoQuery(self.cleaned_data["profession"]))
+        for feld in [
+            "gender",
+            "profession",
+            "wiss_austausch",
+            "uni",
+            "uni_habil",
+            "fach_habilitation",
+        ]:
+            if self.cleaned_data[feld]:
+                f_dict_for = {feld: AutoQuery(self.cleaned_data[feld])}
+                sqs = sqs.filter(**f_dict_for)
+        if self.cleaned_data["mgld_nsdap"]:
+            sqs = sqs.filter(mitglied_nsdap=self.cleaned_data["mgld_nsdap"])
+        if self.cleaned_data["pres_funktionen"]:
+            pres_funk_dict = SQ()
+            for funk in self.cleaned_data["pres_funktionen"]:
+                pres_funk_dict.add(SQ(**{funk: True}), SQ.OR)
+            sqs = sqs.filter(pres_funk_dict)
         if (
             self.cleaned_data["mtgld_mitgliedschaft"]
             or self.cleaned_data["mtgld_klasse"]
         ):
             mtgld_dic = SQ()
             for mitgliedschaft in self.cleaned_data["mtgld_mitgliedschaft"]:
-                mtgld_dic.add(
-                    SQ(akademiemitgliedschaft=Raw(f"{mitgliedschaft}*")), SQ.OR
-                )
+                mtgld_dic.add(SQ(akademiemitgliedschaft=mitgliedschaft), SQ.OR)
             kls_dict = SQ()
             for klasse in self.cleaned_data["mtgld_klasse"]:
-                kls_dict.add(SQ(akademiemitgliedschaft=klasse), SQ.OR)
+                kls_dict.add(SQ(klasse_person=klasse), SQ.OR)
             sqs = sqs.filter(mtgld_dic & kls_dict)
         if self.cleaned_data["ewk"]:
             sqs = sqs.filter(ewk=self.cleaned_data["ewk"])

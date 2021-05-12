@@ -3,8 +3,9 @@ from django.conf.urls import url
 from . import dal_views
 from . import views
 from . import api_views
+from . import autocompletes
 
-app_name = "theme"
+app_name = "paas_theme"
 
 
 urlpatterns = [
@@ -17,6 +18,16 @@ urlpatterns = [
     url(r"^network/?$", views.network_viz),
     url(r"^api/network/$", api_views.NetVizTheme.as_view()),
     url(r"^api/egonetwork/$", api_views.EgoNetwork.as_view()),
+    url(
+        r"^paas/autocompletes/institution/$",
+        autocompletes.PaasInstitutionAutocomplete.as_view(),
+        name="paas_institution_autocomplete",
+    ),
+    url(
+        r"^paas/autocompletes/position/$",
+        autocompletes.PaasPersonInstitutionPositionAutocomplete.as_view(),
+        name="paas_position_autocomplete",
+    ),
     url(
         r"^person/(?P<pk>[0-9]+)$",
         views.PersonDetailView.as_view(),
