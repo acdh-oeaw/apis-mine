@@ -29,6 +29,21 @@ urlpatterns = [
         name="paas_institution_uni_autocomplete",
     ),
     url(
+        r"^paas/autocompletes/schule/$",
+        autocompletes.PaasInstitutionSchuleAutocomplete.as_view(),
+        name="paas_institution_schule_autocomplete",
+    ),
+    url(
+        r"^paas/autocompletes/place_of_birth/$",
+        autocompletes.PaasPlaceBirthAutocomplete.as_view(),
+        name="paas_place_of_birth_autocomplete",
+    ),
+    url(
+        r"^paas/autocompletes/place_of_death/$",
+        autocompletes.PaasPlaceDeathAutocomplete.as_view(),
+        name="paas_place_of_death_autocomplete",
+    ),
+    url(
         r"^paas/autocompletes/position/$",
         autocompletes.PaasPersonInstitutionPositionAutocomplete.as_view(),
         name="paas_position_autocomplete",

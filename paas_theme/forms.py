@@ -1,15 +1,17 @@
+from apis_core.apis_vocabularies.models import PersonInstitutionRelation
 from crispy_forms.bootstrap import Accordion, AccordionGroup
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout, Fieldset, Div
 from dal import autocomplete
 from django import forms
+from django.db.models.base import ModelBase
 from django.forms.fields import MultipleChoiceField
 from haystack.forms import FacetedSearchForm, SearchForm
 from haystack.query import SQ, AutoQuery, SearchQuerySet
 from haystack.inputs import Raw
 from apis_core.helper_functions.DateParser import parse_date
 from apis_core.apis_entities.fields import Select2Multiple, ListSelect2
-from .provide_data import classes
+from .provide_data import classes, get_child_classes
 
 
 class MultiSolrField(forms.MultipleChoiceField):
@@ -31,6 +33,21 @@ class MultiSolrField(forms.MultipleChoiceField):
         elif value is None:
             return True
         return False
+
+
+class MultiSolrChildsField(MultiSolrField):
+    """Form field that extends the results to the child elements"""
+
+    def to_python(self, value):
+        """Normalize data to a list of strings."""
+        # Return an empty list if no input was given.
+        if not value:
+            return []
+        return [int(x) for x in get_child_classes(value, self._model_class) + value]
+
+    def __init__(self, *args, model_class: ModelBase, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self._model_class = model_class
 
 
 class PersonFilterFormHelperNew(FormHelper):
@@ -174,11 +191,24 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     )
     wahl_beruf = forms.CharField(required=False, label="Beruf")
     wahl_person = forms.CharField(required=False, label="Name")
-    place_of_birth = forms.CharField(required=False, label="Geburtsort")
-    place_of_death = forms.CharField(required=False, label="Sterbeort")
+    place_of_birth = MultiSolrField(
+        required=False,
+        label="Geburtsort",
+        widget=autocomplete.Select2Multiple(
+            url="paas_theme:paas_place_of_birth_autocomplete",
+        ),
+    )
+    place_of_death = MultiSolrField(
+        required=False,
+        label="Sterbesort",
+        widget=autocomplete.Select2Multiple(
+            url="paas_theme:paas_place_of_death_autocomplete",
+        ),
+    )
     profession = forms.CharField(required=False, label="Beruf")
     nobelpreis = forms.BooleanField(required=False, label="Nobelpreis")
-    beruf_position = MultiSolrField(
+    beruf_position = MultiSolrChildsField(
+        model_class=PersonInstitutionRelation,
         required=False,
         label="Position",
         widget=autocomplete.Select2Multiple(
@@ -222,7 +252,13 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         required=False, label="Österreichisches Ehrenzeichen für Wissenschaft und Kunst"
     )
     wiss_austausch = forms.CharField(required=False, label="Land")
-    schule = forms.CharField(required=False, label="Schule")
+    schule = MultiSolrField(
+        required=False,
+        label="Schule",
+        widget=autocomplete.Select2Multiple(
+            url="paas_theme:paas_institution_schule_autocomplete",
+        ),
+    )
     uni = MultiSolrField(
         required=False,
         label="Universität",
@@ -259,7 +295,12 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             if self.cleaned_data[feld]:
                 f_dict_for = {feld: AutoQuery(self.cleaned_data[feld])}
                 sqs = sqs.filter(**f_dict_for)
-        for feld in [("uni", "universitaet_id__in")]:
+        for feld in [
+            ("uni", "universitaet_id__in"),
+            ("schule", "schule_id__in"),
+            ("place_of_birth", "place_of_birth_id__in"),
+            ("place_of_death", "place_of_death_id__in"),
+        ]:
             if len(self.cleaned_data[feld[0]]) > 0:
                 sqs = sqs.filter(
                     **{feld[1]: [str(x) for x in self.cleaned_data[feld[0]]]}

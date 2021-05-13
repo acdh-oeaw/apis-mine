@@ -65,3 +65,43 @@ class PaasInstitutionUniAutocomplete(PaasInstitutionAutocomplete):
         "django_ct": "apis_entities.institution",
         "relation_types_person_id__in": [1369, 1371],
     }
+
+
+class PaasInstitutionSchuleAutocomplete(PaasInstitutionAutocomplete):
+    f = {
+        "django_ct": "apis_entities.institution",
+        "relation_types_person_id__in": [176],
+    }
+
+
+class PaasPlaceAutocomplete(autocomplete.Select2QuerySetView):
+    f = {"django_ct": "apis_entities.place"}
+
+    def get_result_label(self, item):
+        lbl = item.name
+        return lbl
+
+    def get_queryset(self):
+        # sqs = SearchQuerySet().filter(django_ct="apis_entities.institution")
+        if self.q:
+            self.f["name_auto"] = self.q
+        sqs = SearchQuerySet().filter(**self.f)
+        return sqs
+
+
+class PaasPlaceBirthAutocomplete(PaasPlaceAutocomplete):
+    """Autocomplet only returning places that have a birth event attached"""
+
+    f = {
+        "django_ct": "apis_entities.place",
+        "relation_types_person_id__in": [64, 3090, 152],
+    }
+
+
+class PaasPlaceDeathAutocomplete(PaasPlaceAutocomplete):
+    """Autocomplet only returning places that have a birth event attached"""
+
+    f = {
+        "django_ct": "apis_entities.place",
+        "relation_types_person_id__in": [153, 3054, 3091],
+    }

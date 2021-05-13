@@ -53,6 +53,43 @@ class PersonInstitutionRelationIndex(indexes.SearchIndex, indexes.Indexable):
         return None
 
 
+class PlaceIndex(indexes.SearchIndex, indexes.Indexable):
+    text = indexes.CharField(document=True, use_template=True)
+    name = indexes.CharField(model_attr="name")
+    kind = indexes.CharField(model_attr="kind__label", null=True)
+    name_auto = indexes.EdgeNgramField(model_attr="name")
+    location = indexes.LocationField(null=True)
+    relation_types_person_id = indexes.MultiValueField(null=True)
+
+    def get_model(self):
+        return Place
+
+    def prepare_relation_types_person_id(self, object):
+        res = []
+        for pi in object.personplace_set.all():
+            if pi.relation_type_id not in res:
+                res.append(pi.relation_type_id)
+        return res
+
+    def prepare_location(self, object):
+        if object.lat and object.lng:
+            return f"{object.lat},{object.lng}"
+        else:
+            return None
+
+    def prepare_text(self, object):
+        res = {"name": object.name}
+        alt_names = getattr(settings, "APIS_ALTERNATIVE_NAMES", [])
+        alt_names_qs = LabelType.objects.filter(name__in=alt_names)
+        res["alternative_names"] = [
+            alt.label
+            for alt in Label.objects.filter(
+                temp_entity=object, label_type__in=alt_names_qs
+            )
+        ]
+        return res
+
+
 class InstitutionIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
     name = indexes.CharField(model_attr="name")
@@ -380,8 +417,9 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
     birth_date_show = indexes.CharField(model_attr="start_date_written", null=True)
     death_date_show = indexes.CharField(model_attr="end_date_written", null=True)
     place_of_birth = indexes.CharField(null=True, faceted=True)
+    place_of_birth_id = indexes.IntegerField(null=True)
     place_of_death = indexes.CharField(null=True, faceted=True)
-    place_of_death = indexes.CharField(null=True, faceted=True)
+    place_of_death_id = indexes.IntegerField(null=True)
     klasse_person = indexes.CharField(null=True, faceted=True)
     gender = indexes.CharField(null=True, model_attr="gender", faceted=True)
     profession = indexes.MultiValueField(null=True, faceted=True)
@@ -404,6 +442,7 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
     nobelpreis = indexes.BooleanField(default=False)
     ewk = indexes.BooleanField(default=False)
     schule = indexes.MultiValueField(null=True, faceted=True)
+    schule_id = indexes.MultiValueField(null=True)
     universitaet = indexes.MultiValueField(null=True, faceted=True)
     universitaet_id = indexes.MultiValueField(null=True, faceted=True)
     uni_habilitation = indexes.MultiValueField(null=True, faceted=True)
@@ -421,6 +460,13 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
         return list(
             object.personinstitution_set.filter(relation_type_id__in=[176]).values_list(
                 "related_institution__name", flat=True
+            )
+        )
+
+    def prepare_schule_id(self, object):
+        return list(
+            object.personinstitution_set.filter(relation_type_id__in=[176]).values_list(
+                "related_institution_id", flat=True
             )
         )
 
@@ -703,6 +749,18 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
         else:
             return None
 
+    def prepare_place_of_birth_id(self, object):
+        birth_rel = getattr(settings, "BIRTH_REL_NAME", [])
+        if isinstance(birth_rel, str):
+            birth_rel = PersonPlaceRelation.objects.filter(name=birth_rel).values_list(
+                "pk", flat=True
+            )
+        rel = object.personplace_set.filter(relation_type_id__in=birth_rel)
+        if rel.count() == 1:
+            return rel[0].related_place_id
+        else:
+            return None
+
     def prepare_place_of_death(self, object):
         death_rel = getattr(settings, "DEATH_REL_NAME", [])
         if isinstance(death_rel, str):
@@ -712,6 +770,18 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
         rel = object.personplace_set.filter(relation_type_id__in=death_rel)
         if rel.count() == 1:
             return rel[0].related_place.name
+        else:
+            return None
+
+    def prepare_place_of_death_id(self, object):
+        death_rel = getattr(settings, "DEATH_REL_NAME", [])
+        if isinstance(death_rel, str):
+            death_rel = PersonPlaceRelation.objects.filter(name=death_rel).values_list(
+                "pk", flat=True
+            )
+        rel = object.personplace_set.filter(relation_type_id__in=death_rel)
+        if rel.count() == 1:
+            return rel[0].related_place_id
         else:
             return None
 
