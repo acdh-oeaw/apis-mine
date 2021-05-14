@@ -205,7 +205,13 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             url="paas_theme:paas_place_of_death_autocomplete",
         ),
     )
-    profession = forms.CharField(required=False, label="Beruf")
+    profession = MultiSolrField(
+        required=False,
+        label="Beruf",
+        widget=autocomplete.Select2Multiple(
+            url="paas_theme:paas_person_beruf_autocomplete",
+        ),
+    )
     nobelpreis = forms.BooleanField(required=False, label="Nobelpreis")
     beruf_position = MultiSolrChildsField(
         model_class=PersonInstitutionRelation,
@@ -251,7 +257,13 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     ewk = forms.BooleanField(
         required=False, label="Österreichisches Ehrenzeichen für Wissenschaft und Kunst"
     )
-    wiss_austausch = forms.CharField(required=False, label="Land")
+    wiss_austausch = MultiSolrField(
+        required=False,
+        label="Land",
+        widget=autocomplete.Select2Multiple(
+            url="paas_theme:paas_place_wiss_austausch_autocomplete",
+        ),
+    )
     schule = MultiSolrField(
         required=False,
         label="Schule",
@@ -266,8 +278,20 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             url="paas_theme:paas_institution_uni_autocomplete",
         ),
     )
-    uni_habil = forms.CharField(required=False, label="Universität Habilitation")
-    fach_habilitation = forms.CharField(required=False, label="Habilitationsfach")
+    uni_habil = MultiSolrField(
+        required=False,
+        label="Universität Habilitation",
+        widget=autocomplete.Select2Multiple(
+            url="paas_theme:paas_institution_uni_habil_autocomplete",
+        ),
+    )
+    fach_habilitation = MultiSolrField(
+        required=False,
+        label="Habilitationsfach",
+        widget=autocomplete.Select2Multiple(
+            url="paas_theme:paas_institution_habil_fach_autocomplete",
+        ),
+    )
 
     def is_valid(self) -> bool:
         val = super().is_valid()
@@ -287,10 +311,6 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             sqs = sqs.filter(funk_dict)
         for feld in [
             "gender",
-            "profession",
-            "wiss_austausch",
-            "uni_habil",
-            "fach_habilitation",
         ]:
             if self.cleaned_data[feld]:
                 f_dict_for = {feld: AutoQuery(self.cleaned_data[feld])}
@@ -298,6 +318,10 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         for feld in [
             ("uni", "universitaet_id__in"),
             ("schule", "schule_id__in"),
+            ("profession", "profession_id__in"),
+            ("uni_habil", "uni_habilitation_id__in"),
+            ("fach_habilitation", "fach_habilitation_id__in"),
+            ("wiss_austausch", "w_austausch_id__in"),
             ("place_of_birth", "place_of_birth_id__in"),
             ("place_of_death", "place_of_death_id__in"),
         ]:

@@ -29,9 +29,29 @@ urlpatterns = [
         name="paas_institution_uni_autocomplete",
     ),
     url(
+        r"^paas/autocompletes/universitaet_habil/$",
+        autocompletes.PaasInstitutionUniHabilitationAutocomplete.as_view(),
+        name="paas_institution_uni_habil_autocomplete",
+    ),
+    url(
+        r"^paas/autocompletes/habilitation_fach/$",
+        autocompletes.PaasHabilitationFachAutocomplete.as_view(),
+        name="paas_institution_habil_fach_autocomplete",
+    ),
+    url(
+        r"^paas/autocompletes/beruf/$",
+        autocompletes.PaasProfessionAutocomplete.as_view(),
+        name="paas_person_beruf_autocomplete",
+    ),
+    url(
         r"^paas/autocompletes/schule/$",
         autocompletes.PaasInstitutionSchuleAutocomplete.as_view(),
         name="paas_institution_schule_autocomplete",
+    ),
+    url(
+        r"^paas/autocompletes/wiss_austausch/$",
+        autocompletes.PaasPlaceWAustauschAutocomplete.as_view(),
+        name="paas_place_wiss_austausch_autocomplete",
     ),
     url(
         r"^paas/autocompletes/place_of_birth/$",

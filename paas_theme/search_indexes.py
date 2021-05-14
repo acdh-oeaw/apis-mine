@@ -6,6 +6,7 @@ from apis_core.apis_vocabularies.models import (
     LabelType,
     PersonInstitutionRelation,
     PersonPlaceRelation,
+    ProfessionType,
 )
 from apis_core.apis_labels.models import Label
 from apis_core.apis_entities.models import Person, Institution, Place
@@ -31,6 +32,26 @@ map_classes_pr_labels = {
         item for sublist in classes["berufslaufbahn_map"].values() for item in sublist
     ],
 }
+
+
+class PersonProfessionIndex(indexes.SearchIndex, indexes.Indexable):
+    text = indexes.CharField(document=True, model_attr="label")
+    label_auto = indexes.EdgeNgramField()
+    name = indexes.CharField(model_attr="name")
+    name_auto = indexes.EdgeNgramField(model_attr="name")
+    kind = indexes.CharField(null=True)
+
+    def get_model(self):
+        return ProfessionType
+
+    def prepare_label_auto(self, object):
+        return " ".join([x.strip() for x in object.label.split(">>")])
+
+    def prepare_kind(self, object):
+        for k, v in map_classes_pr_labels.items():
+            if object.pk in v:
+                return k
+        return None
 
 
 class PersonInstitutionRelationIndex(indexes.SearchIndex, indexes.Indexable):
@@ -423,6 +444,7 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
     klasse_person = indexes.CharField(null=True, faceted=True)
     gender = indexes.CharField(null=True, model_attr="gender", faceted=True)
     profession = indexes.MultiValueField(null=True, faceted=True)
+    profession_id = indexes.MultiValueField(null=True)
     akademiemitgliedschaft = indexes.MultiValueField(null=True, faceted=True)
     mitgliedschaft_short = indexes.CharField(null=True, faceted=True)
     funk_praesidentin = indexes.BooleanField(default=False)
@@ -446,8 +468,11 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
     universitaet = indexes.MultiValueField(null=True, faceted=True)
     universitaet_id = indexes.MultiValueField(null=True, faceted=True)
     uni_habilitation = indexes.MultiValueField(null=True, faceted=True)
+    uni_habilitation_id = indexes.MultiValueField(null=True)
     fach_habilitation = indexes.MultiValueField(null=True, faceted=True)
+    fach_habilitation_id = indexes.MultiValueField(null=True)
     w_austausch = indexes.MultiValueField(null=True, faceted=True)
+    w_austausch_id = indexes.MultiValueField(null=True)
     mitglied_nsdap = indexes.BooleanField(default=False)
 
     def get_model(self):
@@ -497,6 +522,15 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
             )
         )
 
+    def prepare_uni_habilitation_id(self, object):
+        return list(
+            (
+                object.personinstitution_set.filter(
+                    relation_type_id__in=classes["habilitation"]
+                ).values_list("related_institution_id", flat=True)
+            )
+        )
+
     def prepare_fach_habilitation(self, object):
         return list(
             set(
@@ -509,11 +543,32 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
             )
         )
 
+    def prepare_fach_habilitation_id(self, object):
+        return list(
+            set(
+                [
+                    x.relation_type_id
+                    for x in object.personinstitution_set.filter(
+                        relation_type_id__in=classes["habilitation"]
+                    )
+                ]
+            )
+        )
+
     def prepare_w_austausch(self, object):
         return list(
             set(
                 object.personplace_set.filter(relation_type_id=3375).values_list(
                     "related_place__name", flat=True
+                )
+            )
+        )
+
+    def prepare_w_austausch_id(self, object):
+        return list(
+            set(
+                object.personplace_set.filter(relation_type_id=3375).values_list(
+                    "related_place_id", flat=True
                 )
             )
         )
@@ -736,6 +791,9 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
 
     def prepare_profession(self, object):
         return [x.label for x in object.profession.all()]
+
+    def prepare_profession_id(self, object):
+        return [x.pk for x in object.profession.all()]
 
     def prepare_place_of_birth(self, object):
         birth_rel = getattr(settings, "BIRTH_REL_NAME", [])
