@@ -19,7 +19,7 @@ from .provide_data import (
 )
 from .provide_data import classes
 
-coll_id = 16
+coll_id = 2
 
 map_classes_pr_labels = {
     "Habilitation": classes["habilitation"],
