@@ -773,7 +773,10 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
             related_institution_id__in=[2, 3, 500],
             relation_type_id__in=classes["mitgliedschaft"][0],
         )
-        return str(res[0].related_institution)
+        if res.count() > 0:
+            return str(res[0].related_institution)
+        else:
+            return None
 
     def prepare_mitgliedschaft_short(self, object):
         res = object.personinstitution_set.filter(
