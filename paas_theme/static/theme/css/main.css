@@ -1583,6 +1583,49 @@ div.leaflet-marker-icon svg.feather-map-pin {
 }
 }
 
+/*** egonetzwerk ***/
+
+#egonetspinner {
+  min-height:300px;
+  display: flex;
+  align-items: center;
+}
+
+
+
+#egonetwork_visualization > * {
+  position:relative !important;
+}
+
+
+
+/*** spinner ***/ 
+@keyframes spinner-grow {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.spinner-grow{
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  margin: auto;
+  vertical-align: text-bottom;
+  background-color: currentColor;
+  border-radius: 50%;
+  opacity: 0;
+  -webkit-animation: spinner-grow .75s linear infinite;
+  animation: spinner-grow .75s linear infinite;
+}
+.spinner-grow-sm{
+    height: 1rem;
+    border-width: .2em;
+}
+
 /*** print ***/
 
 @media print {
