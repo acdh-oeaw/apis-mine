@@ -108,10 +108,6 @@ a {
   background-color: #f0f0f7;
 }
 
-.oebl-font-red {
-  color: #125794;
-}
-
 .oebl-inverted {
   background: #125794;
   color: white;
@@ -133,34 +129,47 @@ a {
 .entry-content {
   text-align: justify;
 }
-.oebl-table {
+.custom-table {
   margin-bottom: 0;
+  border-collapse: separate;
+  border-spacing:0 0.25rem;
 }
-.oebl-table td,
-.oebl-table th {
-  /* font-size: 0.8rem; */
+.custom-table td,
+.custom-table th {
+  font-size: 0.9rem;
   padding: 0.25rem;
   text-decoration: none;
-}
-.oebl-table th {
   white-space: nowrap;
-  background: #a8bfdd;
+}
+.custom-table th {
   line-height: 1.7em;
+  border:none !important;
 }
-.oebl-table tr {
+
+.custom-table th a {
+  color:black;
+}
+
+.custom-table tr {
   line-height: 1.2em;
+  margin: 0 0.5rem;
+  background:white;
 }
 
-[data-member="True"] {
+.custom-table td {
+  border:none;
+}
+
+/*[data-member="True"] {
   background-color: #1c77c75b;
-}
+}*/
 
-.oebl-table .order-indicator {
+.custom-table .order-indicator {
   position: relative;
   top: -0.4em;
 }
 
-.oebl-table th a svg.feather {
+.custom-table th a svg.feather {
   width: inherit;
 }
 
@@ -674,7 +683,7 @@ li.facet-item.active {
 }
 .pagination li a,
 .pagination li a span {
-  font-size: 80%;
+  font-size: 1rem;
 }
 .detailPagination {
   margin-bottom: 30px;
@@ -1349,19 +1358,6 @@ svg.remove-badge {
   display: inline-block;
 }
 
-.facet-group-item .btn {
-  /* font-size: 0.8rem; */
-}
-
-.facet-group-item,
-.facet-group-item a {
-  color: #212529;
-}
-
-.facet .card-header {
-  /* background-color: #e2e2e2; */
-  background-color: #a8bfdd;
-}
 
 .facet-group-item a.badge {
   font-size: 0.9em;
@@ -1405,32 +1401,26 @@ ul li.page-item {
   color: white;
 }
 
-.page-item {
-  font-size: 14px;
-}
 
 .page-link {
-  padding-top: 12px;
   color: #125794;
   background: transparent;
   border: 0;
-  height: 38px;
 }
 
 .page-item.active .page-link {
   z-index: 1;
-  background-color: #125794;
+  background-color: var(--mine-grey);
   border-color: white;
   border-radius: 0;
+  color:black;
+  font-weight:bold;
 }
 
 .facet-group ul li {
   display: inline;
 }
 
-.more-facetitems-link {
-  /* font-size: 0.8rem; */
-}
 
 .background_none {
   background: none;
@@ -1526,10 +1516,15 @@ div.leaflet-marker-icon svg.feather-map-pin {
   background-color:var(--mine-grey);
 }
 
- svg.feather.feather-chevron-up {
+ svg.feather.feather-chevron-up,svg.feather.feather-chevron-left,svg.feather.feather-chevron-right {
   stroke:none;
   fill:var(--oeaw-blau);
   width:unset;
+}
+
+svg.feather.feather-chevron-left,svg.feather.feather-chevron-right {
+  height:20px;
+  width:24px;
 }
 
 #maplifelinebtn {

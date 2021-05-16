@@ -1,11 +1,11 @@
 {% load django_tables2 %}
 {% load i18n %}
 {% block table-wrapper %}
-<div class="table-container">
+<div class="table-container p-30 bg-mine">
     {% block pagination_top %}
-    <div class="d-flex justify-content-end table_meta pb-3">
+    <!--<div class="d-flex justify-content-end table_meta pb-3">
 
-        <span class="my-auto mr-1">{{table.rows | length}} {% if table.rows|length > 1 %}Ergebnisse{%else%}Ergebnis{%endif%}</span>
+    <span class="my-auto mr-1">{{table.rows | length}} {% if table.rows|length > 1 %}Ergebnisse{%else%}Ergebnis{%endif%}</span>
         
         <nav aria-label="Table navigation" class="d-inline-block">
             <ul class="pagination mb-0">
@@ -44,7 +44,7 @@
             </ul>
         </nav>
    
-    </div>
+    </div>-->
     {% endblock pagination_top %}
     {% block table %}
     <!-- https://github.com/twbs/bootstrap/issues/24638 -->
@@ -110,48 +110,49 @@
 </div>
     {% endblock table %}
 
-    {% block pagination %}
-    {% if table.page and table.paginator.num_pages > 1 %}
-    <div class="d-flex justify-content-end table_meta p-1 mt-2">
-        <span class="my-auto mr-1">{{table.rows | length}} Ergebnisse</span>
-        <nav aria-label="Table navigation" class="d-inline-block">
-            <ul class="pagination mb-0">
-                {% if table.page.has_previous %}
-                {% block pagination.previous %}
-                <li class="previous page-item">
-                    <a href="{% querystring table.prefixed_page_field=table.page.previous_page_number %}"
-                        class="page-link rounded-0">
-                        <i class="feather-14" data-feather="chevron-left"></i>
-                    </a>
-                </li>
-                {% endblock pagination.previous %}
-                {% endif %}
-                {% if table.page.has_previous or table.page.has_next %}
-                {% block pagination.range %}
-                {% for p in table.page|table_page_range:table.paginator %}
-                <li class="page-item{% if table.page.number == p %} active{% endif %}">
-                    <a class="page-link" {% if p != '...' %}href="{% querystring table.prefixed_page_field=p %}"
-                        {% endif %}>
-                        {{ p }}
-                    </a>
-                </li>
-                {% endfor %}
-                {% endblock pagination.range %}
-                {% endif %}
-                {% if table.page.has_next %}
-                {% block pagination.next %}
-                <li class="next page-item">
-                    <a href="{% querystring table.prefixed_page_field=table.page.next_page_number %}"
-                        class="page-link  rounded-0">
-                        <i class="feather-14" data-feather="chevron-right"></i>
-                    </a>
-                </li>
-                {% endblock pagination.next %}
-                {% endif %}
-            </ul>
-        </nav>
-    </div>
-    {% endif %}
-    {% endblock pagination %}
+   
 </div>
+{% block pagination %}
+{% if table.page and table.paginator.num_pages > 1 %}
+<div class="d-flex justify-content-end table_meta p-1 mt-2">
+    <span class="my-auto mr-2">{{table.rows | length}} Ergebnisse</span>
+    <nav aria-label="Table navigation" class="d-inline-block">
+        <ul class="pagination mb-0">
+            {% if table.page.has_previous %}
+            {% block pagination.previous %}
+            <li class="previous page-item">
+                <a href="{% querystring table.prefixed_page_field=table.page.previous_page_number %}"
+                    class="page-link pr-0 rounded-0">
+                    <i class="feather-14" data-feather="chevron-left"></i>
+                </a>
+            </li>
+            {% endblock pagination.previous %}
+            {% endif %}
+            {% if table.page.has_previous or table.page.has_next %}
+            {% block pagination.range %}
+            {% for p in table.page|table_page_range:table.paginator %}
+            <li class="page-item{% if table.page.number == p %} active{% endif %}">
+                <a class="page-link" {% if p != '...' %}href="{% querystring table.prefixed_page_field=p %}"
+                    {% endif %}>
+                    {{ p }}
+                </a>
+            </li>
+            {% endfor %}
+            {% endblock pagination.range %}
+            {% endif %}
+            {% if table.page.has_next %}
+            {% block pagination.next %}
+            <li class="next page-item">
+                <a href="{% querystring table.prefixed_page_field=table.page.next_page_number %}"
+                    class="page-link  pl-0 rounded-0">
+                    <i class="feather-14" data-feather="chevron-right"></i>
+                </a>
+            </li>
+            {% endblock pagination.next %}
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endif %}
+{% endblock pagination %}
 {% endblock table-wrapper %}

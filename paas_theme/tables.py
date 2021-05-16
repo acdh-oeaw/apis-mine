@@ -26,9 +26,9 @@ class SearchResultTable(tables.Table):
     mitgliedschaft = tables.Column(accessor="mitgliedschaft_short", verbose_name="Mgl.")
 
     name = tables.TemplateColumn(
-        template_code='<a class="oebl-font-red semi-bold" href="person/{{record.pk}}">{{record.name}}</a>',
+        template_code='<a class=".text-oeaw-blau semi-bold" href="person/{{record.pk}}">{{record.name}}</a>',
         verbose_name="Name",
-        attrs={"a": {"class": "oebl-font-red semi-bold"}},
+        attrs={"a": {"class": ".text-oeaw-blau semi-bold"}},
     )
 
     profession = tables.Column(accessor="profession", verbose_name="Beruf")
@@ -66,6 +66,6 @@ class SearchResultTable(tables.Table):
             "death_place",
             "profession",
         )
-        attrs = {"class": "table table-hover oebl-table", "thead": {}}
+        attrs = {"class": "table table-hover custom-table bg-mine", "thead": {}}
         template_name = "theme/custom_table.html"
         row_attrs = {"data-member": lambda record: record.academy_member}

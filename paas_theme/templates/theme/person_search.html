@@ -8,7 +8,7 @@
 {% load render_table from django_tables2 %}
 <div class="container-fluid">
   <div class="row">
-    <div class="col-md-3">
+    <div class="col-md-4">
       <div class="card mt-3 border-0 rounded-0 background_none">
         <div class="card-body p-0">
 
@@ -23,8 +23,8 @@
                     {%endif%}
                   {%endfor%}
               {%endfor%}
-              <div class="card rounded-0">
-                <div class="card-header p-0" id="heading_lebensdaten">
+              <div class="card rounded-0 bg-mine">
+                <!--<div class="card-header p-0" id="heading_lebensdaten">
                   <h5 class="mb-0">
                     <button type="button" class="btn btn-link collapsebtn w-100 text-left" data-toggle="collapse"
                       data-target="#lebensdaten" aria-expanded="true" aria-controls="lebensdaten">
@@ -32,23 +32,24 @@
                       <i class="chevron-down" data-feather="chevron-down"></i>
                     </button>
                   </h5>
-                </div>
-                <div id="lebensdaten" class="collapse show" aria-labelledby="heading_lebensdaten">
+                </div>-->
+                <!--<div id="lebensdaten" class="collapse show" aria-labelledby="heading_lebensdaten">-->
                   <div class="card-body pt-5 pb-5 pl-4 pr-4">
                     <div class="range-slider"></div>
                   </div>
-                </div>
+               <!-- </div>-->
               </div>
+              <div class="card bg-mine mt-2 p-2">
               {% for field in facets.fields %}
                 {% filter_facetfields facets.fields field as filtered_vals %}
                   {% if filtered_vals|length > 0 %}
-                    <div class="card mt-2 rounded-0">
-                      <div class="card-header p-0" id="heading{{field}}">
+                    <div class="card my-2 mx-3 rounded-0">
+                      <div class="card-header p-0 bg-white" id="heading{{field}}">
                         <h5 class="mb-0">
                           <button type="button" class="btn btn-link collapsebtn w-100 text-left" data-toggle="collapse"
                             data-target="#{{field}}" aria-expanded="true" aria-controls="{{field}}">
-                            {% normalize_facet field 'simple' %}
-                            <i class="chevron-down" data-feather="chevron-down"></i>
+                            <b>{% normalize_facet field 'simple' %}</b>
+                            <i class="chevron-up" data-feather="chevron-up"></i>
                           </button>
                         </h5>
                       </div>
@@ -82,12 +83,13 @@
                     </div>
                   {%endif%}
                 {%endfor%}
+                  </div>
               </form>
             </div>
           </div>
         </div>
     </div>
-    <div class="col-md-9 mt-3" id="results">
+    <div class="col-md-8 mt-3" id="results">
       <div>
         {% if form.data.selected_facets|length > 0 %}
           <ul class="facet-group pl-0 mb-0" >
@@ -124,9 +126,9 @@
   if (window.location.search.length > 0) {
     const table_h = document.querySelector('div.table-container > div:first-of-type')
     const html_raw = `<div class="dropdown show" style="float: left">
-  <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownNetworksLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+  <!--<a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownNetworksLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     als Netzwerk
-  </a>
+  </a>-->
 
   <div class="dropdown-menu" aria-labelledby="dropdownNetworksLink">
   {% for network in network_buttons %}
