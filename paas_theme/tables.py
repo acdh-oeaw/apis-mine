@@ -21,9 +21,12 @@ class PersonTable(tables.Table):
         )
         attrs = {"class": "table table-responsive table-hover"}
 
+
 class InstitutionTable(tables.Table):
 
-    name = tables.LinkColumn("theme:institution-detail", args=[A("id")], verbose_name="Name")
+    name = tables.LinkColumn(
+        "theme:institution-detail", args=[A("id")], verbose_name="Name"
+    )
 
     class Meta:
         model = Institution
@@ -31,13 +34,13 @@ class InstitutionTable(tables.Table):
             "name",
             "first_name",
         )
-        attrs = {"class": "table table-responsive table-hover"}        
+        attrs = {"class": "table table-responsive table-hover"}
 
 
 class SearchResultTable(tables.Table):
 
     name = tables.TemplateColumn(
-        template_code='<a class="text-oeaw-blau semi-bold" href="person/{{record.pk}}">{{record.name}}</a>',
+        template_code='<a class="text-oeaw-blau semi-bold" href="/person/{{record.pk}}">{{record.name}}</a>',
         verbose_name="Name",
         attrs={"a": {"class": ".text-oeaw-blau semi-bold"}},
     )
@@ -82,7 +85,7 @@ class SearchResultTable(tables.Table):
 
 class InstitutionsSearchResultTable(tables.Table):
 
-    #mitgliedschaft = tables.Column(accessor="mitgliedschaft_short", verbose_name="Mgl.")
+    # mitgliedschaft = tables.Column(accessor="mitgliedschaft_short", verbose_name="Mgl.")
 
     name = tables.TemplateColumn(
         template_code='<a class="text-oeaw-blau semi-bold" href="/institution/{{record.pk}}">{{record.name}}</a>',
@@ -106,7 +109,6 @@ class InstitutionsSearchResultTable(tables.Table):
         attrs={"td": {"class": "no-wrap"}},
     )
 
-    
     def render_profession(self, value):
         separator = ", "
         return separator.join(value)
@@ -121,4 +123,4 @@ class InstitutionsSearchResultTable(tables.Table):
         )
         attrs = {"class": "table table-hover custom-table bg-mine", "thead": {}}
         template_name = "theme/custom_table.html"
-        row_attrs = {"data-member": lambda record: record.academy_member}      
+        row_attrs = {"data-member": lambda record: record.academy_member}
