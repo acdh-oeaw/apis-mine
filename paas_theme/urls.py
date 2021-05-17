@@ -14,7 +14,9 @@ urlpatterns = [
     url(r"^about/$", views.AboutView.as_view(), name="about"),
     url(r"^contact/$", views.ContactView.as_view(), name="contact"),
     url(r"^expert-search/$", views.PersonListView.as_view(), name="expert-search"),
-    url(r"search/?$", views.SearchView.as_view(), name="search"),
+    url(r"search/$", views.SearchView.as_view(), name="search"),
+    url(r"^institutionen/$", views.IndexInstitutionsView.as_view(), name="institutions"),
+    url(r"^institutionen/search/?$", views.SearchViewInstitutions.as_view(), name="institutionssearch"),
     url(r"^network/?$", views.network_viz),
     url(r"^api/network/$", api_views.NetVizTheme.as_view()),
     url(r"^api/egonetwork/$", api_views.EgoNetwork.as_view()),
@@ -72,6 +74,11 @@ urlpatterns = [
         r"^person/(?P<pk>[0-9]+)$",
         views.PersonDetailView.as_view(),
         name="person-detail",
+    ),
+    url(
+        r"^institution/(?P<pk>[0-9]+)$",
+        views.InstitutionDetailView.as_view(),
+        name="institution-detail",
     ),
     url(
         r"^ac/obel-person/$",

@@ -7,6 +7,28 @@
 {% load static %}
 {% load render_table from django_tables2 %}
 <div class="container-fluid">
+  <div class="row mx-0">
+    <div class="col-md-12 bg-mine border-mine">
+      <h1 class="text-uppercase">Auswertungsergebnis</h1>
+      <div>
+        {% if form.data.selected_facets|length > 0 %}
+          <ul class="facet-group pl-0 mb-0" >
+            {% for fac in form.selected_facets %}
+              <li class="facet-group-item facet-badges pl-0">
+                <a href="{% normalize_facet fac 'filter' request.get_full_path %}" type="button"
+                  class="badge badge-custom badge-pill p-1 oebl-inverted">
+                  <i class="remove-badge ml-1 text-oeaw-blau" data-feather="x"></i>{% normalize_facet fac 'name' %}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        <!-- <a href="{% remove_facets request.get_full_path %}" type="button"
+          class="btn btn-link btn-sm btn-right">Filter zurücksetzen<span
+            class="icon-remove"></span></a>-->
+        {% endif %}
+      </div>
+    </div>
+  </div>
   <div class="row">
     <div class="col-md-4">
       <div class="card mt-3 border-0 rounded-0 background_none">
@@ -34,8 +56,10 @@
                   </h5>
                 </div>-->
                 <!--<div id="lebensdaten" class="collapse show" aria-labelledby="heading_lebensdaten">-->
-                  <div class="card-body pt-5 pb-5 pl-4 pr-4">
-                    <div class="range-slider"></div>
+                  <div class="card-body pt-5 pl-4 pr-4">
+                    <div class="slider-container">
+                      <div class="range-slider"></div>
+                    </div>
                   </div>
                <!-- </div>-->
               </div>
@@ -173,8 +197,8 @@
     range: { min, max },
     pips: {
       mode: 'values',
-      values: [1700, 1750, 1800, 1850, 1900, 1950, 1990],
-      density: 4
+      values: [1700, 1990],
+      density:'100%'
     }
   })
   s.on('change', ([start, end]) => {
