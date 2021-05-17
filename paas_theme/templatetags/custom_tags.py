@@ -46,6 +46,8 @@ def normalize_facet(facet, kind, url=None):
         "profession": "Beruf",
         "comissions": "Kommissionen",
         "akademiemitgliedschaft": "Mitgliedschaft",
+        "gender": "Geschlecht",
+        "q": "Suche",
     }
     fac = facet.split(":")
     fac[0] = fac[0].replace("_exact", "")
@@ -64,6 +66,62 @@ def normalize_facet(facet, kind, url=None):
 
 
 @register.simple_tag
+def normalize_filter(filter, kind, url=None):
+    norm_kind = {
+        "place_of_birth": "Geburtsort",
+        "place_of_death": "Sterbeort",
+        "career": "Karriere",
+        "education": "Ausbildung",
+        "profession": "Beruf",
+        "comissions": "Kommissionen",
+        "akademiemitgliedschaft": "Mitgliedschaft",
+        "akademiefunktionen": "Akademiefunktionen",
+        "gender": "Geschlecht",
+        "wiss_austausch": "Wissenschaftler/innen/austausch",
+        "pres_funktionen": "Funktionen im Präsidium",
+        "q": "Suche",
+    }
+    bool_fields_norm = {
+        "funk_praesidentin": "Präsident/in",
+        "funk_vizepraesidentin": "Vizepräsident/in",
+        "funk_generalsekretaerin": "Generalsekretär/in",
+        "funk_sekretaerin": "Sekretär/in",
+        "funk_klassenpres_math_nat": "Klassenpräsident/in math.-nat. Klasse",
+        "funk_klassenpres_phil_hist": "Klassenpräsident/in phil.-hist. Klasse",
+        "funk_obfrau": "Obmann/Obfrau einer Kommission",
+        "funk_mitgl_kommission": "Mitglied einer Kommission",
+        "funk_obfrau_kurat": "Obmann/Obfrau eines Kuratoriums/Board eines Institut/einer Forschungsstelle",
+        "funk_direkt_forsch_inst": "Direktor/in eines Instituts/einer Forschungsstelle",
+    }
+    if kind == "simple":
+        return f"{norm_kind[filter['field']]}"
+    if kind == "name":
+        if filter["kind"] == "multi":
+            val = " ODER ".join([x[1] for x in filter["value"]])
+        elif filter["kind"] == "boolean":
+            val = " ODER ".join([bool_fields_norm[x] for x in filter["value"]])
+        else:
+            val = filter["value"]
+        return f"{norm_kind[filter['field'].lower()]}: '{val}'"
+
+    elif kind == "filter":
+        if filter["kind"] == "multi":
+            val = [f"{x[0]}|{x[1]}" for x in filter["value"]]
+        elif filter["kind"] == "boolean":
+            val = [x for x in filter["value"]]
+        else:
+            val = [filter["value"]]
+        for val1 in val:
+            url = re.sub(
+                f"([\&\?]{filter['field']}=)({urllib.parse.quote(val1)})",
+                "",
+                url,
+            )
+        url = url.replace("search&", "search?")
+        return url
+
+
+@register.simple_tag
 def remove_facets(url):
     url = re.subn("&selected_facets\=[^&]+", "", url)
     return url[0]
@@ -75,9 +133,16 @@ def filter_facetfields(fields, fieldname):
 
 
 @register.simple_tag
-def check_facet_selection(key, val, selectedfacets):
+def check_facet_selection(key, val, selectedfacets, vals):
     selectedfacet = f"{key}_exact:{val}"
-    return selectedfacet in selectedfacets
+    c1 = 0
+    selected = ""
+    for v in vals:
+        if isinstance(v, tuple):
+            if v[1] > 0:
+                c1 += 1
+                selected = v[0]
+    return selectedfacet in selectedfacets or (c1 == 1 and val == selected)
 
 
 @register.simple_tag

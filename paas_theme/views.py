@@ -99,13 +99,11 @@ class PersonSearchView(UserPassesTestMixin, FacetedSearchView):
     form_class = PersonFacetedSearchFormNew
     facet_fields = [
         # "akademiemitgliedschaft",
+        "gender",
         "place_of_birth",
-        "place_of_death",
-        # "comissions",
         "profession",
-        # "education",
-        # "career",
     ]
+    facet_fields_optional = {"place_of_birth": ["place_of_death"]}
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -115,7 +113,27 @@ class PersonSearchView(UserPassesTestMixin, FacetedSearchView):
             else {"key": k, "label": k}
             for k, v in classes["netzwerk"].items()
         ]
+        context["selected_filters"] = []
+        for k, v in context["form"].cleaned_data.items():
+            if v:
+                if isinstance(v, list):
+                    if isinstance(v[0], str):
+                        kind = "boolean"
+                    else:
+                        kind = "multi"
+                else:
+                    kind = "string"
+                context["selected_filters"].append(
+                    {"field": k, "value": v, "kind": kind}
+                )
         return context
+
+    def get_queryset(self):
+        for k, v in self.request.GET.items():
+            if v != "" and k in self.facet_fields_optional.keys():
+                self.facet_fields.extend(self.facet_fields_optional[k])
+        qs = super().get_queryset()
+        return qs
 
     def test_func(self):
         access = access_for_all(self, viewtype="detail")

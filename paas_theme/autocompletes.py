@@ -22,6 +22,9 @@ def get_date_label(item):
 class PaasInstitutionAutocomplete(autocomplete.Select2QuerySetView):
     f = {"django_ct": "apis_entities.institution", "academy": False}
 
+    def get_result_value(self, result):
+        return f"{result.pk}|{result.name}"
+
     def get_result_label(self, item):
         lbl = item.name
         date = get_date_label(item)
@@ -48,6 +51,9 @@ class PaasInstitutionAutocomplete(autocomplete.Select2QuerySetView):
 class PaasPersonInstitutionRelationAutocomplete(autocomplete.Select2QuerySetView):
     f = {"django_ct": "apis_vocabularies.personinstitutionrelation"}
     kind = None
+
+    def get_result_value(self, result):
+        return f"{result.pk}|{result.name}"
 
     def get_result_label(self, item):
         lbl = item.text
@@ -100,6 +106,9 @@ class PaasInstitutionUniHabilitationAutocomplete(PaasInstitutionAutocomplete):
 class PaasPlaceAutocomplete(autocomplete.Select2QuerySetView):
     f = {"django_ct": "apis_entities.place"}
 
+    def get_result_value(self, result):
+        return f"{result.pk}|{result.name}"
+
     def get_result_label(self, item):
         lbl = item.name
         return lbl
@@ -116,6 +125,9 @@ class PaasProfessionAutocomplete(autocomplete.Select2QuerySetView):
     """Autocomplete for the professions"""
 
     f = {"django_ct": "apis_vocabularies.professiontype"}
+
+    def get_result_value(self, result):
+        return f"{result.pk}|{result.name}"
 
     def get_result_label(self, item):
         lbl = item.text

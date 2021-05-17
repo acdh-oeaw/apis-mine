@@ -442,7 +442,7 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
     place_of_death = indexes.CharField(null=True, faceted=True)
     place_of_death_id = indexes.IntegerField(null=True)
     klasse_person = indexes.CharField(null=True, faceted=True)
-    gender = indexes.CharField(null=True, model_attr="gender", faceted=True)
+    gender = indexes.CharField(null=True, faceted=True)
     profession = indexes.MultiValueField(null=True, faceted=True)
     profession_id = indexes.MultiValueField(null=True)
     akademiemitgliedschaft = indexes.MultiValueField(null=True, faceted=True)
@@ -480,6 +480,14 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
 
     def index_queryset(self, using=None):
         return self.get_model().objects.filter(collection__id=coll_id)
+
+    def prepare_gender(self, object):
+        if object.gender == "male":
+            return "männlich"
+        elif object.gender == "female":
+            return "weiblich"
+        else:
+            return "unbekannt"
 
     def prepare_schule(self, object):
         return list(
@@ -859,7 +867,7 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
             return False
 
     def prepare_name(self, object):
-        return str(object)
+        return f"{object.first_name} {object.name}"
 
     def prepare_text(self, object):
         lst_fields = [

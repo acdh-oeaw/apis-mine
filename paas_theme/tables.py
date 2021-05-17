@@ -23,8 +23,6 @@ class PersonTable(tables.Table):
 
 class SearchResultTable(tables.Table):
 
-    mitgliedschaft = tables.Column(accessor="mitgliedschaft_short", verbose_name="Mgl.")
-
     name = tables.TemplateColumn(
         template_code='<a class=".text-oeaw-blau semi-bold" href="person/{{record.pk}}">{{record.name}}</a>',
         verbose_name="Name",
@@ -35,21 +33,21 @@ class SearchResultTable(tables.Table):
 
     birth_date = tables.DateColumn(
         accessor="birth_date",
-        format="d. m. Y",
-        verbose_name="geboren am",
+        format="Y",
+        verbose_name="geboren",
         attrs={"td": {"class": "no-wrap"}},
     )
 
     death_date = tables.DateColumn(
         accessor="death_date",
-        format="d. m. Y",
-        verbose_name="gestorben am",
+        format="Y",
+        verbose_name="gestorben",
         attrs={"td": {"class": "no-wrap"}},
     )
 
     birth_place = tables.Column(accessor="place_of_birth", verbose_name="geboren in")
 
-    death_place = tables.Column(accessor="place_of_death", verbose_name="gestorben in")
+    # death_place = tables.Column(accessor="place_of_death", verbose_name="gestorben in")
 
     def render_profession(self, value):
         separator = ", "
@@ -58,12 +56,10 @@ class SearchResultTable(tables.Table):
     class Meta:
         model = Person
         fields = (
-            "mitgliedschaft",
             "name",
             "birth_date",
-            "birth_place",
             "death_date",
-            "death_place",
+            "birth_place",
             "profession",
         )
         attrs = {"class": "table table-hover custom-table bg-mine", "thead": {}}

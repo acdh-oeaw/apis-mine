@@ -59,7 +59,7 @@
                             {% for fv in filtered_vals %}
                               {% if fv.1 > 0 %}
                                 <li class="facet-group-item mt-2 mb-2 pl-0">
-                                  {% check_facet_selection field fv.0 form.selected_facets as facet_selected %}
+                                  {% check_facet_selection field fv.0 form.selected_facets filtered_vals as facet_selected  %}
                                   {% if facet_selected %}
                                     <span class="disabled">{{ fv.0 }} ({{ fv.1 }})</span>
                                   {% else %}
@@ -91,13 +91,21 @@
     </div>
     <div class="col-md-8 mt-3" id="results">
       <div>
-        {% if form.data.selected_facets|length > 0 %}
+        {% if form.data.selected_facets|length > 0 or selected_filters|length > 0 %}
           <ul class="facet-group pl-0 mb-0" >
             {% for fac in form.selected_facets %}
               <li class="facet-group-item facet-badges pl-0">
                 <a href="{% normalize_facet fac 'filter' request.get_full_path %}" type="button"
                   class="badge badge-custom badge-pill p-1 oebl-inverted">
                   {% normalize_facet fac 'name' %}<i class="remove-badge ml-1" data-feather="x"></i>
+                </a>
+              </li>
+            {% endfor %}
+            {% for fac in selected_filters %}
+              <li class="facet-group-item facet-badges pl-0">
+                <a href="{% normalize_filter fac 'filter' request.get_full_path %}" type="button"
+                  class="badge badge-custom badge-pill p-1 oebl-inverted">
+                  {% normalize_filter fac 'name' %}<i class="remove-badge ml-1" data-feather="x"></i>
                 </a>
               </li>
             {% endfor %}

@@ -20,7 +20,7 @@ class MultiSolrField(forms.MultipleChoiceField):
         # Return an empty list if no input was given.
         if not value:
             return []
-        return [int(x) for x in value]
+        return [(int(x.split("|")[0]), x.split("|")[1]) for x in value]
 
     def validate(self, value):
         """Check if value consists only of valid emails."""
@@ -43,7 +43,13 @@ class MultiSolrChildsField(MultiSolrField):
         # Return an empty list if no input was given.
         if not value:
             return []
-        return [int(x) for x in get_child_classes(value, self._model_class) + value]
+        ids, lables = get_child_classes(
+            [x.split("|")[0] for x in value], self._model_class, labels=True
+        )
+        value = [(int(x.split("|")[0]), x.split("|")[1]) for x in value]
+        for idx, v in enumerate(ids):
+            value.append((v, lables[idx]))
+        return value
 
     def __init__(self, *args, model_class: ModelBase, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -105,7 +111,7 @@ class PersonFilterFormHelperNew(FormHelper):
                 Div(
                     Accordion(
                         AccordionGroup(
-                            "Funktionen in der Akademie",
+                            "Funktionen in Akademieinstitutionen",
                             "akademiefunktionen",
                             css_id="in_der_akademie",
                         ),
@@ -327,7 +333,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         ]:
             if len(self.cleaned_data[feld[0]]) > 0:
                 sqs = sqs.filter(
-                    **{feld[1]: [str(x) for x in self.cleaned_data[feld[0]]]}
+                    **{feld[1]: [str(x[0]) for x in self.cleaned_data[feld[0]]]}
                 )
         if self.cleaned_data["mgld_nsdap"]:
             sqs = sqs.filter(mitglied_nsdap=self.cleaned_data["mgld_nsdap"])
