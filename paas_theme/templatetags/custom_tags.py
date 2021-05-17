@@ -102,7 +102,10 @@ def normalize_filter(filter, kind, url=None):
             val = " ODER ".join([bool_fields_norm[x] for x in filter["value"]])
         else:
             val = filter["value"]
-        return f"{norm_kind[filter['field'].lower()]}: '{val}'"
+        if filter["field"].lower() in norm_kind.keys():
+            return f"{norm_kind[filter['field'].lower()]}: '{val}'"
+        else:
+            return f"{filter['field'].title()}: '{val}'"
 
     elif kind == "filter":
         if filter["kind"] == "multi":
