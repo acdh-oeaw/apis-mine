@@ -7,6 +7,7 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 
 
 from apis_core.apis_entities.models import Person
+from apis_core.apis_entities.models import Institution
 from apis_core.apis_relations.models import PersonPlace
 from apis_core.apis_entities.views import set_session_variables
 from browsing.browsing_utils import GenericListView
@@ -16,9 +17,11 @@ from .forms import (
     PersonFilterFormHelper,
     PersonFacetedSearchForm,
     PersonFacetedSearchFormNew,
+    InstitutionFacetedSearchForm,
+    InstitutionFacetedSearchFormNew,
 )
-from .tables import PersonTable, SearchResultTable
-from .provide_data import oebl_persons, enrich_person_context, classes
+from .tables import PersonTable, SearchResultTable, InstitutionTable, InstitutionsSearchResultTable
+from .provide_data import oebl_persons, institutions, enrich_person_context, enrich_institution_context, classes
 
 from apis_core.helper_functions.utils import access_for_all
 
@@ -64,8 +67,21 @@ class IndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["heading"] = "Mitglieder der Österreichischen Akademie der Wissenschaften"
+        context["intro_text"] = "Die Österreichische Akademie der Wissenschaften besteht aus zwei Klassen, der mathematisch-naturwissenschaftlichen und der philosophisch-historischen Klasse. Die Gelehrtengesellschaft ergänzt sich selbst durch die Wahl neuer Mitglieder."
         context["search_form"] = PersonFacetedSearchFormNew()
         return context
+
+class IndexInstitutionsView(TemplateView):
+    model = Institution
+    template_name = "theme/institutions.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["heading"] = "Institutionen der Österreichischen Akademie der Wissenschaften"
+        context["intro_text"] = "Die Österreichische Akademie der Wissenschaften organisiert ihre Forschungstätigkeit in Kommissionen und Instituten. Hier können Sie nach historischen und gegenwärtigen Forschungseinrichtungen suchen und kombinierte Auswertungen durchführen."
+        context["search_form"] = InstitutionFacetedSearchFormNew()
+        return context        
 
 
 class AboutView(TemplateView):
@@ -131,6 +147,44 @@ class SearchView(SingleTableMixin, PersonSearchView, UserPassesTestMixin):
     def get_table_data(self):
         return self.queryset
 
+class InstitutionSearchView(UserPassesTestMixin, FacetedSearchView):
+    login_url = "/webpage/accounts/login/"
+    queryset = SearchQuerySet()
+    form_class = InstitutionFacetedSearchFormNew
+    facet_fields = [
+        # "akademiemitgliedschaft",
+        "place_of_birth",
+        "place_of_death",
+        # "comissions",
+        "profession",
+        # "education",
+        # "career",
+    ]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["network_buttons"] = [
+            {"key": k, "label": v["label"]}
+            if "label" in v.keys()
+            else {"key": k, "label": k}
+            for k, v in classes["netzwerk"].items()
+        ]
+        return context
+
+    def test_func(self):
+        access = access_for_all(self, viewtype="detail")
+        if access:
+            self.request = set_session_variables(self.request)
+        return access
+
+
+class SearchViewInstitutions(SingleTableMixin, InstitutionSearchView, UserPassesTestMixin):
+    table_class = InstitutionsSearchResultTable
+    template_name = "theme/institution_search.html"
+
+    def get_table_data(self):
+        return self.queryset
+
 
 class PersonDetailView(UserPassesTestMixin, DetailView):
     model = Person
@@ -180,6 +234,42 @@ class PersonDetailView(UserPassesTestMixin, DetailView):
         except AttributeError:
             context["next"] = None
         enriched_context = enrich_person_context(self.object, context)
+
+        return enriched_context
+
+class InstitutionDetailView(UserPassesTestMixin, DetailView):
+    model = Institution
+    template_name = "theme/institution_detail.html"
+    login_url = "/webpage/accounts/login/"
+
+    def test_func(self):
+        access = access_for_all(self, viewtype="detail")
+        if access:
+            self.request = set_session_variables(self.request)
+        return access
+
+    def get_object(self):
+        obj = Institution.objects.prefetch_related(
+            "personinstitution_set",
+            "personinstitution_set__relation_type",
+            "personinstitution_set__related_institution",
+        ).get(pk=self.kwargs["pk"])
+        return obj
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        try:
+            context["prev"] = (
+                institutions.filter(id__lt=self.object.id).order_by("-id").first()
+            )
+        except AttributeError:
+            context["prev"] = None
+        try:
+            context["next"] = institutions.filter(id__gt=self.object.id).first()
+        except AttributeError:
+            context["next"] = None
+        enriched_context = enrich_institution_context(self.object, context)
 
         return enriched_context
 

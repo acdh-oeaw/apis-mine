@@ -3,6 +3,10 @@ body {
   color:black;
   --oeaw-blau: #0047bb;
   --mine-grey: #f0f0f7;
+  --mine-red: #c80000;
+  --mine-green: #009c75;
+  --mine-purple: #ae5cb1;
+  --mine-orange:#ff8200;
 }
 
 * {
@@ -1570,7 +1574,11 @@ div.leaflet-marker-icon svg.feather-map-pin {
 }
 
 .border-mine {
-  border-top: 7px solid #c80000;
+  border-top: 7px solid var(--mine-red);
+}
+
+.border-mine-green {
+  border-top: 7px solid var(--mine-green);
 }
 
 .nav-tabs .nav-link {
@@ -1584,7 +1592,13 @@ div.leaflet-marker-icon svg.feather-map-pin {
 
 .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
   
-  border-color:#c80000;
+  border-color:var(--mine-red);
+  background-color:var(--mine-grey);
+}
+
+#institutionTab  .nav-item.show .nav-link, #institutionTab  .nav-link.active {
+  
+  border-color:var(--mine-green);
   background-color:var(--mine-grey);
 }
 

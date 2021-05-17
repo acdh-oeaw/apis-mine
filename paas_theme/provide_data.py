@@ -864,6 +864,9 @@ def enrich_person_context(person_object, context):
 
     return context
 
+def enrich_institution_context(institution_object, context):
+    context["relatedinstitutions"] = get_child_institutions_from_parent([institution_object.pk])
+    return context
 
 col_oebl = getattr(settings, "APIS_OEBL_BIO_COLLECTION", "ÖBL Biographie")
 col_oebl = Collection.objects.filter(name=col_oebl)
@@ -872,6 +875,7 @@ if col_oebl.count() == 1:
 else:
     oebl_persons = Person.objects.all()
 
+institutions = Institution.objects.all()
 
 person_place_born = PersonPlace.objects.filter(
     relation_type__name__icontains=getattr(settings, "BIRTH_REL_NAME", "birth")
