@@ -27,6 +27,7 @@ a {
   padding-right:15px;
 }
 
+
 .p-30 {
   padding:30px;
 }
@@ -101,7 +102,7 @@ a {
 
 .site {
   margin:0 auto;
-  max-width:70%;
+ 
 }
 
 .oebl-background-grey {
@@ -1305,22 +1306,92 @@ ul.relentities {
 }
 
 /* NOUI SLIDER */
-.noUi-target {
-  font-size: 0.8em;
+
+
+.noUi-pips-horizontal { 
+  top:-58px;
 }
+
+.noUi-target {
+  font-size: 0.7em;
+  border:none;
+  height:1px;
+  border-radius: 0;
+  background-color: var(--oeaw-blau);
+  box-shadow:none;
+}
+
+.noUi-connects {
+  height:6px;
+  top:-2px;
+}
+
 .noUi-connect {
-  background-color: #125794;
+  background-color: var(--oeaw-blau);
 }
 .noUi-horizontal .noUi-handle {
-  width: 25px;
-  height: 25px;
-  border-radius: 100%;
-  outline: 0;
+  background:transparent;
+  border:none;
+  box-shadow:none;
+}
+
+.noUi-horizontal .noUi-handle:focus {
+  outline:none;
+}
+
+.noUi-touch-area {
+  display:none;
 }
 .noUi-horizontal .noUi-handle::before,
 .noUi-horizontal .noUi-handle::after {
   display: none;
 }
+
+.noUi-horizontal .noUi-tooltip {
+  background:var(--oeaw-blau);
+  border-radius: 0;
+  padding:2px;
+  color:white;
+  border:none;
+  bottom:140%;
+}
+
+.noUi-tooltip:after {
+    content: '';
+    position: absolute;
+    left: 35%;
+    top: 100%;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid var(--oeaw-blau);
+    clear: both;
+}
+
+.noUi-marker {
+  display:none;
+}
+
+.noUi-value {
+  background:white;
+  color:black;
+  padding:2px;
+}
+
+.noUi-value:after {
+  content: '';
+  position: absolute;
+  left: 35%;
+  top: 100%;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid white;
+  clear: both;
+}
+
 
 .dwnlds {
   list-style-type: none;
@@ -1366,7 +1437,8 @@ svg.remove-badge {
   text-overflow: ellipsis;
   white-space: nowrap;
   padding: 0.5em !important;
-  background: #1c77c75b;
+  background: transparent;
+  color:black;
 }
 
 .collapsebtn,
@@ -1570,6 +1642,9 @@ svg.feather.feather-chevron-left,svg.feather.feather-chevron-right {
 }
 
 @media (min-width:768px){
+.site{
+  max-width:70%;
+}  
 .pl-md-15 {
   padding-left:15px !important;
 }
