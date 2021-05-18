@@ -22,7 +22,7 @@
       <div class="row justify-content-between pt-3">
         <div class="col-md-auto">
           {% if prev.id %}
-          <a class="card-link preventity" href="{% url 'theme:person-detail' pk=prev.id %}" title="{{ prev }}">
+          <a class="card-link preventity" href="{% url 'theme:institution-detail' pk=prev.id %}" title="{{ prev }}">
             &larr; {{ prev }}
           </a>
           {% endif %}
@@ -30,7 +30,7 @@
         <div class="col"></div>
         <div class="col-md-auto">
           {% if next.id %}
-          <a class="card-link nextentity" href="{% url 'theme:person-detail' pk=next.id %}" title="{{ next }}">
+          <a class="card-link nextentity" href="{% url 'theme:institution-detail' pk=next.id %}" title="{{ next }}">
             {{ next }} &rarr;
           </a>
           {% endif %}
@@ -48,47 +48,46 @@
         </div>
         <div id="main" class="card-body">
           <div class="row">
-            <div class="col-md-5 bg-mine border-mine pl-1 pr-0">
-              <h1 class="font-weight-normal float-md-left pt-1 pb-4" style="width:calc(100% - 110px)">
+            <div class="col-md-5 bg-mine border-mine-green pl-1 pr-0">
+              <h3 class="font-weight-normal  pt-1 pb-4" style="width:calc(100% - 110px)">
                 <!--{{ object.name }}{%if object.first_name %}, {{ object.first_name }}{% endif %}-->
                 {%if object.first_name %}{{ object.first_name }}{% endif %}<br />
                 {{ object.name }}
-              </h1>
+              </h3>
 
-              <div class="imgcontainer">
+              <!--<div class="imgcontainer">
                 {% if image %}
                 <img class="float-md-right" style="max-width:110px;" src="{% static image %}">
                 {% else %}
                 <img class="float-md-right" style="max-width:110px;" src="https://via.placeholder.com/110x134">
                 {% endif %}
-              </div>
+              </div>-->
 
               <p class="profession-date-of-birth">
-                {% if profession %}<span class="font-weight-bold">{{ profession }}</span> <br />{% endif %}
-                <span class="font-weight-normal"><abbr
-                    title="geboren">*</abbr>{% if object.start_date_written is not None %}
-                  {{object.start_date_written }}{% if place_of_birth is not None %}
-                  ({{place_of_birth}}){% endif %}{% else %} -{% endif %}</span><br />
-                <span class="font-weight-normal"><abbr title='gestorben'>&dagger;</abbr>
+                {% if object.kind %}<span>{{ object.kind }}</span> <br />{% endif %}
+                <span class="font-weight-normal">{% if object.start_date_written is not None %}
+                     {{object.start_date_written }}{% endif %}
                   {% if object.end_date_written is not None %}
-                  {{object.end_date_written }}{% if place_of_death is not None %}
-                  ({{place_of_death}}){% endif %}{% else %} -{% endif %}</span>
+                  &ndash;
+                  {{object.end_date_written }}{% endif %}
+                  </span>
               </p>
+              
 
-
-              {% if mitgliedschaften %}
+              
               <div class="section">
-                <span class="font-weight-bold">Mitgliedschaft</span>
+                <span class="font-weight-bold">Struktur der Komission</span>
                 <ul class="relentities">
-                  {% for x in mitgliedschaften %}
+                  {% for x in relatedinstitutions %}
                   <li class="pl-0 font-weight-normal pb-0" style="padding-bottom: 0.8em">
+                    {{x.name}}
                     {{x|safe}}
                   </li>
                   {% endfor %}
                 </ul>
               </div>
 
-              {% endif %}
+             
               {% if normdaten %}
               <div class="section">
                 <span class="font-weight-bold">Online-Ressourcen</span>
@@ -104,7 +103,7 @@
                 <span class="font-weight-bold">Downloads</span>
                 <ul class="uris pl-0">
                   <li class="pl-0 font-weight-normal"><a target="_blank" rel="noopener noreferrer"
-                      href="/apis/api/entities/person/{{object.pk}}/?format=json">Json</a></li>
+                      href="/apis/api/entities/institution/{{object.pk}}/?format=json">Json</a></li>
                   <li class="pl-0 font-weight-normal"><a target="_blank" rel="noopener noreferrer"
                       href="/apis/api2/entity/{{object.pk}}/?format=rdf%2Bturtle">RDF/Turtle</a></li>
                   <li class="pl-0 font-weight-normal"><a target="_blank" rel="noopener noreferrer"
@@ -113,19 +112,19 @@
               </div>
             </div>
             <div class="col-md-7 pr-0  mine-pl-30">
-              <ul class="nav nav-tabs border-0" id="myTab" role="tablist">
+              <ul class="nav nav-tabs border-0" id="institutionTab" role="tablist">
                 <li class="nav-item p-0 font-weight-bold" role="presentation">
                   <a class="nav-link rounded-0 active text-uppercase" data-toggle="tab" id="daten-tab" href="#daten"
-                    role="tab" aria-controls="home" aria-selected="true">Biographie</a>
+                    role="tab" aria-controls="home" aria-selected="true"></a>
                 </li>
-                <li class="nav-item p-0 font-weight-bold" role="presentation">
+                <!--<li class="nav-item p-0 font-weight-bold" role="presentation">
                   <a class="nav-link rounded-0 text-uppercase align-bottom" data-toggle="tab" id="egonet-tab"
                     href="#egonet" role="tab" aria-controls="egonet" aria-selected="false">Egonetzwerk</a>
                 </li>
                 <li class="nav-item p-0 font-weight-bold" role="presentation">
                   <a class="nav-link rounded-0 text-uppercase" data-toggle="tab" id="map-tab" href="#map" role="tab"
                     role="tab" aria-controls="map" aria-selected="false">Karte</a>
-                </li>
+                </li>-->
               </ul>
               <div class="tab-content bg-mine" id="myTabContent">
                 <div class="tab-pane fade show active" id="daten" role="tabpanel" aria-labelledby="daten-tab">
@@ -219,7 +218,7 @@
 
   initMap(baseURL, personPk);
 
-  $('#myTab').on('shown.bs.tab', function (e) {
+  $('#institutionTab').on('shown.bs.tab', function (e) {
     if (e.target.id === 'map-tab') {
       adjustSize();
     }

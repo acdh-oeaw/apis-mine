@@ -16,6 +16,32 @@ body {
 a {
   color:var(--oeaw-blau);
 }
+p a {
+  color: #125794;
+}
+
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: bold;
+}
+
+h1 {
+  font-size: 1.2rem;
+}
+
+h2 {
+  font-size: 1rem;
+}
+
+h3 {
+  font-size: 0.8rem;
+}
+
 
 .container {
   padding-left:30px;
@@ -96,9 +122,15 @@ a {
   visibility: visible;
 }
 
+.text-08 {
+  font-size:0.8rem;
+}
+
 .text-09 {
   font-size:0.9rem;
 }
+
+
 
 .navbar-light .navbar-nav .nav-link {
   color:var(--oeaw-blau)
@@ -215,43 +247,7 @@ p,.section {
   text-align: justify;
 }
 
-p a {
-  color: #125794;
-}
 
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-weight: bold;
-}
-
-h1 {
-  font-size: 1.6rem;
-}
-
-h2 {
-  font-size: 2em;
-}
-
-h3 {
-  font-size: 1.2rem;
-}
-
-h4 {
-  font-size: 1rem;
-}
-
-h5 {
-  font-size: 0.8rem;
-}
-
-h6 {
-  font-size: 0.6rem;
-}
 
 /*@media (min-width: 1200px) {
   .container {
@@ -461,10 +457,6 @@ nav.navbar {
   background: unset;
 }
 
-
-#wrapper-hero-inner h1 {
-  font-size: 1.2rem;
-}
 
 #wrapper-hero-inner p {
   font-weight: bold;
@@ -1328,6 +1320,7 @@ ul.relentities {
 .noUi-connects {
   height:6px;
   top:-2px;
+  border-radius: 0;
 }
 
 .noUi-connect {
