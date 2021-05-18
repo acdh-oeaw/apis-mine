@@ -594,7 +594,7 @@ def enrich_person_context(person_object, context):
         getattr(settings, "BASE_DIR") + "/member_images/" + f"/{person_object.pk}.*"
     )
     if len(lst_images) == 1:
-        context["image"] = lst_images[0].split("/")[-1]
+        context["image"] = (True, lst_images[0].split("/")[-1])
     elif classes.get("image_wiki", False):
         if (
             person_object.label_set.filter(
@@ -603,9 +603,12 @@ def enrich_person_context(person_object, context):
             > 0
         ):
             context["image"] = (
-                person_object.label_set.filter(label_type_id=classes["image_wiki"])
-                .first()
-                .label
+                False,
+                (
+                    person_object.label_set.filter(label_type_id=classes["image_wiki"])
+                    .first()
+                    .label
+                ),
             )
     else:
         context["image"] = False

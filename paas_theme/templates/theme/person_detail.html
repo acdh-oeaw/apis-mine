@@ -57,7 +57,11 @@
 
               <div class="imgcontainer">
                 {% if image %}
-                <img class="float-md-right" style="max-width:110px;" src="{% static image %}">
+                {% if image.0 %}
+                <img class="float-md-right" style="max-width:110px;" src="{% static image.1 %}">
+                {% else %}
+                <img class="float-md-right" style="max-width:110px;" src="{{image.1}}">
+                {% endif %}
                 {% else %}
                 <img class="float-md-right" style="max-width:110px;" src="https://via.placeholder.com/110x134">
                 {% endif %}
