@@ -20,6 +20,7 @@ from apis_core.apis_relations.models import (
 )
 
 from apis_core.apis_vocabularies.models import (
+    LabelType,
     PersonPersonRelation,
     PersonEventRelation,
     PersonInstitutionRelation,
@@ -281,6 +282,7 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
             if x not in classes["time_ranges_ids"]
         ]
     )
+    classes["image_wiki"] = LabelType.objects.get(name="Wikicommons Image").pk
     classes["habilitation"] = get_child_classes([1385], PersonInstitutionRelation)
     classes["berufslaufbahn_ids"] = berufslaufbahn_ids
     classes["subs_akademie"] = subs_akademie + [2, 3, 500]
@@ -549,7 +551,7 @@ def enrich_person_context(person_object, context):
             {
                 "kind": "WGW",
                 "uri": normdaten_wgw[0].uri,
-                "identifier": normdaten_wgw[0].uri.split("/")[-1],
+                "identifier": normdaten_wgw[0].uri.split("=")[-1],
             }
         )
     normdaten_gnd = person_object.uri_set.filter(uri__contains="d-nb.info")
@@ -561,11 +563,50 @@ def enrich_person_context(person_object, context):
                 "identifier": normdaten_gnd[0].uri.split("/")[-1],
             }
         )
+    normdaten_wikidata = person_object.uri_set.filter(uri__contains="wikidata")
+    if normdaten_wikidata.count() == 1:
+        context["normdaten"].append(
+            {
+                "kind": "Wikidata",
+                "uri": normdaten_wikidata[0].uri,
+                "identifier": normdaten_wikidata[0].uri.split("/")[-1],
+            }
+        )
+    normdaten_db = person_object.uri_set.filter(uri__contains="deutsche-biographie")
+    if normdaten_db.count() == 1:
+        context["normdaten"].append(
+            {
+                "kind": "Deutsche Biographie",
+                "uri": normdaten_db[0].uri,
+                "identifier": normdaten_db[0].uri.split("/")[-1].split(".")[0],
+            }
+        )
+    normdaten_parlament = person_object.uri_set.filter(uri__contains="parlament")
+    if normdaten_parlament.count() == 1:
+        context["normdaten"].append(
+            {
+                "kind": "Österreichisches Parlament",
+                "uri": normdaten_parlament[0].uri,
+                "identifier": normdaten_parlament[0].uri.split("_")[-1][:-1],
+            }
+        )
     lst_images = glob.glob(
         getattr(settings, "BASE_DIR") + "/member_images/" + f"/{person_object.pk}.*"
     )
     if len(lst_images) == 1:
         context["image"] = lst_images[0].split("/")[-1]
+    elif classes.get("image_wiki", False):
+        if (
+            person_object.label_set.filter(
+                label_type_id=classes.get("image_wiki")
+            ).count()
+            > 0
+        ):
+            context["image"] = (
+                person_object.label_set.filter(label_type_id=classes["image_wiki"])
+                .first()
+                .label
+            )
     else:
         context["image"] = False
     preise = []
@@ -721,7 +762,7 @@ def enrich_person_context(person_object, context):
                 f'Anwärter{"in" if person_object.gender == "female" else ""} folgender nationalsozialistischer Vereinigungen: <ul>'
                 + "".join(
                     [
-                        f'{rel.related_institution} {get_date_range(rel, classes["time_ranges_ids"], extended=True)}'
+                        f'<li>{rel.related_institution} {get_date_range(rel, classes["time_ranges_ids"], extended=True)}</li>'
                         for rel in person_object.personinstitution_set.filter(
                             relation_type_id__in=[3470, 3462]
                         )
@@ -738,7 +779,7 @@ def enrich_person_context(person_object, context):
                 "Mitglied folgender nationalsozialistischer Vereinigungen: <ul>"
                 + "".join(
                     [
-                        f"<li>{rel.related_institution} {get_date_range(rel, classes['time_ranges_ids'], extended=True)}"
+                        f"<li>{rel.related_institution} {get_date_range(rel, classes['time_ranges_ids'], extended=True)}</li>"
                         for rel in person_object.personinstitution_set.filter(
                             relation_type_id__in=[3452, 3451]
                         )
@@ -755,7 +796,7 @@ def enrich_person_context(person_object, context):
                 f"förderndes Mitglied folgender nationalsozialistischer Vereinigungen: <ul>"
                 + "".join(
                     [
-                        f"<{rel.related_institution} {get_date_range(rel, classes['time_ranges_ids'], extended=True)}"
+                        f"<li><{rel.related_institution} {get_date_range(rel, classes['time_ranges_ids'], extended=True)}</li>"
                         for rel in person_object.personinstitution_set.filter(
                             relation_type_id__in=[3473]
                         )
@@ -804,7 +845,7 @@ def enrich_person_context(person_object, context):
                 )
             ],
             "Mitgliedschaften in anderen Akademien": [
-                f'<a href="/institution/{rel.related_institution_id}">{rel.related_institution}<a/>, {rel.relation_type.name} {get_date_range(rel, classes["time_ranges_ids"])}'
+                f'<a href="/institution/{rel.related_institution_id}">{rel.related_institution}</a>, {rel.relation_type.name} {get_date_range(rel, classes["time_ranges_ids"])}'
                 for rel in person_object.personinstitution_set.filter(
                     related_institution__kind_id=3378
                 ).order_by("related_institution__name")
@@ -864,9 +905,13 @@ def enrich_person_context(person_object, context):
 
     return context
 
+
 def enrich_institution_context(institution_object, context):
-    context["relatedinstitutions"] = get_child_institutions_from_parent([institution_object.pk])
+    context["relatedinstitutions"] = get_child_institutions_from_parent(
+        [institution_object.pk]
+    )
     return context
+
 
 col_oebl = getattr(settings, "APIS_OEBL_BIO_COLLECTION", "ÖBL Biographie")
 col_oebl = Collection.objects.filter(name=col_oebl)
