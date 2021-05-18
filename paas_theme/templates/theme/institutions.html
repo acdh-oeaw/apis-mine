@@ -12,7 +12,7 @@
     <div class="container hero-light" id="wrapper-hero-inner" tabindex="-1">
 
 
-      <div class="row m-0 bg-mine border-mine p-1">
+      <div class="row m-0 bg-mine border-mine-green p-1">
 
         <h1 class="w-50 text-uppercase">{{heading}}</h1>
         <div class="w-75 mx-auto">
@@ -24,7 +24,7 @@
   </div>
   <div class="wrapper pt-0" id="index-wrapper">
     <div class="container" id="content" tabindex="-1">
-      <form action="/search?" class="w-100" method="get">
+      <form action="/institutionen/search?" class="w-100" method="get">
         <div id="search_form">
         {% crispy search_form search_form.helper %}
         </div>
@@ -48,14 +48,7 @@
 <link href="{%static 'theme/vendor/select2-bootstrap4/select2-bootstrap4.min.css' %}" rel="stylesheet" />
 <script type="text/javascript">
 $(document).ready(function() {
-    $('.select2-main').select2();
-    
-    (new URL(window.location.href)).searchParams.forEach((x, y) => {
-    console.log(y,x)
-      $(`[name="${y}"]`).val(x);
-      $(`[name="${y}"]`).closest(".collapse").addClass("show"); 
-    })
-})
+    $('.select2-main').select2();})
 </script>
 <script type="text/javascript">
   $('#searchindex').val("personsearch");
@@ -94,7 +87,7 @@ $(document).ready(function() {
   }
 
   function doFullTextSearch() {
-    window.location.href = "/search?q=" + $("#fulltextsearch").val();
+    window.location.href = "/institutionen/search?q=" + $("#fulltextsearch").val();
   }
 
 

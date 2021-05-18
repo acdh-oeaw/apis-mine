@@ -7,46 +7,64 @@
 {% load static %}
 {% load render_table from django_tables2 %}
 <div class="container-fluid">
+  <div class="bg-mine border-mine">
   <div class="row mx-0">
-    <div class="col-md-12 bg-mine border-mine">
+    <div class="col-md-6">
       <h1 class="text-uppercase">Auswertungsergebnis</h1>
+    </div>
+    <div class="col-md-6 text-right text-uppercase text-08 text-oeaw-blau font-weight-bold">
+     <a href="#" onclick="navigateToLandingPage()"><i class="chevron-left" data-feather="chevron-left"></i> Zurück zur Auswertung</a>
+      <!--<h1 class="text-uppercase pt-1"><a href="{% remove_facets request.get_full_path %}" type="button"
+          class="btn btn-link btn-sm btn-right">Filter zurücksetzen<span class="icon-remove"></span></a></h1>
+     -->
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
       <div>
-        {% if form.data.selected_facets|length > 0 %}
-          <ul class="facet-group pl-0 mb-0" >
-            {% for fac in form.selected_facets %}
-              <li class="facet-group-item facet-badges pl-0">
-                <a href="{% normalize_facet fac 'filter' request.get_full_path %}" type="button"
-                  class="badge badge-custom badge-pill p-1 oebl-inverted">
-                  <i class="remove-badge ml-1 text-oeaw-blau" data-feather="x"></i>{% normalize_facet fac 'name' %}
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
-        <!-- <a href="{% remove_facets request.get_full_path %}" type="button"
-          class="btn btn-link btn-sm btn-right">Filter zurücksetzen<span
-            class="icon-remove"></span></a>-->
+        {% if form.data.selected_facets|length > 0 or selected_filters|length > 0 %}
+        <ul class="facet-group pl-0 mb-0">
+          {% for fac in form.selected_facets %}
+          <li class="facet-group-item facet-badges pl-0">
+            <a href="{% normalize_facet fac 'filter' request.get_full_path %}" type="button"
+              class="badge badge-custom badge-pill p-1 oebl-inverted">
+              {% normalize_facet fac 'name' %}<i class="remove-badge ml-1" data-feather="x"></i>
+            </a>
+          </li>
+          {% endfor %}
+          {% for fac in selected_filters %}
+          <li class="facet-group-item facet-badges pl-0">
+            <a href="{% normalize_filter fac 'filter' request.get_full_path %}" type="button"
+              class="badge badge-custom badge-pill p-1 oebl-inverted">
+              {% normalize_filter fac 'name' %}<i class="remove-badge ml-1" data-feather="x"></i>
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
         {% endif %}
       </div>
     </div>
   </div>
-  <div class="row">
-    <div class="col-md-4">
-      <div class="card mt-3 border-0 rounded-0 background_none">
-        <div class="card-body p-0">
+</div>
+<div class="row">
+  <div class="col-md-4">
+    <div class="card mt-3 border-0 rounded-0 background_none">
+      <div class="card-body p-0">
 
-            <!-- Begin faceting. -->
-            <div class="facet">
-              <form>
-              {% for param_name, value in request.GET.items %}
-                {% filter_params request param_name as param_list %}
-                  {% for param_value in param_list  %}
-                    {%if param_name == 'q' or param_name == 'selected_facets'%}
-                      <input type="hidden" name="{{param_name}}" class="form-suche-input" id="suche" placeholder="Suche" {% if query %}value="{{param_value}}" {% endif %}>
-                    {%endif%}
-                  {%endfor%}
-              {%endfor%}
-              <div class="card rounded-0 bg-mine">
-                <!--<div class="card-header p-0" id="heading_lebensdaten">
+        <!-- Begin faceting. -->
+        <div class="facet">
+          <form>
+            {% for param_name, value in request.GET.items %}
+            {% filter_params request param_name as param_list %}
+            {% for param_value in param_list  %}
+            {%if param_name == 'q' or param_name == 'selected_facets'%}
+            <input type="hidden" name="{{param_name}}" class="form-suche-input" id="suche" placeholder="Suche"
+              {% if query %}value="{{param_value}}" {% endif %}>
+            {%endif%}
+            {%endfor%}
+            {%endfor%}
+            <div class="card rounded-0 bg-mine">
+              <!--<div class="card-header p-0" id="heading_lebensdaten">
                   <h5 class="mb-0">
                     <button type="button" class="btn btn-link collapsebtn w-100 text-left" data-toggle="collapse"
                       data-target="#lebensdaten" aria-expanded="true" aria-controls="lebensdaten">
@@ -55,97 +73,74 @@
                     </button>
                   </h5>
                 </div>-->
-                <!--<div id="lebensdaten" class="collapse show" aria-labelledby="heading_lebensdaten">-->
-                  <div class="card-body pt-5 pl-4 pr-4">
-                    <div class="slider-container">
-                      <div class="range-slider"></div>
-                    </div>
-                  </div>
-               <!-- </div>-->
+              <!--<div id="lebensdaten" class="collapse show" aria-labelledby="heading_lebensdaten">-->
+              <div class="card-body pt-5 pl-4 pr-4">
+                <div class="slider-container">
+                  <div class="range-slider"></div>
+                </div>
               </div>
-              <div class="card bg-mine mt-2 p-2">
-              {% for field in facets.fields %}
-                {% filter_facetfields facets.fields field as filtered_vals %}
-                  {% if filtered_vals|length > 0 %}
-                    <div class="card my-2 mx-3 rounded-0">
-                      <div class="card-header p-0 bg-white" id="heading{{field}}">
-                        <h5 class="mb-0">
-                          <button type="button" class="btn btn-link collapsebtn w-100 text-left" data-toggle="collapse"
-                            data-target="#{{field}}" aria-expanded="true" aria-controls="{{field}}">
-                            <b>{% normalize_facet field 'simple' %}</b>
-                            <i class="chevron-up" data-feather="chevron-up"></i>
-                          </button>
-                        </h5>
-                      </div>
-                      <div id="{{field}}" class="collapse show" aria-labelledby="heading{{field}}">
-                        <div class="card-body p-2 pl-3 pr-3 show-limited-number">
-                          <ul class="pl-0 mb-0">
-                            {% for fv in filtered_vals %}
-                              {% if fv.1 > 0 %}
-                                <li class="facet-group-item mt-2 mb-2 pl-0">
-                                  {% check_facet_selection field fv.0 form.selected_facets filtered_vals as facet_selected  %}
-                                  {% if facet_selected %}
-                                    <span class="disabled">{{ fv.0 }} ({{ fv.1 }})</span>
-                                  {% else %}
-                                    {% if query or request.GET|length > 0 %}
-                                  <a href="{{ request.get_full_path }}&amp;selected_facets={{field}}_exact:{{ fv.0|urlencode }}"
-                                      class="facet-group-link">{{ fv.0 }} ({{ fv.1 }})</a>
-                                    {% else %}
-                                    <a href="{{ request.get_full_path }}?selected_facets={{field}}_exact:{{ fv.0|urlencode }}"
-                                      class="facet-group-link">{{ fv.0 }} ({{ fv.1 }})</a>
-                                    {% endif %}
-                                  {% endif %}
-                                </li>
-                              {% endif %}
-                            {% endfor %}
-                          </ul>
-                          {% if filtered_vals.5.1 > 0 %}
-                          <button type="button" class="pl-0 btn btn-link btn-sm load-more-less" class="oebl-font-red more-facetitems-link">mehr...</a>
-                            {% endif %}
-                        </div>
-                      </div>
-                    </div>
-                  {%endif%}
-                {%endfor%}
-                  </div>
-              </form>
+              <!-- </div>-->
             </div>
-          </div>
+            <div class="card bg-mine mt-2 p-2">
+              {% for field in facets.fields %}
+              {% filter_facetfields facets.fields field as filtered_vals %}
+              {% if filtered_vals|length > 0 %}
+              <div class="card my-2 mx-3 rounded-0">
+                <div class="card-header p-0 bg-white" id="heading{{field}}">
+                  <h5 class="mb-0">
+                    <button type="button" class="btn btn-link collapsebtn w-100 text-left" data-toggle="collapse"
+                      data-target="#{{field}}" aria-expanded="true" aria-controls="{{field}}">
+                      <b>{% normalize_facet field 'simple' %}</b>
+                      <i class="chevron-up" data-feather="chevron-up"></i>
+                    </button>
+                  </h5>
+                </div>
+                <div id="{{field}}" class="collapse show" aria-labelledby="heading{{field}}">
+                  <div class="card-body p-2 pl-3 pr-3 show-limited-number">
+                    <ul class="pl-0 mb-0">
+                      {% for fv in filtered_vals %}
+                      {% if fv.1 > 0 %}
+                      <li class="facet-group-item mt-2 mb-2 pl-0">
+                        {% check_facet_selection field fv.0 form.selected_facets filtered_vals as facet_selected  %}
+                        {% if facet_selected %}
+                        <span class="disabled">{{ fv.0 }} ({{ fv.1 }})</span>
+                        {% else %}
+                        {% if query or request.GET|length > 0 %}
+                        <a href="{{ request.get_full_path }}&amp;selected_facets={{field}}_exact:{{ fv.0|urlencode }}"
+                          class="facet-group-link">{{ fv.0 }} ({{ fv.1 }})</a>
+                        {% else %}
+                        <a href="{{ request.get_full_path }}?selected_facets={{field}}_exact:{{ fv.0|urlencode }}"
+                          class="facet-group-link">{{ fv.0 }} ({{ fv.1 }})</a>
+                        {% endif %}
+                        {% endif %}
+                      </li>
+                      {% endif %}
+                      {% endfor %}
+                    </ul>
+                    {% if filtered_vals.5.1 > 0 %}
+                    <button type="button" class="pl-0 btn btn-link btn-sm load-more-less"
+                      class="oebl-font-red more-facetitems-link">mehr...</a>
+                      {% endif %}
+                  </div>
+                </div>
+              </div>
+              {%endif%}
+              {%endfor%}
+            </div>
+          </form>
         </div>
-    </div>
-    <div class="col-md-8 mt-3" id="results">
-      <div>
-        {% if form.data.selected_facets|length > 0 or selected_filters|length > 0 %}
-          <ul class="facet-group pl-0 mb-0" >
-            {% for fac in form.selected_facets %}
-              <li class="facet-group-item facet-badges pl-0">
-                <a href="{% normalize_facet fac 'filter' request.get_full_path %}" type="button"
-                  class="badge badge-custom badge-pill p-1 oebl-inverted">
-                  {% normalize_facet fac 'name' %}<i class="remove-badge ml-1" data-feather="x"></i>
-                </a>
-              </li>
-            {% endfor %}
-            {% for fac in selected_filters %}
-              <li class="facet-group-item facet-badges pl-0">
-                <a href="{% normalize_filter fac 'filter' request.get_full_path %}" type="button"
-                  class="badge badge-custom badge-pill p-1 oebl-inverted">
-                  {% normalize_filter fac 'name' %}<i class="remove-badge ml-1" data-feather="x"></i>
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
-        <!-- <a href="{% remove_facets request.get_full_path %}" type="button"
-          class="btn btn-link btn-sm btn-right">Filter zurücksetzen<span
-            class="icon-remove"></span></a>-->
-        {% endif %}
-      </div>
-      <div>
-        {% render_table table %}
-        <!-- End faceting -->
-
       </div>
     </div>
   </div>
+  <div class="col-md-8 mt-3" id="results">
+
+    <div>
+      {% render_table table %}
+      <!-- End faceting -->
+
+    </div>
+  </div>
+</div>
 </div>
 <script>
 
@@ -168,7 +163,7 @@
   {% endfor %}
   </div>
 </div>`
-    
+
     let bt = document.createElement('A')
     let ft = document.createElement('I')
     ft.style = 'margin-right: 5px;'
@@ -198,7 +193,7 @@
     pips: {
       mode: 'values',
       values: [1700, 1990],
-      density:'100%'
+      density: '100%'
     }
   })
   s.on('change', ([start, end]) => {
@@ -208,40 +203,45 @@
   })
 
   document.getElementById("academy_member").addEventListener(
-    "click", e => {console.log(e);
-        console.log("event listener")
-        const qs = new URLSearchParams(window.location.search)
-        if (e.target.checked) {
-          qs.set("academy_member", true)
-        } else {
-          qs.set("academy_member", false)
-        }
-        window.location.search = qs.toString()
+    "click", e => {
+      console.log(e);
+      console.log("event listener")
+      const qs = new URLSearchParams(window.location.search)
+      if (e.target.checked) {
+        qs.set("academy_member", true)
+      } else {
+        qs.set("academy_member", false)
+      }
+      window.location.search = qs.toString()
     }
   )
 
-  $(".load-more-less").on("click",this,function() {
+  $(".load-more-less").on("click", this, function () {
     $(this).parent().toggleClass("show-limited-number");
     if ($(this).parent().hasClass("show-limited-number")) {
-        $(this).text("mehr...");
+      $(this).text("mehr...");
     } else {
-        $(this).text("weniger...");
+      $(this).text("weniger...");
     }
   });
-window.onload = function() {
-  const qs = new URLSearchParams(window.location.search)
-  let wm = qs.get("academy_member")
-  console.log(wm)
-  if (!wm) {
-    document.getElementById("academy_member").checked = false
-  } else if (wm == "false") {
-    document.getElementById("academy_member").checked = false;
-    console.log("ran through check");
-    console.log(wm);
-  } else {
-    document.getElementById("academy_member").checked = true;
+  window.onload = function () {
+    const qs = new URLSearchParams(window.location.search)
+    let wm = qs.get("academy_member")
+    console.log(wm)
+    if (!wm) {
+      document.getElementById("academy_member").checked = false
+    } else if (wm == "false") {
+      document.getElementById("academy_member").checked = false;
+      console.log("ran through check");
+      console.log(wm);
+    } else {
+      document.getElementById("academy_member").checked = true;
+    }
   }
-}
+
+  function navigateToLandingPage() {
+      window.location.href = "/" + window.location.search;
+  }
 </script>
 
 {% endblock %}
