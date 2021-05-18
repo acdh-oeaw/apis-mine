@@ -80,6 +80,8 @@ def normalize_filter(filter, kind, url=None):
         "wiss_austausch": "Wissenschaftler/innen/austausch",
         "pres_funktionen": "Funktionen im Präsidium",
         "q": "Suche",
+        "start_date_form": "Lebensspanne von",
+        "end_date_form": "Lebensspanne bis",
     }
     bool_fields_norm = {
         "funk_praesidentin": "Präsident/in",

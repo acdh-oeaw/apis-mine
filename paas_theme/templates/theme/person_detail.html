@@ -61,6 +61,7 @@
                 <img class="float-md-right" style="max-width:110px;" src="{% static image.1 %}">
                 {% else %}
                 <img class="float-md-right" style="max-width:110px;" src="{{image.1}}">
+                <p id="photocredit" class="float-md-right" style="max-width:110px;" data-photourl="{{image.1}}"></p>
                 {% endif %}
                 {% else %}
                 <img class="float-md-right" style="max-width:110px;" src="https://via.placeholder.com/110x134">
@@ -403,5 +404,28 @@
 <script>
   const egotab = document.getElementById("egonet-tab")
   egotab.addEventListener("click", function () { getEgoNetworkViz(0) }, false)
+</script>
+<script>
+async function getMetadataPhoto(title = '') {
+  console.log(title)
+  let url = `https://commons.wikimedia.org/w/api.php?action=query&titles=Image:${title}&prop=imageinfo&iiprop=extmetadata&format=json&origin=*`
+  console.log(url)
+const response = await fetch(url, 
+{method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+return response.json();
+}
+function add_metadata_photo(){
+const photo = document.getElementById("photocredit")
+if (photo){
+  let title = photo.dataset.photourl.match("[^/]+$")[0]
+  getMetadataPhoto(title).then(data => {
+    photo.insertAdjacentHTML( 'beforeend', data.query.pages[Object.keys(data.query.pages)[0]].imageinfo[0].extmetadata.Credit.value.replace(/>.*</, ">Credit<") );
+  })
+}}
+window.onload=add_metadata_photo
 </script>
 {% endblock %}
