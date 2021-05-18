@@ -369,7 +369,11 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
             "relation_type_id__in": [64, 3090, 152, 153, 3054, 3091],
         },
     }
-
+    classes["inst_typ"] = {
+        "Kommission": [82],
+        "Institut": [83],
+        "Forschungsstelle": [84],
+    }
     with open(cache_path, "wb") as outp:
         pickle.dump(classes, outp)
     return classes
@@ -909,10 +913,64 @@ def enrich_person_context(person_object, context):
     return context
 
 
+def get_typ_of_institution(inst):
+    for k, v in classes["inst_typ"].items():
+        if inst.kind_id in v:
+            return k
+
+
 def enrich_institution_context(institution_object, context):
     context["relatedinstitutions"] = get_child_institutions_from_parent(
         [institution_object.pk]
     )
+    context["typ"] = get_typ_of_institution(institution_object)
+    rel_akad = institution_object.related_institutionB.filter(
+        related_institutionB_id__in=[2, 3, 500]
+    ).values_list("related_institutionB__name", flat=True)
+    if rel_akad.count() > 0:
+        context[
+            "untertitel"
+        ] = f"{context['typ']} der {rel_akad[0].replace('E KLASSE', 'EN KLASSE')}"
+    if context["typ"] == "Kommission":
+        context["struktur"] = [
+            f"<a href='/institution/{kom.pk}'>{kom.name}</a></br>{kom.start_date_written if kom.start_date_written else ''} - {kom.end_date_written if kom.end_date_written else ''}"
+            for kom in Institution.objects.filter(
+                pk__in=get_child_institutions_from_parent([institution_object])
+            )
+        ] + [
+            f"<a href='/institution/{instinst.related_institutionA_id}'>{instinst.related_institutionA.name}</a></br>Eingegliedert in die {institution_object.name} {'am '+instinst.start_date.strftime('%d.%m.%Y') if instinst.start_date else ''}"
+            for instinst in institution_object.related_institutionA.filter(
+                relation_type_id=4203
+            )
+        ]
+
+    context["daten_institution"] = {
+        "DIREKTOR/INN/EN": [
+            f"{pi.start_date.strftime('%Y') if pi.start_date else ''} - {pi.end_date.strftime('%Y') if pi.end_date else ''} <a href='/person/{pi.related_person_id}'>{pi.related_person.first_name} {pi.related_person.name}</a>"
+            for pi in institution_object.personinstitution_set.filter(
+                relation_type_id__in=classes["akad_funktionen"]["obfrau/obmann"][0]
+            ).order_by("start_date")
+        ],
+        "KURATORIUM": [
+            f"{pi.start_date.strftime('%Y') if pi.start_date else ''} - {pi.end_date.strftime('%Y') if pi.end_date else ''} <a href='/person/{pi.related_person_id}'>{pi.related_person.first_name} {pi.related_person.name}</a>"
+            for pi in institution_object.personinstitution_set.filter(
+                relation_type_id__in=classes["akad_funktionen"]["kuratorium"][0]
+            ).order_by("start_date")
+        ],
+        "INSTITUTIONELLE VORLÄUFER": [
+            f"<a href='/institution/{ii.related_institutionA_id}'>{ii.related_institutionA.name}</a></br>{ii.related_institutionA.start_date.strftime('%Y') if ii.related_institutionA.start_date else ''} - {ii.related_institutionA.end_date.strftime('%Y') if ii.related_institutionA.end_date else ''}"
+            for ii in institution_object.related_institutionA.filter(
+                relation_type_id__in=[4203, 4202, 5, 3]
+            ).order_by("start_date")
+        ],
+        "INSTITUTIONELLE NACHFOLGER": [
+            f"<a href='/institution/{ii.related_institutionB_id}'>{ii.related_institutionB.name}</a></br>{ii.related_institutionB.start_date.strftime('%Y') if ii.related_institutionB.start_date else ''} - {ii.related_institutionB.end_date.strftime('%Y') if ii.related_institutionB.end_date else ''}"
+            for ii in institution_object.related_institutionB.filter(
+                relation_type_id__in=[4203, 4202, 5, 3]
+            ).order_by("start_date")
+        ],
+    }
+
     return context
 
 
