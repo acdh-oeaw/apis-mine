@@ -923,6 +923,10 @@ def enrich_institution_context(institution_object, context):
     context["relatedinstitutions"] = get_child_institutions_from_parent(
         [institution_object.pk]
     )
+    if institution_object.pk in classes["subs_akademie"] + [2, 3, 500]:
+        context["akademie"] = True
+    else:
+        context["akademie"] = False
     context["typ"] = get_typ_of_institution(institution_object)
     rel_akad = institution_object.related_institutionB.filter(
         related_institutionB_id__in=[2, 3, 500]
@@ -931,6 +935,13 @@ def enrich_institution_context(institution_object, context):
         context[
             "untertitel"
         ] = f"{context['typ']} der {rel_akad[0].replace('E KLASSE', 'EN KLASSE')}"
+    else:
+        loc = institution_object.institutionplace_set.filter(relation_type_id=159)
+        if loc.count() == 1:
+            loc = loc[0]
+            if loc.related_place.lat:
+                context["gelegen_in"] = (loc.related_place.lat, loc.related_place.lng)
+
     if context["typ"] == "Kommission":
         context["struktur"] = [
             f"<a href='/institution/{kom.pk}'>{kom.name}</a></br>{kom.start_date_written if kom.start_date_written else ''} - {kom.end_date_written if kom.end_date_written else ''}"

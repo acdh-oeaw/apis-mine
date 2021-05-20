@@ -6,6 +6,7 @@ from dal import autocomplete
 from django import forms
 from django.db.models.base import ModelBase
 from django.forms.fields import MultipleChoiceField
+from django.utils.translation import activate
 from haystack.forms import FacetedSearchForm, SearchForm
 from haystack.query import SQ, AutoQuery, SearchQuerySet
 from haystack.inputs import Raw
@@ -70,12 +71,18 @@ class PersonFilterFormHelperNew(FormHelper):
             Div(
                 Div(
                     Accordion(
-                        AccordionGroup(
-                            "Mitgliedschaft",
+                        Fieldset(
+                            "",
                             "mtgld_mitgliedschaft",
                             "mtgld_klasse",
                             css_id="mitgliedschaft",
+                            css_class="show card-body card",
                         ),
+                    ),
+                    css_class="col-md-6 pt-30 pr-0 pr-md-15 pl-0",
+                ),
+                Div(
+                    Accordion(
                         AccordionGroup(
                             "Funktionen im Präsidium",
                             "pres_funktionen",
@@ -105,11 +112,6 @@ class PersonFilterFormHelperNew(FormHelper):
                             "mgld_nsdap",
                             css_id="akademischer_CV",
                         ),
-                    ),
-                    css_class="col-md-6 pt-30 pr-0 pr-md-15 pl-0",
-                ),
-                Div(
-                    Accordion(
                         AccordionGroup(
                             "Funktionen in Akademieinstitutionen",
                             "akademiefunktionen",
@@ -236,11 +238,10 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     )
     mgld_nsdap = forms.BooleanField(required=False, label="Mitglied der NSDAP")
     mtgld_mitgliedschaft = forms.MultipleChoiceField(
-        widget=forms.SelectMultiple(attrs={"class": "select2-main"}),
+        widget=forms.CheckboxSelectMultiple(),
         required=False,
         label="Mitgliedschaft",
         choices=[
-            ("", "-"),
             ("kM I", "korrespondierendes Mitglied im Inland"),
             ("kM A", "korrespondierendes Mitglied im Ausland"),
             ("wM", "Wirkliches Mitglied"),
@@ -248,11 +249,10 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         ],
     )
     mtgld_klasse = forms.MultipleChoiceField(
-        widget=forms.SelectMultiple(attrs={"class": "select2-main"}),
+        widget=forms.CheckboxSelectMultiple(),
         required=False,
         label="Klasse",
         choices=[
-            ("", "-"),
             (
                 "MATHEMATISCH-NATURWISSENSCHAFTLICHE",
                 "Mathematisch-Naturwissenschaftliche Klasse",
@@ -506,6 +506,7 @@ class PersonFilterFormHelper(FormHelper):
             ),
         )
 
+
 class InstitutionFilterFormHelperNew(FormHelper):
     def __init__(self, *args, **kwargs):
         super(InstitutionFilterFormHelperNew, self).__init__(*args, **kwargs)
@@ -715,9 +716,7 @@ class InstitutionFacetedSearchFormNew(FacetedSearchForm):
 
     def search(self):
         super().search()
-        sqs = self.searchqueryset.filter(
-            django_ct="apis_entities.institution"
-        )
+        sqs = self.searchqueryset.filter(django_ct="apis_entities.institution")
         if self.cleaned_data["q"] != "":
             sqs = sqs.filter(content=AutoQuery(self.cleaned_data["q"]))
         if self.cleaned_data["akademiefunktionen"]:
@@ -833,6 +832,7 @@ class InstitutionFacetedSearchFormNew(FacetedSearchForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = InstitutionFilterFormHelperNew()
+
 
 class InstitutionFacetedSearchForm(FacetedSearchForm):
     start_date_form = forms.CharField(required=False)

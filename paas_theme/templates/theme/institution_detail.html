@@ -49,11 +49,14 @@
         <div id="main" class="card-body">
           <div class="row">
             <div class="col-md-5 bg-mine border-mine-green pl-1 pr-0">
-              <h3 class="font-weight-normal  pt-1 pb-4" style="width:calc(100% - 110px)">
+              <h1 class="font-weight-normal  pt-1 pb-4" style="width:calc(100% - 110px)">
                 <!--{{ object.name }}{%if object.first_name %}, {{ object.first_name }}{% endif %}-->
                 {{ object.name }}
-              </h3>
+              </h1>
               <h4>{{untertitel}}</h4>
+              {% if akademie %}
+              <h6>Akademieinstitution</h6>
+              {% endif %}
 
               <!--<div class="imgcontainer">
                 {% if image %}
@@ -64,7 +67,7 @@
               </div>-->
 
               <p class="profession-date-of-birth">
-                {% if object.kind %}<span>{{ object.kind }}</span> <br />{% endif %}
+                {% if object.kind %}<span>{{ object.kind.name }}</span> <br />{% endif %}
                 <span class="font-weight-normal">{% if object.start_date_written is not None %}
                      {{object.start_date_written }}{% endif %}
                   {% if object.end_date_written is not None %}
@@ -84,6 +87,12 @@
                   </li>
                   {% endfor %}
                 </ul>
+              </div>
+              {% endif %}
+              {% if gelegen_in %}
+              <div class="section">
+                <span class="font-weight-bold">Ort</span>
+                <div id="institution_map" data-lat={{gelegen_in.0}} data-lng={{gelegen_in.1}}>{% leaflet_map "institution_map" callback="window.map_institution" %}</div>
               </div>
               {% endif %}
 
@@ -115,7 +124,7 @@
               <ul class="nav nav-tabs border-0" id="institutionTab" role="tablist">
                 <li class="nav-item p-0 font-weight-bold" role="presentation">
                   <a class="nav-link rounded-0 active text-uppercase" data-toggle="tab" id="daten-tab" href="#daten"
-                    role="tab" aria-controls="home" aria-selected="true"></a>
+                    role="tab" aria-controls="home" aria-selected="true">Daten</a>
                 </li>
                 <!--<li class="nav-item p-0 font-weight-bold" role="presentation">
                   <a class="nav-link rounded-0 text-uppercase align-bottom" data-toggle="tab" id="egonet-tab"
@@ -209,194 +218,13 @@
 </div>
 {% endblock content %}
 {% block scripts %}
-
-<script type="text/javascript" src="{%static 'theme/js/map.js' %}"></script>
 <script>
-  var personPk = "{{object.pk}}";
-  var baseURL = "{% url 'apis:apis_api2:GetRelatedPlaces' %}";
-
-
-  initMap(baseURL, personPk);
-
-  $('#institutionTab').on('shown.bs.tab', function (e) {
-    if (e.target.id === 'map-tab') {
-      adjustSize();
+    function map_institution(map, options) {
+      options.zoom = 12
+        let loc = document.getElementById("institution_map")
+        console.log(loc)
+        L.marker([loc.dataset.lat.replace(",", "."), loc.dataset.lng.replace(",", ".")]).addTo(map);
+        map.setView([loc.dataset.lat.replace(",", "."), loc.dataset.lng.replace(",", ".")], 4);
     }
-  });
-</script>
-<script>
-  function getEgoNetworkViz(offset) {
-    document.querySelector("#egonetspinner").style.display="flex";
-    console.log("function fired")
-    let urlParams = new URLSearchParams(window.location.search);
-    const endpoint = '/api/egonetwork/';
-    let selectedNodes = {};
-    let nodesDetails = {};
-
-    urlParams.append('format', 'json+net');
-    urlParams.append('limit', '1000')
-    urlParams.append('offset', offset)
-    urlParams.append('pk', '{{object.pk}}')
-    let url = new URL(endpoint, window.location.origin)
-    urlParams.forEach((value, key) => {
-      console.log(key);
-      url.searchParams.set(key, value)
-    });
-    console.log(url);
-    fetch(url)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(response.statusText)
-        }
-        let loader = document.getElementById("loader");
-        if (loader) {
-          loader.remove();
-        }
-        return response.json()
-      })
-      .then(data => {
-        document.querySelector("#egonetspinner").style.display="none";
-        if (data['next']) {
-          let urlparams = new URLSearchParams(data['next'])
-          if (!document.getElementById('loadmore')) {
-            console.log('more than 1000')
-            let b_more = document.createElement('DIV')
-            b_more.id = "loadmore"
-            b_more.style = "width:100%; height:50px; color: grey;"
-            b_more.append(document.createTextNode('Mehr als 1000 Verbindungen geladen! '))
-            let b_more_link = document.createElement('Button')
-            b_more_link.onclick = function () { getEgoNetworkViz("test", urlparams.get('offset')) };
-            b_more_link.append(document.createTextNode('Clicken um weiter zu laden.'))
-            b_more.append(b_more_link)
-            let cv = document.getElementById('banner_viz')
-            cv.prepend(b_more)
-          } else {
-            let b_more_link = document.querySelector('#loadmore > a:first-of-type')
-            b_more_link.onclick = function () { getEgoNetworkViz("test", urlparams.get('offset')) }
-          }
-        } else if (document.getElementById('loadmore')) {
-          document.getElementById('loadmore').remove()
-        }
-        const edges = {}
-        const nodes = {}
-        const types = { edges: {}, nodes: {} }
-        let type_source
-        let type_target
-        const type_definitions = {
-          "Person": {
-            id: "Person",
-            label: "Person",
-            color: "#c80000"
-          },
-          "Place": {
-            id: 'Place',
-            label: 'Ort',
-            color: 'rebeccapurple',
-          },
-
-          "Institution": {
-            id: 'Institution',
-            label: 'Institution',
-            color: 'green',
-          }
-        }
-        var match_entities = /entities\/(\w+)/;
-        var base_url = window.location;
-        data.results.forEach(relation => {
-          const { id, source, target, relation_type: relationType } = relation
-          type_source = match_entities.exec(source.url)[1]
-          type_target = match_entities.exec(target.url)[1]
-          type_source = type_source.charAt(0).toUpperCase() + type_source.slice(1)
-          type_target = type_target.charAt(0).toUpperCase() + type_target.slice(1)
-          edges[id] = {
-            id,
-            source: source.id,
-            target: target.id,
-            type: relationType.id,
-          }
-          nodes[source.id] = {
-            id: source.id,
-            label: source.label,
-            type: type_source,
-            url: `${base_url.protocol}//${base_url.host}/${type_source.toLowerCase()}/${source.id}`
-          }
-          nodes[target.id] = {
-            id: target.id,
-            label: target.label,
-            type: type_target,
-            url: `${base_url.protocol}//${base_url.host}/${type_target.toLowerCase()}/${target.id}`
-          }
-          types.edges[relationType.id] = {
-            id: relationType.id,
-            label: relationType.label,
-          }
-        })
-        types.nodes[type_source] = type_definitions[type_source]
-        types.nodes[type_target] = type_definitions[type_target]
-        ReactDOM.render(
-          React.createElement(NetworkVisualization.SelectionControls, {
-            graph: {
-              edges,
-              nodes,
-              types,
-            },
-            onNodeSelect: (node, selected) => {
-              console.log(node);
-              console.log(selected);
-              if (!selectedNodes.hasOwnProperty(node.id)) {
-                console.log("if hit");
-                selectedNodes[node.id] = node;
-                let listitem = document.createElement("li")
-                listitem.setAttribute("data-nodeid", node.id);
-                listitem.setAttribute("class", "node-detail-entry");
-                let heading = document.createElement("span")
-                heading.setAttribute("class", "node-list-heading")
-                let textnode = document.createTextNode(node.label)
-                heading.append(textnode)
-                listitem.append(heading)
-                listitem.append(document.createElement("br"))
-                let kind = document.createElement("span")
-                kind.setAttribute("class", "node-list-kind")
-                kind.append(document.createTextNode(node.type))
-                listitem.append(kind)
-                listitem.append(document.createElement("br"))
-                let link = document.createElement("a")
-                link.setAttribute("class", "node-list-link")
-                link.setAttribute("href", node.url)
-                link.append(document.createTextNode(node.url))
-                listitem.append(link)
-                listitem.append(document.createElement("hr"))
-                let uldetails = document.getElementById("details-nodes-list")
-                uldetails.append(listitem)
-                document.getElementById("details-nodes").style.display = "block"
-              }
-              console.log(selectedNodes)
-            },
-            onNodeDeselect: node => {
-              console.log(node);
-              document.querySelector(`[data-nodeid="${node.id}"]`).remove();
-              delete selectedNodes[node.id]
-              if (Object.keys(selectedNodes).length === 0) {
-                document.getElementById("details-nodes").style.display = "none"
-
-              }
-            },
-            children: props => [
-              React.createElement(NetworkVisualization.ExportButton, props),
-              React.createElement(NetworkVisualization.Legend, props),
-            ],
-          }),
-          document.getElementById('egonetwork_visualization')
-        );
-      })
-      .catch(error => {
-        console.error(error)
-      })
-  };
-
-</script>
-<script>
-  const egotab = document.getElementById("egonet-tab")
-  egotab.addEventListener("click", function () { getEgoNetworkViz(0) }, false)
 </script>
 {% endblock %}

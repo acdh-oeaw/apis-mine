@@ -82,6 +82,8 @@ def normalize_filter(filter, kind, url=None):
         "q": "Suche",
         "start_date_form": "Lebensspanne von",
         "end_date_form": "Lebensspanne bis",
+        "mtgld_mitgliedschaft": "Mitgliedschaft",
+        "mtgld_klasse": "Klasse",
     }
     bool_fields_norm = {
         "funk_praesidentin": "Präsident/in",
@@ -94,6 +96,8 @@ def normalize_filter(filter, kind, url=None):
         "funk_mitgl_kommission": "Mitglied einer Kommission",
         "funk_obfrau_kurat": "Obmann/Obfrau eines Kuratoriums/Board eines Institut/einer Forschungsstelle",
         "funk_direkt_forsch_inst": "Direktor/in eines Instituts/einer Forschungsstelle",
+        "MATHEMATISCH-NATURWISSENSCHAFTLICHE": "Mathematisch-Naturwissenschaftliche Klasse",
+        "PHILOSOPHISCH-HISTORISCHE": "Philosophisch-Historische Klasse",
     }
     if kind == "simple":
         return f"{norm_kind[filter['field']]}"
@@ -101,7 +105,12 @@ def normalize_filter(filter, kind, url=None):
         if filter["kind"] == "multi":
             val = " ODER ".join([x[1] for x in filter["value"]])
         elif filter["kind"] == "boolean":
-            val = " ODER ".join([bool_fields_norm[x] for x in filter["value"]])
+            val = " ODER ".join(
+                [
+                    bool_fields_norm[x] if x in bool_fields_norm.keys() else x
+                    for x in filter["value"]
+                ]
+            )
         else:
             val = filter["value"]
         if filter["field"].lower() in norm_kind.keys():
