@@ -163,12 +163,24 @@
                   {% endfor %}
                 </div>
                 <div class="tab-pane fade" id="egonet" role="tabpanel" aria-labelledby="egonet-tab">
-                  <div id="egonetspinner">
-                  <div class="spinner-grow" role="status">
-                    <span class="sr-only">Loading...</span>
+                  <div id="egonetworkwrapper" class="row" data-status="minimized">
+                    <div id="egonetspinner" class="col-md-12">
+                      <div class="spinner-grow" role="status">
+                        <span class="sr-only">Loading...</span>
+                      </div>
+                    </div>
+                    <a class="leaflet-control-zoom-in" id="moveegontwbtn" role="button" onclick="move_network('up')">
+                      <i data-feather="maximize-2"></i>
+                    </a>
+                    <div id="egonetwork_visualization" class="col-md-12"></div>
+                    <div id="node-info" class="d-none">
+                      <small>Für Zusatzinfos auf Knoten klicken</small>
+                        <ul>
+                          <li data-src='type'></li>
+                          <li><a data-src='link' target="_blank" rel="noopener" href=""></a></li>
+                      </ul>
+                    </div>
                   </div>
-                </div>
-                  <div id="egonetwork_visualization"></div>
                 </div>
                 <div class="tab-pane fade" id="map" role="tabpanel" aria-labelledby="map-tab">
                   <div id="maplifeline">
@@ -215,7 +227,7 @@
 </div>
 {% endblock content %}
 {% block scripts %}
-
+<script type="text/javascript" src="{%static 'theme/js/helpers.js' %}"></script>
 <script type="text/javascript" src="{%static 'theme/js/map.js' %}"></script>
 <script>
   var personPk = "{{object.pk}}";
@@ -232,7 +244,7 @@
 </script>
 <script>
   function getEgoNetworkViz(offset) {
-    document.querySelector("#egonetspinner").style.display="flex";
+    document.querySelector("#egonetspinner").style.display = "flex";
     console.log("function fired")
     let urlParams = new URLSearchParams(window.location.search);
     const endpoint = '/api/egonetwork/';
@@ -261,7 +273,7 @@
         return response.json()
       })
       .then(data => {
-        document.querySelector("#egonetspinner").style.display="none";
+        document.querySelector("#egonetspinner").style.display = "none";
         if (data['next']) {
           let urlparams = new URLSearchParams(data['next'])
           if (!document.getElementById('loadmore')) {
@@ -292,7 +304,7 @@
           "Person": {
             id: "Person",
             label: "Person",
-            color: "#c80000"
+            color: "#DB2B39"
           },
           "Place": {
             id: 'Place',
@@ -303,7 +315,7 @@
           "Institution": {
             id: 'Institution',
             label: 'Institution',
-            color: 'green',
+            color: '#344055',
           }
         }
         var match_entities = /entities\/(\w+)/;
@@ -346,49 +358,44 @@
               nodes,
               types,
             },
+            nodeRelativeSize: 5,
+            simulation: {
+              charge: -50
+            },
             onNodeSelect: (node, selected) => {
               console.log(node);
-              console.log(selected);
-              if (!selectedNodes.hasOwnProperty(node.id)) {
-                console.log("if hit");
-                selectedNodes[node.id] = node;
-                let listitem = document.createElement("li")
-                listitem.setAttribute("data-nodeid", node.id);
-                listitem.setAttribute("class", "node-detail-entry");
-                let heading = document.createElement("span")
-                heading.setAttribute("class", "node-list-heading")
-                let textnode = document.createTextNode(node.label)
-                heading.append(textnode)
-                listitem.append(heading)
-                listitem.append(document.createElement("br"))
-                let kind = document.createElement("span")
-                kind.setAttribute("class", "node-list-kind")
-                kind.append(document.createTextNode(node.type))
-                listitem.append(kind)
-                listitem.append(document.createElement("br"))
-                let link = document.createElement("a")
-                link.setAttribute("class", "node-list-link")
-                link.setAttribute("href", node.url)
-                link.append(document.createTextNode(node.url))
-                listitem.append(link)
-                listitem.append(document.createElement("hr"))
-                let uldetails = document.getElementById("details-nodes-list")
-                uldetails.append(listitem)
-                document.getElementById("details-nodes").style.display = "block"
-              }
-              console.log(selectedNodes)
-            },
-            onNodeDeselect: node => {
-              console.log(node);
-              document.querySelector(`[data-nodeid="${node.id}"]`).remove();
-              delete selectedNodes[node.id]
-              if (Object.keys(selectedNodes).length === 0) {
-                document.getElementById("details-nodes").style.display = "none"
-
-              }
+                showNodeInfo(node);
+              /* if (!selectedNodes.hasOwnProperty(node.id)) {
+                 console.log("if hit");
+                 selectedNodes[node.id] = node;
+                 let listitem = document.createElement("li")
+                 listitem.setAttribute("data-nodeid", node.id);
+                 listitem.setAttribute("class", "node-detail-entry");
+                 let heading = document.createElement("span")
+                 heading.setAttribute("class", "node-list-heading")
+                 let textnode = document.createTextNode(node.label)
+                 heading.append(textnode)
+                 listitem.append(heading)
+                 listitem.append(document.createElement("br"))
+                 let kind = document.createElement("span")
+                 kind.setAttribute("class", "node-list-kind")
+                 kind.append(document.createTextNode(node.type))
+                 listitem.append(kind)
+                 listitem.append(document.createElement("br"))
+                 let link = document.createElement("a")
+                 link.setAttribute("class", "node-list-link")
+                 link.setAttribute("href", node.url)
+                 link.append(document.createTextNode(node.url))
+                 listitem.append(link)
+                 listitem.append(document.createElement("hr"))
+                 let uldetails = document.getElementById("details-nodes-list")
+                 uldetails.append(listitem)
+                 document.getElementById("details-nodes").style.display = "block"
+               }
+               console.log(selectedNodes)*/
             },
             children: props => [
-              React.createElement(NetworkVisualization.ExportButton, props),
+              //React.createElement(NetworkVisualization.ExportButton, props),
               React.createElement(NetworkVisualization.Legend, props),
             ],
           }),
@@ -406,26 +413,28 @@
   egotab.addEventListener("click", function () { getEgoNetworkViz(0) }, false)
 </script>
 <script>
-async function getMetadataPhoto(title = '') {
-  console.log(title)
-  let url = `https://commons.wikimedia.org/w/api.php?action=query&titles=Image:${title}&prop=imageinfo&iiprop=extmetadata&format=json&origin=*`
-  console.log(url)
-const response = await fetch(url, 
-{method: 'GET',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
-return response.json();
-}
-function add_metadata_photo(){
-const photo = document.getElementById("photocredit")
-if (photo){
-  let title = photo.dataset.photourl.match("[^/]+$")[0]
-  getMetadataPhoto(title).then(data => {
-    photo.insertAdjacentHTML( 'beforeend', data.query.pages[Object.keys(data.query.pages)[0]].imageinfo[0].extmetadata.Credit.value.replace(/>.*</, ">Credit<") );
-  })
-}}
-window.onload=add_metadata_photo
+  async function getMetadataPhoto(title = '') {
+    console.log(title)
+    let url = `https://commons.wikimedia.org/w/api.php?action=query&titles=Image:${title}&prop=imageinfo&iiprop=extmetadata&format=json&origin=*`
+    console.log(url)
+    const response = await fetch(url,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+    return response.json();
+  }
+  function add_metadata_photo() {
+    const photo = document.getElementById("photocredit")
+    if (photo) {
+      let title = photo.dataset.photourl.match("[^/]+$")[0]
+      getMetadataPhoto(title).then(data => {
+        photo.insertAdjacentHTML('beforeend', data.query.pages[Object.keys(data.query.pages)[0]].imageinfo[0].extmetadata.Credit.value.replace(/>.*</, ">Credit<"));
+      })
+    }
+  }
+  window.onload = add_metadata_photo
 </script>
 {% endblock %}

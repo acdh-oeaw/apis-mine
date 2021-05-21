@@ -232,8 +232,6 @@ p,.section {
   background: white;
 }
 
-.bio {
-}
 
 .inline-map {
   overflow: hidden;
@@ -1660,6 +1658,11 @@ svg.feather.feather-chevron-left,svg.feather.feather-chevron-right {
 }
 }
 
+/*** tabs ***/
+.tab-content {
+  position:relative;
+}
+
 /*** egonetzwerk ***/
 
 #egonetspinner {
@@ -1668,13 +1671,58 @@ svg.feather.feather-chevron-left,svg.feather.feather-chevron-right {
   align-items: center;
 }
 
-
-
-#egonetwork_visualization > * {
-  position:relative !important;
+#egonetwork_visualization {
+  min-height:300px;
+  position:relative;
 }
 
+#egonetwork_visualization [data-nerv-legend] {
+  top:0;
+  left:0;
+  width:fit-content;
+}
 
+#egonetwork_visualization [data-nerv-legend] li {
+  float:left;
+  clear:left;
+}
+
+#egonetwork_visualization [data-nerv-export] {
+  bottom:0;
+  right:0;
+}
+
+#egonetwork_visualization [data-nerv-export] > span > select {
+  background:none;
+}
+
+#egonetwork_visualization [data-nerv-export] > span > select:hover {
+  background:#d8d8de;
+}
+
+#egonetwork_visualization [data-nerv-export] > span option:hover {
+  background:#d8d8de;
+}
+
+#egonetwork_visualization [data-nerv-export] button {
+
+  display:none;
+}
+
+#moveegontwbtn {
+  position:absolute;
+  z-index:999;
+  top:10px;
+  right:10px;
+}
+
+#node-info.col-md-4 {
+ padding-top:1rem;
+}
+
+#node-info li {
+  list-style-type:none;
+}
 
 /*** spinner ***/ 
 @keyframes spinner-grow {
