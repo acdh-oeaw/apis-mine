@@ -20,18 +20,23 @@
   <div class="row bio-outer">
     <div class="col-md-12 pb-4">
       <div class="row justify-content-between pt-3">
-        <div class="col-md-auto">
+        <div class="col-4">
           {% if prev.id %}
           <a class="card-link preventity" href="{% url 'theme:institution-detail' pk=prev.id %}" title="{{ prev }}">
-            &larr; <span>{{ prev }}</span>
+            <span class="d-inline-block w-100">
+              <span class="d-inline-block float-left w-10">&larr;&nbsp;</span>
+              <span class="d-inline-block text-truncate w-90 text-left float-left">{{ prev }}</span>
+          </span>
           </a>
           {% endif %}
         </div>
-        <div class="col"></div>
-        <div class="col-md-auto">
+        <div class="col-4 col-offset-8">
           {% if next.id %}
           <a class="card-link nextentity" href="{% url 'theme:institution-detail' pk=next.id %}" title="{{ next }}">
-            <span>{{ next }}</span> &rarr;
+            <span class="d-inline-block text-right w-100">
+            <span class="d-inline-block text-truncate w-90 text-right float-left">{{ next }}</span>
+            <span class="d-inline-block float-left w-10">&rarr;</span>
+          </span>
           </a>
           {% endif %}
         </div>

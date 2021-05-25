@@ -1072,6 +1072,7 @@ ul.dropdown-menu-form {
   width: 24px;
   font-size: 0.9em;
 }
+
 /*#contentDetails .preventity span,
 #contentDetails .nextentity span {
   text-overflow: ellipsis;
@@ -1767,3 +1768,14 @@ svg.feather.feather-chevron-left,svg.feather.feather-chevron-right {
     display:block;
   }
 }
+
+/*** utility classes ***/
+
+.w-10 {
+  width:10%;
+}
+
+.w-90 {
+  width:90%;
+}
+
