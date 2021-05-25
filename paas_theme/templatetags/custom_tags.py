@@ -48,6 +48,7 @@ def normalize_facet(facet, kind, url=None):
         "akademiemitgliedschaft": "Mitgliedschaft",
         "gender": "Geschlecht",
         "q": "Suche",
+        "kind": "Typ"
     }
     fac = facet.split(":")
     fac[0] = fac[0].replace("_exact", "")

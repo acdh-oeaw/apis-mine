@@ -132,8 +132,8 @@
                 </button>
               </form>
               <ul id="second-menu" class="navbar-nav mr-0 align-top pl-5">
-                <li class="nav-item"><a title="Über" href="{% url 'theme:search' %}" class="nav-link">Über</a></li>
-                <li class="nav-item"><a title="Kontakt" href="{% url 'theme:search' %}" class="nav-link">Kontakt</a></li>
+                <li class="nav-item"><a title="Über" href="{% url 'theme:about' %}" class="nav-link">Über</a></li>
+                <li class="nav-item"><a title="Kontakt" href="{% url 'theme:contact' %}" class="nav-link">Kontakt</a></li>
               </ul>
             </div>
             <!-- .collapse navbar-collapse -->
@@ -150,7 +150,8 @@
     {% block content %}{% endblock %}
       </div>
 <div>
-    <div class="footer border-mine mlr-30">
+  
+    <div class="footer {% if 'institution' in request.path %} border-mine-green {% else %} border-mine {%endif%} mlr-30">
         <div>
             <div class="container">
                 <footer>

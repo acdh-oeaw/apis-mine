@@ -83,7 +83,7 @@
                             {% for fv in filtered_vals %}
                               {% if fv.1 > 0 %}
                                 <li class="facet-group-item mt-2 mb-2 pl-0">
-                                  {% check_facet_selection field fv.0 form.selected_facets as facet_selected %}
+                                  {% check_facet_selection field fv.0 form.selected_facets filtered_vals as facet_selected %}
                                   {% if facet_selected %}
                                     <span class="disabled">{{ fv.0 }} ({{ fv.1 }})</span>
                                   {% else %}

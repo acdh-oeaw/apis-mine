@@ -171,10 +171,10 @@ class InstitutionSearchView(UserPassesTestMixin, FacetedSearchView):
     form_class = InstitutionFacetedSearchFormNew
     facet_fields = [
         # "akademiemitgliedschaft",
-        "place_of_birth",
-        "place_of_death",
+        #"start_date",
+        #"place_of_death",
         # "comissions",
-        "profession",
+        "kind",
         # "education",
         # "career",
     ]
