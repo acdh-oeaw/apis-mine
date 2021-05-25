@@ -60,8 +60,10 @@
                 {% if image.0 %}
                 <img class="float-md-right" style="max-width:110px;" src="{% static image.1 %}">
                 {% else %}
-                <img class="float-md-right" style="max-width:110px;" src="{{image.1}}">
-                <p id="photocredit" class="float-md-right" style="max-width:110px;" data-photourl="{{image.1}}"></p>
+                <figure class="float-md-right" style="max-width:110px;">
+                  <img src="{{image.1}}">
+                  <figcaption id="photocredit" class="figure-caption text-08 text-center" data-photourl="{{image.1}}"></figcaption>
+                </figure>
                 {% endif %}
                 {% else %}
                 <img class="float-md-right" style="max-width:110px;" src="https://via.placeholder.com/110x134">
