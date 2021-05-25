@@ -163,7 +163,7 @@
                   {% endfor %}
                 </div>
                 <div class="tab-pane fade" id="egonet" role="tabpanel" aria-labelledby="egonet-tab">
-                  <div id="egonetworkwrapper" class="row" data-status="minimized">
+                  <div id="egonetworkwrapper" class="row m-0" data-status="minimized">
                     <div id="egonetspinner" class="col-md-12">
                       <div class="spinner-grow" role="status">
                         <span class="sr-only">Loading...</span>
@@ -358,41 +358,21 @@
               nodes,
               types,
             },
+            colors:{ selected: '#a8a8ad'},
+            showLabels:false,
             nodeRelativeSize: 5,
             simulation: {
               charge: -50
             },
             onNodeSelect: (node, selected) => {
-              console.log(node);
+                let selArray = [...selected];
+                if (selArray.length > 1) {
+                  selected.delete(selArray[selArray.length-1]);
+                }
                 showNodeInfo(node);
-              /* if (!selectedNodes.hasOwnProperty(node.id)) {
-                 console.log("if hit");
-                 selectedNodes[node.id] = node;
-                 let listitem = document.createElement("li")
-                 listitem.setAttribute("data-nodeid", node.id);
-                 listitem.setAttribute("class", "node-detail-entry");
-                 let heading = document.createElement("span")
-                 heading.setAttribute("class", "node-list-heading")
-                 let textnode = document.createTextNode(node.label)
-                 heading.append(textnode)
-                 listitem.append(heading)
-                 listitem.append(document.createElement("br"))
-                 let kind = document.createElement("span")
-                 kind.setAttribute("class", "node-list-kind")
-                 kind.append(document.createTextNode(node.type))
-                 listitem.append(kind)
-                 listitem.append(document.createElement("br"))
-                 let link = document.createElement("a")
-                 link.setAttribute("class", "node-list-link")
-                 link.setAttribute("href", node.url)
-                 link.append(document.createTextNode(node.url))
-                 listitem.append(link)
-                 listitem.append(document.createElement("hr"))
-                 let uldetails = document.getElementById("details-nodes-list")
-                 uldetails.append(listitem)
-                 document.getElementById("details-nodes").style.display = "block"
-               }
-               console.log(selectedNodes)*/
+            },
+            onNodeDeselect: (node) => {
+              clearNodeInfo();
             },
             children: props => [
               //React.createElement(NetworkVisualization.ExportButton, props),

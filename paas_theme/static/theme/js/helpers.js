@@ -3,7 +3,7 @@ function move_network(direction) {
     const egonetworkwrapper = document.querySelector('#egonetworkwrapper');
     const egonetwork = document.querySelector('#egonetwork_visualization');
     const nodeInfoContainer = document.querySelector('#node-info');
-    if (direction==='up') {
+    if (direction === 'up') {
         document.querySelector('#egonet-tab').style.display = "none";
         $('[href="#daten"]').tab('show');
         nodeInfoContainer.classList.remove('d-none');
@@ -26,14 +26,23 @@ function move_network(direction) {
         feather.replace();
         $("#egonet-tab").tab('show');
     }
-  }
+}
 
 function showNodeInfo(node) {
     const egonetwork = document.querySelector('#egonetworkwrapper');
-    if (egonetwork.dataset.status === 'minimized') {} else {
-    const nodeInfoContainer = document.querySelector('#node-info');
-    nodeInfoContainer.querySelector("[data-src='type']").innerHTML = node.type;
-    nodeInfoContainer.querySelector("[data-src='link']").innerHTML = node.label;
-    nodeInfoContainer.querySelector("[data-src='link']").href = node.url;
+    if (egonetwork.dataset.status === 'minimized') { } else {
+        const nodeInfoContainer = document.querySelector('#node-info');
+        nodeInfoContainer.querySelector("[data-src='type']").innerHTML = node.type;
+        nodeInfoContainer.querySelector("[data-src='link']").innerHTML = node.label;
+        nodeInfoContainer.querySelector("[data-src='link']").href = node.url;
+    }
 }
+
+function clearNodeInfo() {
+    const nodeInfoContainer = document.querySelector('#node-info');
+    if (nodeInfoContainer) {
+        nodeInfoContainer.querySelector("[data-src='type']").innerHTML = '';
+        nodeInfoContainer.querySelector("[data-src='link']").innerHTML = '';
+        nodeInfoContainer.querySelector("[data-src='link']").href = '';
+    }
 }

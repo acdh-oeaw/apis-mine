@@ -23,7 +23,7 @@
         <div class="col-md-auto">
           {% if prev.id %}
           <a class="card-link preventity" href="{% url 'theme:institution-detail' pk=prev.id %}" title="{{ prev }}">
-            &larr; {{ prev }}
+            &larr; <span>{{ prev }}</span>
           </a>
           {% endif %}
         </div>
@@ -31,7 +31,7 @@
         <div class="col-md-auto">
           {% if next.id %}
           <a class="card-link nextentity" href="{% url 'theme:institution-detail' pk=next.id %}" title="{{ next }}">
-            {{ next }} &rarr;
+            <span>{{ next }}</span> &rarr;
           </a>
           {% endif %}
         </div>

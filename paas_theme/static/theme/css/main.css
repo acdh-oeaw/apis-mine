@@ -1072,6 +1072,15 @@ ul.dropdown-menu-form {
   width: 24px;
   font-size: 0.9em;
 }
+/*#contentDetails .preventity span,
+#contentDetails .nextentity span {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display:inline-block;
+  width:100%;
+}*/
+
 
 #contentDetails > div > .panel-default {
   border: 1px solid #aec8ea;
