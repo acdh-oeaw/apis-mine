@@ -92,6 +92,10 @@ h3 {
   padding-left:30px;
 }
 
+.bg-oeaw {
+  background:var(--oeaw-blau);
+}
+
 .tooltip-mine {
   position: relative;
   display: inline-block;
@@ -296,8 +300,8 @@ p,.section {
 }
 
 .btn-primary:not(:disabled):not(.disabled):active {
-  background-color: #125794;
-  border-color: #125794;
+  background-color: var(--oeaw-blau);
+  border-color:var(--oeaw-blau);
 }
 
 .select2-main + span {

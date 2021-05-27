@@ -17,6 +17,17 @@
       <!--<h1 class="text-uppercase pt-1"><a href="{% remove_facets request.get_full_path %}" type="button"
           class="btn btn-link btn-sm btn-right">Filter zurücksetzen<span class="icon-remove"></span></a></h1>
      -->
+      <div class="dropdown show">
+        <a class="btn btn-primary btn-sm mt-3 mb-1 rounded-0 bg-oeaw dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Netzwerke
+        </a>
+      
+        <div class="dropdown-menu rounded-0" aria-labelledby="dropdownMenuLink">
+          {% for network in network_buttons %}
+          <a class="dropdown-item text-08" target="_blank" rel="noopener noreferrer" href="#" onclick="navigateToNetworkPage('{{network.key}}')">{{network.label}}</a>
+        {% endfor %}
+        </div>
+      </div>
     </div>
   </div>
   <div class="row">
@@ -241,6 +252,10 @@
 
   function navigateToLandingPage() {
       window.location.href = "/" + window.location.search;
+  }
+
+  function navigateToNetworkPage(label) {
+     window.open(`/network/${window.location.search}&network_type=${label}`);
   }
 </script>
 
