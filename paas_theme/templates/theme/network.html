@@ -24,9 +24,6 @@
     border-radius: 10px;
 }
 
-.node-list-heading {
-    color: rgb(227, 227, 227)
-}
 .node-list-link {
     color: rgb(220 53 69);
     font-size: 0.8em;
@@ -40,7 +37,7 @@
 {% endblock scriptHeader %}
 {% block content %}
 <div style="height: 100%; position: relative">
-<div id="details-nodes" style="position: absolute; right: 10px; top: 80px; background-color: rgba(0, 0, 0, 0.5); display: none; z-index: 1000; min-width: 200px; max-width: 300px">
+<div id="details-nodes" style="position: absolute; right: 10px; top: 80px; display: none; z-index: 1000; min-width: 200px; max-width: 300px">
 <ul id="details-nodes-list" style="list-style-type: none; padding: 5px"></ul>
 </div>
 <div id="banner_viz" style></div>
@@ -54,6 +51,7 @@
             let urlParams = new URLSearchParams(window.location.search) ;
             const endpoint = '/api/network/';
             let selectedNodes = {};
+            let nodesDetails = {};
 
             urlParams.append('format', 'json+net');
             urlParams.append('limit', '1000')
@@ -160,6 +158,10 @@
                               nodes,
                               types,
                           },
+                        
+                            simulation: {
+                            charge: -50
+                            },
                           onNodeSelect: (node, selected) => {console.log(node);
                           console.log(selected);
                           if (!selectedNodes.hasOwnProperty(node.id)) {
@@ -182,6 +184,7 @@
                               let link = document.createElement("a")
                               link.setAttribute("class", "node-list-link")
                               link.setAttribute("href", node.url)
+                              link.setAttribute("target", "_blank")
                               link.append(document.createTextNode(node.url))
                               listitem.append(link)
                               listitem.append(document.createElement("hr"))
