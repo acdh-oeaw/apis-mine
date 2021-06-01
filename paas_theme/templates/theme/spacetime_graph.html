@@ -75,7 +75,7 @@
     const [ minX, maxX ] = [Math.min(...xs), Math.max(...xs)]
     const [ minY, maxY ] = [Math.min(...years), Math.max(...years)]
 
-    const yScale = d3.scaleLinear().domain([minY, maxY]).rangeRound([ 0, height ])
+    const yScale = d3.scaleLinear().domain([minY, maxY]).rangeRound([ height,0 ])
     const xScale = d3.scaleLinear().domain([minX, maxX]).rangeRound([ 0, width ])
 
     const yAxis = d3.axisLeft().scale(yScale).tickFormat(x => x)
