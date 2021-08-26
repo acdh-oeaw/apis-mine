@@ -17,6 +17,7 @@ services:
 
     volumes:
       - ..:/workspace:cached
+      - solr-volume:/var/paas_solr_remote:rw
 
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
@@ -48,6 +49,23 @@ services:
     image: solr:6
     restart: unless-stopped
     network_mode: service:db
+    volumes:
+      - solr-volume:/var/solr/paas_solr:ro
+    command:
+      - solr-precreate
+      - paas_solr
+  
+  tunnel:
+    image: cagataygurturk/docker-ssh-tunnel:0.0.1
+    volumes:
+      - $HOME/.ssh:/root/ssh:ro
+    environment:
+      TUNNEL_HOST: apis-tunnel
+      REMOTE_HOST: helios.arz.oeaw.ac.at
+      LOCAL_PORT: 3308
+      REMOTE_PORT: 3306
+    network_mode: service:db 
 
 volumes:
   mariadb-data:
+  solr-volume:
