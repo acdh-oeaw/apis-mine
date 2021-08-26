@@ -19,6 +19,8 @@ from .provide_data import (
 )
 from .provide_data import classes
 
+from . id_mapping import KLASSEN_IDS
+
 coll_id = 2
 
 map_classes_pr_labels = {
@@ -219,7 +221,7 @@ class WahlIndex(indexes.SearchIndex, indexes.Indexable):
     def prepare_membership_id(self, obj):
         qdict = {
             "related_person_id": obj.related_personA_id,
-            "related_institution_id__in": [2, 3, 500],
+            "related_institution_id__in": KLASSEN_IDS,
         }
         if obj.start_date_written is not None:
             qdict["start_date_written__contains"] = obj.start_date_written

@@ -28,6 +28,11 @@ from apis_core.apis_vocabularies.models import (
     PersonWorkRelation,
 )
 
+from . id_mapping import (
+    KLASSEN_IDS,
+    NSDAP,
+)
+
 try:
     FEATURED_COLLECTION_NAME = settings.FEATURED_COLLECTION_NAME
 except AttributeError:
@@ -47,6 +52,28 @@ try:
     MAIN_TEXT = settings.MAIN_TEXT_NAME
 except AttributeError:
     MAIN_TEXT = None
+
+
+def get_members(klassen_id=KLASSEN_IDS):
+    """ returns all Persons related to passed in ID"""
+    return list(set([x.related_person for x in PersonInstitution.objects.filter(related_institution__in=klassen_id).distinct()]))    
+
+
+def get_nsdap_member_rel(nsdap=NSDAP, early=True):
+    """ returns all PersonInstitution relations of memebers to `nsdap`"""
+    if early:
+        early_nazi_rel = PersonInstitution.objects.filter(
+            related_institution__in=nsdap, start_date__lte='1938-03-13'
+        )
+    else:
+        early_nazi_rel = PersonInstitution.objects.filter(
+            related_institution__in=nsdap, start_date__gte='1938-03-13'
+        )
+    return early_nazi_rel
+
+
+def get_nsdap_member(nsdap=NSDAP, early=True):
+    return [x.related_person for x in get_nsdap_member_rel(nsdap=nsdap, early=early)]
 
 
 def get_child_classes(objids, obclass, labels=False):
@@ -231,7 +258,7 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
             return res
 
     berufslaufbahn_ids = get_child_classes([1851, 1385], PersonInstitutionRelation)
-    subs_akademie = get_child_institutions_from_parent([500, 2, 3])
+    subs_akademie = get_child_institutions_from_parent(KLASSEN_IDS)
     promotion_inst_ids, promotion_inst_labels = get_child_classes(
         [1386], PersonInstitutionRelation, labels=True
     )
