@@ -4,6 +4,7 @@ from . import dal_views
 from . import views
 from . import api_views
 from . import autocompletes
+from . import analyze_views
 
 app_name = "paas_theme"
 
@@ -90,4 +91,9 @@ urlpatterns = [
         dal_views.ProfessionAC.as_view(),
         name="obel-professions-autocomplete",
     ),
+    url(
+        r"^analyze/nationalsozialismus/$",
+        analyze_views.ns_view,
+        name="analyze_nationalsozialismus",
+    )
 ]
