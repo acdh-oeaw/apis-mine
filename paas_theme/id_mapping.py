@@ -15,6 +15,8 @@ NSDAP = [
     49596,
 ]
 
+AKADEMIE_KOMMISSION_TYP_ID = 82
+
 MITGLIED_AUSWERTUNG_COL_NAME = 'mitglied_auswertung'
 MITGLIED_AUSWERTUNG_NS_COL_NAME = 'mitglied_auswertung_ns'
 NATIONALSOZIALISTEN_COL_NAME = 'nationalsozialisten'

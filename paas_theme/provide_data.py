@@ -29,6 +29,7 @@ from apis_core.apis_vocabularies.models import (
 )
 
 from . id_mapping import (
+    AKADEMIE_KOMMISSION_TYP_ID,
     KLASSEN_IDS,
     GESAMTAKADEMIE_UND_KLASSEN,
     MITGLIED_AUSWERTUNG_COL_NAME,
@@ -39,6 +40,7 @@ from . id_mapping import (
 MITGLIEDER = Person.objects.filter(collection__name=MITGLIED_AUSWERTUNG_COL_NAME)
 MITGLIDER_NS = Person.objects.filter(collection__name=MITGLIED_AUSWERTUNG_NS_COL_NAME)
 NATIONALSOZIALISTEN = Person.objects.filter(collection__name=NATIONALSOZIALISTEN_COL_NAME)
+KOMMISSIONEN = Institution.objects.filter(kind__id=AKADEMIE_KOMMISSION_TYP_ID).exclude(name='GEMEINSAME KOMMISSIONEN')
 
 try:
     FEATURED_COLLECTION_NAME = settings.FEATURED_COLLECTION_NAME
@@ -364,7 +366,7 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
     classes["netzwerk"] = {
         "Kommissionen": {
             "relation": "PersonInstitution",
-            "related_institution__kind_id": 82,
+            "related_institution__kind_id": AKADEMIE_KOMMISSION_TYP_ID,
             "relation_type_id__in": get_child_classes(
                 [26, 162], PersonInstitutionRelation, labels=False
             ),
@@ -382,7 +384,7 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
         },
     }
     classes["inst_typ"] = {
-        "Kommission": [82],
+        "Kommission": [AKADEMIE_KOMMISSION_TYP_ID],
         "Institut": [83],
         "Forschungsstelle": [84],
     }
