@@ -5,7 +5,7 @@ from django.http import JsonResponse
 
 from apis_core.apis_relations.models import PersonInstitution
 from . id_mapping import NSDAP, KLASSEN_IDS
-from . provide_data import NATIONALSOZIALISTEN
+from . provide_data import NATIONALSOZIALISTEN, KOMMISSIONEN
 
 props = [
     'related_person__id',
@@ -14,10 +14,22 @@ props = [
     'related_person__start_date',
     'relation_type__name',
     'relation_type__parent_class__name',
+    'related_institution__id',
     'related_institution__name',
     'start_date',
     'end_date'
 ]
+
+
+def get_nazi_kommissionen(request):
+    rels = PersonInstitution.objects.filter(
+        related_person__in=NATIONALSOZIALISTEN,
+        related_institution__in=KOMMISSIONEN
+    ).values_list(*props)
+    orig_df = pd.DataFrame(list(rels), columns=props)
+    return JsonResponse(orig_df.to_dict('records'), safe=False)
+
+
 
 def ns_view(request):
     rels = PersonInstitution.objects.filter(
