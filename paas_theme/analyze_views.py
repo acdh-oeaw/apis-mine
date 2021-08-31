@@ -3,9 +3,34 @@ import pandas as pd
 
 from django.http import JsonResponse
 
-from apis_core.apis_relations.models import PersonInstitution
+from apis_core.apis_relations.models import PersonInstitution, PersonPerson
 from . id_mapping import NSDAP, KLASSEN_IDS
-from . provide_data import NATIONALSOZIALISTEN, KOMMISSIONEN
+from . provide_data import NATIONALSOZIALISTEN, KOMMISSIONEN, get_child_classes, PersonPersonRelation
+
+person_person_props = [
+    'related_personA__id',
+    'related_personA__name',
+    'related_personA__first_name',
+    'relation_type__id',
+    'relation_type__name',
+    'relation_type__parent_class__name',
+    'start_date',
+    'related_personB__id',
+    'related_personB__name',
+    'related_personB__first_name',
+    'end_date'
+]
+
+
+def proposed_by_nazi(request):
+    pers_pers = PersonPerson.objects.filter(
+        relation_type__in=get_child_classes([3141], PersonPersonRelation),
+        related_personB_id__in=NATIONALSOZIALISTEN
+    ).values_list(*person_person_props)
+    orig_df = pd.DataFrame(pers_pers, columns=person_person_props)
+    data = orig_df.to_dict('records')
+    return JsonResponse(data, safe=False)
+
 
 props = [
     'related_person__id',
