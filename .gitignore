@@ -1,3 +1,5 @@
 apis_core
 *.pyc
 /.ipynb_checkpoints
+Untitled*.ipynb
+apis/settings/pandorfer.py
