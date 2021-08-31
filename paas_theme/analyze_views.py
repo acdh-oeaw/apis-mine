@@ -5,7 +5,7 @@ from django.http import JsonResponse
 
 from apis_core.apis_relations.models import PersonInstitution
 from . id_mapping import NSDAP, KLASSEN_IDS
-from . provide_data import MITGLIDER_NS
+from . provide_data import NATIONALSOZIALISTEN
 
 props = [
     'related_person__id',
@@ -22,7 +22,7 @@ props = [
 def ns_view(request):
     rels = PersonInstitution.objects.filter(
         related_institution__in=NSDAP + KLASSEN_IDS,
-        related_person__in=MITGLIDER_NS
+        related_person__in=NATIONALSOZIALISTEN
     ).values_list(*props)
 
     orig_df = pd.DataFrame(list(rels), columns=props)

@@ -17,6 +17,7 @@ NSDAP = [
 
 MITGLIED_AUSWERTUNG_COL_NAME = 'mitglied_auswertung'
 MITGLIED_AUSWERTUNG_NS_COL_NAME = 'mitglied_auswertung_ns'
+NATIONALSOZIALISTEN_COL_NAME = 'nationalsozialisten'
 
 with open('./paas_theme/relation_mapping.json') as f:
     rel_mapping = json.load(f)
