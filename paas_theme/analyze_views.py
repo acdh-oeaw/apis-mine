@@ -7,7 +7,7 @@ from apis_core.apis_relations.models import PersonInstitution, PersonPerson
 from . id_mapping import NSDAP, KLASSEN_IDS
 from . provide_data import NATIONALSOZIALISTEN, KOMMISSIONEN, get_child_classes, PersonPersonRelation
 
-from . analyze_utils import get_ns
+from . analyze_utils import get_ns, nazi_komm_df
 
 person_person_props = [
     'related_personA__id',
@@ -49,11 +49,7 @@ props = [
 
 
 def get_nazi_kommissionen(request):
-    rels = PersonInstitution.objects.filter(
-        related_person__in=NATIONALSOZIALISTEN,
-        related_institution__in=KOMMISSIONEN
-    ).values_list(*props)
-    orig_df = pd.DataFrame(list(rels), columns=props)
+    orig_df = nazi_komm_df()
     grouped = request.GET.get('grouped')
     if grouped == 'kommission':
         data = []
@@ -99,36 +95,6 @@ def get_nazi_kommissionen(request):
 
 
 def ns_view(request):
-    # rels = PersonInstitution.objects.filter(
-    #     related_institution__in=NSDAP + KLASSEN_IDS,
-    #     related_person__in=NATIONALSOZIALISTEN
-    # ).values_list(*props)
-
-    # orig_df = pd.DataFrame(list(rels), columns=props)
-    # data = []
-    # for gr, df in orig_df.groupby('related_person__id'):
-    #     try:
-    #         nsdap = df.query('related_institution__name=="Nationalsozialistische Deutsche Arbeiterpartei"').iloc[0]
-    #     except IndexError:
-    #         continue
-    #     ak = df.iloc[0]
-    #     item = {}
-    #     # for x in props[:3]:
-    #     #     item[x] = ak[x]
-    #     item['id'] = ak['related_person__id']
-    #     item['name'] = ak['related_person__name']
-    #     item['first_name'] = ak['related_person__first_name']
-    #     item['birth_date'] = ak['related_person__start_date']
-    #     item['beitritt_nsdap'] = f"{nsdap['start_date']}"
-    #     item['beitritt_akademie'] = f"{ak['start_date']}"
-    #     try:
-    #         item['illegal'] = nsdap['start_date'] < datetime.date(1938, 3, 13)
-    #     except:
-    #         item['illegal'] = "unklar, kein Eintrittsdatum bekannt"
-    #     item['mitglied_vor_ns'] = ak['start_date'] < datetime.date(1939, 1, 1)
-    #     item['mitglied_in_ns'] = datetime.date(1939, 1, 1) < ak['start_date'] and ak['start_date'] < datetime.date(1944, 12, 31)
-    #     item['mitglied_nach_ns'] = ak['start_date'] > datetime.date(1944, 12, 31)
-    #     data.append(item)
     result_df = pd.DataFrame(get_ns())
 
     payload = {

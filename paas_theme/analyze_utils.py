@@ -3,7 +3,7 @@ import pandas as pd
 
 from apis_core.apis_relations.models import PersonInstitution
 from . id_mapping import NSDAP, KLASSEN_IDS
-from . provide_data import NATIONALSOZIALISTEN
+from . provide_data import NATIONALSOZIALISTEN, KOMMISSIONEN
 
 
 props = [
@@ -18,6 +18,14 @@ props = [
     'start_date',
     'end_date'
 ]
+
+def nazi_komm_df():
+    rels = PersonInstitution.objects.filter(
+            related_person__in=NATIONALSOZIALISTEN,
+            related_institution__in=KOMMISSIONEN
+        ).values_list(*props)
+    orig_df = pd.DataFrame(list(rels), columns=props)
+    return orig_df
 
 def get_ns():
     rels = PersonInstitution.objects.filter(
@@ -34,8 +42,6 @@ def get_ns():
             continue
         ak = df.iloc[0]
         item = {}
-        # for x in props[:3]:
-        #     item[x] = ak[x]
         item['id'] = ak['related_person__id']
         item['name'] = ak['related_person__name']
         item['first_name'] = ak['related_person__first_name']
