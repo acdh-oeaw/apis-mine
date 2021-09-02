@@ -15,6 +15,13 @@ NSDAP = [
     49596,
 ]
 
+RUHEND_GESTELLT = [
+    3373, # Mitglied >> Korrespondierendes Mitglied im Ausland (kM A) >> ruhend gestellt
+    3374, # Mitglied >> Mitglied der Jungen Kurie >> ruhend gestellt
+    3456, # Mitglied >> Wirkliches Mitglied (wM) >> ruhend gestellt
+    3457, # Mitglied >> Korrespondierendes Mitglied im Inland (kM I) >> ruhend gestellt
+]
+
 AKADEMIE_KOMMISSION_TYP_ID = 82
 
 MITGLIED_AUSWERTUNG_COL_NAME = 'mitglied_auswertung'

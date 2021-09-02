@@ -132,6 +132,20 @@
             <div id="proposedByNaziChart"></div>
         </figure>
     </div>
+    <div id="ruhendstellungen">
+        <h2>Entnazifizierung</h2>
+        <ul>
+            <li>
+                Wer wurde ruhendgestellt (August)? Wer wurde im ausgeschlossen? Name, Datum des Ausschlusses/ruhend Stellung, Mitgliedsart (kM I und wM)
+            </li>
+            <li>
+                Wann wurden wessen Ruhendstellungen und Ausschlüsse aufgehoben?
+            </li>
+            <li>
+                Wer ist trotz Ruhendstellung in den veröffentlichen Kommissionslisten? Wer ist Kommissionsmitglied während seiner Ruhendstellung/Ausschlusses?
+            </li>
+        </ul>
+    </div>
 </div>
 
 {% endblock content %}
@@ -234,7 +248,6 @@
                 }
             },
         });
-
         Highcharts.chart('proposedByNaziChart', {
             data: {
                 table: 'proposedByNazi'

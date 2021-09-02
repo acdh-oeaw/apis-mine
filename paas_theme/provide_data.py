@@ -35,6 +35,7 @@ from . id_mapping import (
     MITGLIED_AUSWERTUNG_COL_NAME,
     MITGLIED_AUSWERTUNG_NS_COL_NAME,
     NATIONALSOZIALISTEN_COL_NAME,
+    RUHEND_GESTELLT,
 )
 
 MITGLIEDER = Person.objects.filter(collection__name=MITGLIED_AUSWERTUNG_COL_NAME)
@@ -405,7 +406,7 @@ def get_wahlvorschlag(pers, mitgliedschaften):
     kls = abbreviate(kls)
     res = {}
     umwidm = [56, 57, 58, 59]
-    ruhend = [3457, 3456, 3374, 3373]
+    ruhend = RUHEND_GESTELLT
     reaktiviert = [3471, 3460, 3459]
     lst_gew = []
     for pp in (
