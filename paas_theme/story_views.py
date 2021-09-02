@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView
 
-from . analyze_utils import get_ns, nazi_komm_df, proposed_by_nazi_data
+from . analyze_utils import get_ns, nazi_komm_df, proposed_by_nazi_data, ruhend_gestellt_df
 
 
 class NationalSozialismusStory(TemplateView):
@@ -26,5 +26,6 @@ class NationalSozialismusStory(TemplateView):
         context['proposed_by_nazi_table'] = proposed_by_nazi_df[['gewähltes Mitglied', 'NSDAP Mitglied', 'Wahldatum', 'Art der Mitgliedschaft']].to_html(table_id='proposedByNaziAll', index=False, border=0)
         context['proposed_by_nazi_grouped_by_nazi'] = proposed_by_nazi_grouped_by_nazi.sort_values(by=['counts'], ascending=False).set_index('NSDAP Mitglied').to_html(table_id='nazisProposing')
         context['proposed_by_nazi'] = proposed_by_nazi.sort_values(by=['counts'], ascending=False).set_index('gewähltes Mitglied').to_html(table_id='proposedByNazi')
+        context['ruhend'] = ruhend_gestellt_df().to_dict('records')
 
         return context

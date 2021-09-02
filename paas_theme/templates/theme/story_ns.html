@@ -145,6 +145,27 @@
                 Wer ist trotz Ruhendstellung in den veröffentlichen Kommissionslisten? Wer ist Kommissionsmitglied während seiner Ruhendstellung/Ausschlusses?
             </li>
         </ul>
+        <h3>Tabelle 4: "Ruhend gestellt"</h2>
+            <table id="ruhend" class="display" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Klasse</th>
+                        <th>Ruhendstellung Beginn</th>
+                        <th>Ruhendstellung Ende</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for x in ruhend %}
+                    <tr>
+                        <td>{{ x.related_person__name }}, {{ x.related_person__first_name }} <a href="#{{ x.related_person__id }}">-></a></td>
+                        <td>{{ x.related_institution__name }}</td>
+                        <td>{{ x.start_date|date:"Y-m-d" }}</td>
+                        <td>{{ x.end_date|date:"Y-m-d"  }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
     </div>
 </div>
 
@@ -189,6 +210,15 @@
             responsive: true,
             pageLength: 30,
             order: [[ 2, "asc" ]],
+            buttons: [
+                'copy', 'excel', 'pdf'
+            ]
+        } );
+        $('#ruhend').DataTable( {
+            dom: 'Bfrtip',
+            responsive: true,
+            pageLength: 30,
+            order: [[ 1, "asc" ]],
             buttons: [
                 'copy', 'excel', 'pdf'
             ]

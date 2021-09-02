@@ -2,7 +2,7 @@ import datetime
 import pandas as pd
 
 from apis_core.apis_relations.models import PersonInstitution, PersonPerson
-from . id_mapping import NSDAP, KLASSEN_IDS
+from . id_mapping import NSDAP, KLASSEN_IDS, RUHEND_GESTELLT
 from . provide_data import NATIONALSOZIALISTEN, KOMMISSIONEN, get_child_classes, PersonPersonRelation
 
 
@@ -61,6 +61,18 @@ def nazi_komm_df():
         ).values_list(*props)
     orig_df = pd.DataFrame(list(rels), columns=props)
     return orig_df
+
+
+def ruhend_gestellt_df():
+    rels = PersonInstitution.objects.filter(
+            related_person__in=NATIONALSOZIALISTEN,
+            relation_type__in=RUHEND_GESTELLT
+        ).values_list(*props)
+    df = pd.DataFrame(list(rels), columns=props)
+    df['Name'] = df.apply(
+    lambda row: make_full_name(row, 'related_person__name', 'related_person__first_name') , axis=1
+)
+    return df
 
 def get_ns():
     rels = PersonInstitution.objects.filter(
