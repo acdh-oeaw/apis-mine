@@ -18,6 +18,7 @@ class NationalSozialismusStory(TemplateView):
         kommissionen = nazi_komm_df()
         komm_grouped = kommissionen.groupby(['related_institution__name']).size().reset_index(name='counts')
         member_grouped = kommissionen.groupby(['related_person__name']).size().reset_index(name='counts')
+        
         context = super().get_context_data(**kwargs)
         context['ns_members'] = get_ns()
         context['nazi_komm'] = kommissionen.to_dict('records')
@@ -27,5 +28,6 @@ class NationalSozialismusStory(TemplateView):
         context['proposed_by_nazi_grouped_by_nazi'] = proposed_by_nazi_grouped_by_nazi.sort_values(by=['counts'], ascending=False).set_index('NSDAP Mitglied').to_html(table_id='nazisProposing')
         context['proposed_by_nazi'] = proposed_by_nazi.sort_values(by=['counts'], ascending=False).set_index('gewähltes Mitglied').to_html(table_id='proposedByNazi')
         context['ruhend'] = ruhend_gestellt_df().to_dict('records')
+        context['ruhend_by_klasse'] = ruhend_gestellt_df().groupby(['related_institution__name']).size().reset_index(name='counts').set_index('related_institution__name').to_html(table_id='ruhendByKlasse')
 
         return context

@@ -13,7 +13,13 @@
 {% block content %}
 <div class="container">
     <div class="alert alert-warning" role="alert">
-        Work in Progress
+        Work in Progress;<br />
+        <strong>ToDos</strong>
+        <ul>
+            <li>Link entitites to their detail-views</li>
+            <li>make columns filterable</li>
+            <li>remove blank bars from charts</li>
+        </ul>
       </div>
     <h1>Nationalsozialsimus und Entnazifizierung</h1>
 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus perspiciatis voluptatem accusamus ratione nulla, quod similique. Possimus, recusandae soluta nemo itaque, corporis repellat facere obcaecati laborum praesentium, fugiat eum! Exercitationem! </p>
@@ -87,8 +93,8 @@
                         <td>{{ x.related_institution__name }}<a href="#{{ x.related_institution__id }}">-></a></td>
                         <td>{{ x.related_person__name }}, {{ x.related_person__first_name }} <a href="#{{ x.related_person__id }}">-></a></td>
                         <td>{{ x.relation_type__name }}</td>
-                        <td>{{ x.start_date }}</td>
-                        <td>{{ x.end_date }}</td>
+                        <td>{{ x.start_date|date:"Y-m-d" }}</td>
+                        <td>{{ x.end_date|date:"Y-m-d" }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -166,6 +172,11 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <h3>Grafik 5: Ruhendstellung nach Klassen</h3>
+        <div hidden>{{ ruhend_by_klasse|safe }}</div>
+        <figure class="highcharts-figure">
+            <div id="ruhendByKlasseChart"></div>
+        </figure>
     </div>
 </div>
 
@@ -288,6 +299,24 @@
             },
             title: {
                 text: 'Gewählte, gruppiert nach Anzahl der Vorschläge'
+            },
+            yAxis: {
+                allowDecimals: false,
+                title: {
+                    text: 'Units'
+                }
+            },
+        });
+        Highcharts.chart('ruhendByKlasseChart', {
+            data: {
+                table: 'ruhendByKlasse'
+            },
+            chart: {
+                type: 'bar',
+                zoomType: 'x'
+            },
+            title: {
+                text: 'Ruhendstellung nach Klassen'
             },
             yAxis: {
                 allowDecimals: false,
