@@ -1,9 +1,13 @@
 import datetime
 import pandas as pd
 
-from apis_core.apis_relations.models import PersonInstitution
+from apis_core.apis_relations.models import PersonInstitution, PersonPerson
 from . id_mapping import NSDAP, KLASSEN_IDS
-from . provide_data import NATIONALSOZIALISTEN, KOMMISSIONEN
+from . provide_data import NATIONALSOZIALISTEN, KOMMISSIONEN, get_child_classes, PersonPersonRelation
+
+
+def make_full_name(row, prop_name, prop_first_name):
+    return ", ".join([row[prop_name], row[prop_first_name]])
 
 
 props = [
@@ -18,6 +22,37 @@ props = [
     'start_date',
     'end_date'
 ]
+
+person_person_props = [
+    'related_personA__id',
+    'related_personA__name',
+    'related_personA__first_name',
+    'relation_type__id',
+    'relation_type__name',
+    'relation_type__parent_class__name',
+    'start_date',
+    'related_personB__id',
+    'related_personB__name',
+    'related_personB__first_name',
+    'end_date'
+]
+
+def proposed_by_nazi_data():
+    pers_pers = PersonPerson.objects.filter(
+        relation_type__in=get_child_classes([3141], PersonPersonRelation),
+        related_personB_id__in=NATIONALSOZIALISTEN,
+        start_date__gte='1938-03-01'
+    ).values_list(*person_person_props)
+    orig_df = pd.DataFrame(pers_pers, columns=person_person_props)
+    orig_df['gewähltes Mitglied'] = orig_df.apply(
+        lambda row: make_full_name(row, 'related_personA__name', 'related_personA__first_name') , axis=1
+    )
+    orig_df['NSDAP Mitglied'] = orig_df.apply(
+        lambda row: make_full_name(row, 'related_personB__name', 'related_personB__first_name') , axis=1
+    )
+    orig_df['Wahldatum'] = orig_df['start_date']
+    orig_df['Art der Mitgliedschaft'] = orig_df['relation_type__name']
+    return orig_df.sort_values(by='Wahldatum')
 
 def nazi_komm_df():
     rels = PersonInstitution.objects.filter(

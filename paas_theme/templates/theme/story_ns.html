@@ -110,6 +110,24 @@
                 Wen schlagen die ehemaligen Nationalsozialisten nach 1945 erfolgreich zur Wahl vor? (Kriterium: mindestens 2 ehemalige NSDAP-Angehörige als Vorschlagende) Sortierung nach Anzahl der vorschlagenden NSDAP Mitgliedern
             </li>
         </ul>
+        <h3>Table 3: Wer schlägt wen vor</h3>
+        {{ proposed_by_nazi_table|safe }}
+        <p>
+            Gruppiert man diese Tabelle nach den vorschlagenden NSDAP Mitgliedern so ergibt sich untenstehende Verteilung:
+        </p>
+        <h3>Grafik 3: Vorschläge nach NSDAP-Mitgliedern gruppiert</h3>
+        <div hidden>{{ proposed_by_nazi_grouped_by_nazi|safe }}</div>
+        <figure class="highcharts-figure">
+            <div id="nazisProposingChart"></div>
+        </figure>
+        <p>
+            Eine Gruppierung nach den Vorgeschlagenen stellt sich folgendermaßen dar:
+        </p>
+        <h3>Grafik 4: Mitglieder nach Anzahl vorschlagender NSDAP-Mitgliedern</h3>
+        <div hidden>{{ proposed_by_nazi|safe }}</div>
+        <figure class="highcharts-figure">
+            <div id="proposedByNaziChart"></div>
+        </figure>
     </div>
 </div>
 
@@ -149,6 +167,15 @@
                 'copy', 'excel', 'pdf'
             ]
         } );
+        $('#proposedByNaziAll').DataTable( {
+            dom: 'Bfrtip',
+            responsive: true,
+            pageLength: 30,
+            order: [[ 2, "asc" ]],
+            buttons: [
+                'copy', 'excel', 'pdf'
+            ]
+        } );
 
         Highcharts.chart('kommByNaziChart', {
             data: {
@@ -168,16 +195,53 @@
                 }
             },
         });
-    Highcharts.chart('naziByKommChart', {
+        Highcharts.chart('naziByKommChart', {
+                data: {
+                    table: 'naziByKomm'
+                },
+                chart: {
+                    type: 'column',
+                    zoomType: 'x'
+                },
+                title: {
+                    text: 'Kommissionen gruppiert nach Anzahl NSDAP-Mitgliedern'
+                },
+                yAxis: {
+                    allowDecimals: false,
+                    title: {
+                        text: 'Units'
+                    }
+                },
+            });
+        Highcharts.chart('nazisProposingChart', {
             data: {
-                table: 'naziByKomm'
+                table: 'nazisProposing'
             },
             chart: {
                 type: 'column',
                 zoomType: 'x'
             },
             title: {
-                text: 'Kommissionen gruppiert nach Anzahl NSDAP-Mitgliedern'
+                text: 'Wahlvorschläge gruppiert nach NSDAP Mitgliedern'
+            },
+            yAxis: {
+                allowDecimals: false,
+                title: {
+                    text: 'Units'
+                }
+            },
+        });
+
+        Highcharts.chart('proposedByNaziChart', {
+            data: {
+                table: 'proposedByNazi'
+            },
+            chart: {
+                type: 'column',
+                zoomType: 'x'
+            },
+            title: {
+                text: 'Wahlvorschläge gruppiert nach NSDAP Mitgliedern'
             },
             yAxis: {
                 allowDecimals: false,

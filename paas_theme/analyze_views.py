@@ -3,49 +3,17 @@ import pandas as pd
 
 from django.http import JsonResponse
 
-from apis_core.apis_relations.models import PersonInstitution, PersonPerson
+from apis_core.apis_relations.models import PersonPerson
 from . id_mapping import NSDAP, KLASSEN_IDS
-from . provide_data import NATIONALSOZIALISTEN, KOMMISSIONEN, get_child_classes, PersonPersonRelation
+from . provide_data import NATIONALSOZIALISTEN, get_child_classes, PersonPersonRelation
 
-from . analyze_utils import get_ns, nazi_komm_df
-
-person_person_props = [
-    'related_personA__id',
-    'related_personA__name',
-    'related_personA__first_name',
-    'relation_type__id',
-    'relation_type__name',
-    'relation_type__parent_class__name',
-    'start_date',
-    'related_personB__id',
-    'related_personB__name',
-    'related_personB__first_name',
-    'end_date'
-]
+from . analyze_utils import get_ns, nazi_komm_df, proposed_by_nazi_data
 
 
 def proposed_by_nazi(request):
-    pers_pers = PersonPerson.objects.filter(
-        relation_type__in=get_child_classes([3141], PersonPersonRelation),
-        related_personB_id__in=NATIONALSOZIALISTEN
-    ).values_list(*person_person_props)
-    orig_df = pd.DataFrame(pers_pers, columns=person_person_props)
+    orig_df = proposed_by_nazi_data()
     data = orig_df.to_dict('records')
     return JsonResponse(data, safe=False)
-
-
-props = [
-    'related_person__id',
-    'related_person__name',
-    'related_person__first_name',
-    'related_person__start_date',
-    'relation_type__name',
-    'relation_type__parent_class__name',
-    'related_institution__id',
-    'related_institution__name',
-    'start_date',
-    'end_date'
-]
 
 
 def get_nazi_kommissionen(request):
