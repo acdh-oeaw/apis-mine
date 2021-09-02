@@ -5,6 +5,7 @@ from . import views
 from . import api_views
 from . import autocompletes
 from . import analyze_views
+from . import story_views
 
 app_name = "paas_theme"
 
@@ -19,6 +20,7 @@ urlpatterns = [
     url(r"^institutionen/$", views.IndexInstitutionsView.as_view(), name="institutions"),
     url(r"^institutionen/search/?$", views.SearchViewInstitutions.as_view(), name="institutionssearch"),
     url(r"^network/?$", views.network_viz),
+    url(r"^stories/ns-zeit/$", story_views.NationalSozialismusStory.as_view(), name="ns_zeit"),
     url(r"^api/network/$", api_views.NetVizTheme.as_view()),
     url(r"^api/egonetwork/$", api_views.EgoNetwork.as_view()),
     url(
@@ -95,5 +97,15 @@ urlpatterns = [
         r"^analyze/nationalsozialismus/$",
         analyze_views.ns_view,
         name="analyze_nationalsozialismus",
+    ),
+    url(
+        r"^analyze/nationalsozialismus-kommissionen/$",
+        analyze_views.get_nazi_kommissionen,
+        name="analyze_nationalsozialismus_kommissionen",
+    ),
+    url(
+        r"^analyze/nationalsozialismus-vorschlag/$",
+        analyze_views.proposed_by_nazi,
+        name="analyze_nationalsozialismus_vorschlag",
     )
 ]

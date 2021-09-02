@@ -29,9 +29,19 @@ from apis_core.apis_vocabularies.models import (
 )
 
 from . id_mapping import (
+    AKADEMIE_KOMMISSION_TYP_ID,
     KLASSEN_IDS,
-    NSDAP,
+    GESAMTAKADEMIE_UND_KLASSEN,
+    MITGLIED_AUSWERTUNG_COL_NAME,
+    MITGLIED_AUSWERTUNG_NS_COL_NAME,
+    NATIONALSOZIALISTEN_COL_NAME,
+    RUHEND_GESTELLT,
 )
+
+MITGLIEDER = Person.objects.filter(collection__name=MITGLIED_AUSWERTUNG_COL_NAME)
+MITGLIDER_NS = Person.objects.filter(collection__name=MITGLIED_AUSWERTUNG_NS_COL_NAME)
+NATIONALSOZIALISTEN = Person.objects.filter(collection__name=NATIONALSOZIALISTEN_COL_NAME)
+KOMMISSIONEN = Institution.objects.filter(kind__id=AKADEMIE_KOMMISSION_TYP_ID).exclude(name='GEMEINSAME KOMMISSIONEN')
 
 try:
     FEATURED_COLLECTION_NAME = settings.FEATURED_COLLECTION_NAME
@@ -52,28 +62,6 @@ try:
     MAIN_TEXT = settings.MAIN_TEXT_NAME
 except AttributeError:
     MAIN_TEXT = None
-
-
-def get_members(klassen_id=KLASSEN_IDS):
-    """ returns all Persons related to passed in ID"""
-    return list(set([x.related_person for x in PersonInstitution.objects.filter(related_institution__in=klassen_id).distinct()]))    
-
-
-def get_nsdap_member_rel(nsdap=NSDAP, early=True):
-    """ returns all PersonInstitution relations of memebers to `nsdap`"""
-    if early:
-        early_nazi_rel = PersonInstitution.objects.filter(
-            related_institution__in=nsdap, start_date__lte='1938-03-13'
-        )
-    else:
-        early_nazi_rel = PersonInstitution.objects.filter(
-            related_institution__in=nsdap, start_date__gte='1938-03-13'
-        )
-    return early_nazi_rel
-
-
-def get_nsdap_member(nsdap=NSDAP, early=True):
-    return [x.related_person for x in get_nsdap_member_rel(nsdap=nsdap, early=early)]
 
 
 def get_child_classes(objids, obclass, labels=False):
@@ -195,7 +183,7 @@ def get_mitgliedschaft_from_relation(rel, abbreviate=True):
 
 def get_gewaehlt(pers, year):
     rel = pers.personinstitution_set.filter(
-        related_institution_id__in=[2, 3], start_date_written__contains=year
+        related_institution_id__in=KLASSEN_IDS, start_date_written__contains=year
     ).order_by("start_date")
     if rel.count() == 0:
         return "nicht gewählt", None
@@ -258,7 +246,7 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
             return res
 
     berufslaufbahn_ids = get_child_classes([1851, 1385], PersonInstitutionRelation)
-    subs_akademie = get_child_institutions_from_parent(KLASSEN_IDS)
+    subs_akademie = get_child_institutions_from_parent(GESAMTAKADEMIE_UND_KLASSEN)
     promotion_inst_ids, promotion_inst_labels = get_child_classes(
         [1386], PersonInstitutionRelation, labels=True
     )
@@ -312,7 +300,7 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
     classes["image_wiki"] = LabelType.objects.get(name="Wikicommons Image").pk
     classes["habilitation"] = get_child_classes([1385], PersonInstitutionRelation)
     classes["berufslaufbahn_ids"] = berufslaufbahn_ids
-    classes["subs_akademie"] = subs_akademie + [2, 3, 500]
+    classes["subs_akademie"] = subs_akademie + GESAMTAKADEMIE_UND_KLASSEN
     classes["promotion_inst_ids"] = promotion_inst_ids
     classes["daten_mappings"] = daten_mappings
     classes["vorschlag"] = get_child_classes(
@@ -348,10 +336,10 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
         ),
     }
     classes["akademiepreise"] = get_academy_awards(
-        subs_akademie=classes["subs_akademie"] + [2, 3, 500]
+        subs_akademie=classes["subs_akademie"] + GESAMTAKADEMIE_UND_KLASSEN
     )
     classes["preisaufgaben"] = get_academy_preisaufgaben(
-        subs_akademie=classes["subs_akademie"] + [2, 3, 500]
+        subs_akademie=classes["subs_akademie"] + GESAMTAKADEMIE_UND_KLASSEN
     )
     classes["berufslaufbahn_map"] = {
         "Professor/in": get_child_classes(
@@ -379,7 +367,7 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
     classes["netzwerk"] = {
         "Kommissionen": {
             "relation": "PersonInstitution",
-            "related_institution__kind_id": 82,
+            "related_institution__kind_id": AKADEMIE_KOMMISSION_TYP_ID,
             "relation_type_id__in": get_child_classes(
                 [26, 162], PersonInstitutionRelation, labels=False
             ),
@@ -397,7 +385,7 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
         },
     }
     classes["inst_typ"] = {
-        "Kommission": [82],
+        "Kommission": [AKADEMIE_KOMMISSION_TYP_ID],
         "Institut": [83],
         "Forschungsstelle": [84],
     }
@@ -411,14 +399,14 @@ classes = create_data_utils()
 
 def get_wahlvorschlag(pers, mitgliedschaften):
     kls = (
-        pers.personinstitution_set.filter(related_institution_id__in=[2, 3])
+        pers.personinstitution_set.filter(related_institution_id__in=KLASSEN_IDS)
         .first()
         .related_institution
     )
     kls = abbreviate(kls)
     res = {}
     umwidm = [56, 57, 58, 59]
-    ruhend = [3457, 3456, 3374, 3373]
+    ruhend = RUHEND_GESTELLT
     reaktiviert = [3471, 3460, 3459]
     lst_gew = []
     for pp in (
@@ -678,7 +666,7 @@ def enrich_person_context(person_object, context):
     rel_test = []
     mitgliedschaften = []
     for rel in person_object.personinstitution_set.filter(
-        related_institution_id__in=[2, 3, 500],
+        related_institution_id__in=GESAMTAKADEMIE_UND_KLASSEN,
         relation_type_id__in=[
             33,
             34,
@@ -789,7 +777,7 @@ def enrich_person_context(person_object, context):
                 for rel in person_object.personinstitution_set.filter(
                     relation_type_id__in=classes["berufslaufbahn_ids"]
                 ).exclude(
-                    related_institution_id__in=classes["subs_akademie"] + [2, 3, 500]
+                    related_institution_id__in=classes["subs_akademie"] + GESAMTAKADEMIE_UND_KLASSEN
                 )
             ],
             "Mitglied in einer nationalsozialistischen Vereinigung": [
@@ -874,7 +862,7 @@ def enrich_person_context(person_object, context):
             + [
                 f'Zum Sekretär der {abbreviate(rel.related_institution)} {rel.relation_type.name} am {rel.start_date_written}{", tätig bis "+rel.end_date_written if rel.end_date_written is not None else ""}'
                 for rel in person_object.personinstitution_set.filter(
-                    related_institution_id__in=[2, 3, 500],
+                    related_institution_id__in=GESAMTAKADEMIE_UND_KLASSEN,
                     relation_type_id__in=classes["akad_funktionen"]["sekretärin"][0],
                 )
             ],
@@ -950,13 +938,13 @@ def enrich_institution_context(institution_object, context):
     context["relatedinstitutions"] = get_child_institutions_from_parent(
         [institution_object.pk]
     )
-    if institution_object.pk in classes["subs_akademie"] + [2, 3, 500]:
+    if institution_object.pk in classes["subs_akademie"] + GESAMTAKADEMIE_UND_KLASSEN:
         context["akademie"] = True
     else:
         context["akademie"] = False
     context["typ"] = get_typ_of_institution(institution_object)
     rel_akad = institution_object.related_institutionB.filter(
-        related_institutionB_id__in=[2, 3, 500]
+        related_institutionB_id__in=GESAMTAKADEMIE_UND_KLASSEN
     ).values_list("related_institutionB__name", flat=True)
     if rel_akad.count() > 0:
         context[
