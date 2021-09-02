@@ -1,14 +1,33 @@
 import django_filters
 from dal import autocomplete
 
-from apis_core.apis_entities.models import Person
+from apis_core.apis_entities.models import Person, Institution
+from apis_core.apis_relations.models import PersonInstitution
 from apis_core.apis_vocabularies.models import ProfessionType
 from .filter_utils import born_in_filter, died_in_filter
-from .provide_data import get_born_range, get_died_range
+from .provide_data import get_born_range, get_died_range, NATIONALSOZIALISTEN
 from .widgets import NoUISliderInput
 
 born_range = get_born_range()
 died_range = get_died_range()
+
+
+class KommissionenFilter(django_filters.FilterSet):
+    aktiv_bis = django_filters.DateFilter(field_name="end_date", lookup_expr="lte")
+    aktiv_von = django_filters.DateFilter(field_name="start_date", lookup_expr="gte")
+    ns_mitglieder = django_filters.BooleanFilter(method="ns_mitglieder_filter")
+
+    def ns_mitglieder_filter(self, queryset, name, value):
+        if value:
+            kom_nazi = PersonInstitution.objects.filter(related_person__in=NATIONALSOZIALISTEN, related_institution__in=queryset).values_list("related_institution_id", flat=True)
+            return queryset.filter(id__in=list(kom_nazi))
+        else:
+            return queryset
+
+    class Meta:
+        model = Institution
+        exclude = ["annotation_set_relation"]
+     
 
 
 class PersonListFilter(django_filters.FilterSet):

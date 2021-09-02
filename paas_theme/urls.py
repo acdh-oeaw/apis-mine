@@ -99,6 +99,11 @@ urlpatterns = [
         name="analyze_nationalsozialismus",
     ),
     url(
+        r"^analyze/api/kommissionen$",
+        api_views.GetKommissionen.as_view(),
+        name="get_kommissionen",
+    ),
+    url(
         r"^analyze/nationalsozialismus-kommissionen/$",
         analyze_views.get_nazi_kommissionen,
         name="analyze_nationalsozialismus_kommissionen",
