@@ -1,3 +1,4 @@
+from typing import List
 from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -5,10 +6,13 @@ from haystack.query import SearchQuerySet
 from .forms import PersonFacetedSearchFormNew
 from apis_core.api_routers import serializers_dict
 from apis_core.apis_relations.models import PersonInstitution, PersonPlace
+from apis_core.apis_entities.models import Institution
 from apis_core.api_renderers import NetJsonRenderer
 from django.conf import settings
 from copy import deepcopy
 from django.db.models import Q
+from .filters import KommissionenFilter
+from .serializers_analyse import KommissionZeitstrahl, KommissionenZeitstrahlNazis
 
 from .provide_data import classes
 
@@ -16,6 +20,20 @@ relation_type_dict = {
     "personinstitution": PersonInstitution,
     "personplace": PersonPlace,
 }
+
+class GetKommissionen(ListAPIView):
+    action = "list"
+    filterset_class = KommissionenFilter
+    queryset = Institution.objects.filter(kind_id=82)
+
+    def get_serializer_class(self):
+        #qs_d = self.request.GET.copy()
+        if "count_nazis" in self.request.query_params.keys():
+            return KommissionenZeitstrahlNazis
+        else:
+            return KommissionZeitstrahl
+
+
 
 
 class NetVizTheme(ListAPIView):
