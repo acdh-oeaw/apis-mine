@@ -1,9 +1,11 @@
 import datetime
 import pandas as pd
 
+from django.db.models import Count
+
 from apis_core.apis_relations.models import PersonInstitution, PersonPerson
 from . id_mapping import NSDAP, KLASSEN_IDS, RUHEND_GESTELLT
-from . provide_data import NATIONALSOZIALISTEN, KOMMISSIONEN, get_child_classes, PersonPersonRelation
+from . provide_data import MITGLIEDER, NATIONALSOZIALISTEN, KOMMISSIONEN, get_child_classes, PersonPersonRelation
 
 
 def make_full_name(row, prop_name, prop_first_name):
@@ -36,6 +38,39 @@ person_person_props = [
     'related_personB__first_name',
     'end_date'
 ]
+
+
+def kommission_mitglied_per_year(
+    start_year=1846,
+    end_year=2020,
+    person=MITGLIEDER,
+    inst=KOMMISSIONEN,
+):
+    time = {}
+    for i in range(start_year, end_year):
+        time[i] = 0
+    komm = {}
+    for x in KOMMISSIONEN:
+        komm[x.name] = dict(time)
+        komm[x.name]['id'] = x.id
+    for year in range(start_year, end_year):
+        rels = PersonInstitution.objects.filter(
+            related_person__in=person,
+            related_institution__in=inst,
+            start_date__year__lte=year,
+            end_date__year__gte=year
+        ).values_list(*['related_institution__name', 'related_institution__id']).annotate(Count('related_person_id'))
+        for x in rels:
+            komm_entry = komm[x[0]]
+            komm_entry[year] = x[2]
+    series = []
+    for key, value in komm.items():
+        item = {
+            'name': key
+        }
+        item['data'] = [x[1] for x in value.items() if isinstance(x[1], int)]
+        series.append(item)
+    return series
 
 def proposed_by_nazi_data():
     pers_pers = PersonPerson.objects.filter(

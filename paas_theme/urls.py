@@ -112,5 +112,10 @@ urlpatterns = [
         r"^analyze/nationalsozialismus-vorschlag/$",
         analyze_views.proposed_by_nazi,
         name="analyze_nationalsozialismus_vorschlag",
+    ),
+    url(
+        r"^analyze/mitglieder/$",
+        analyze_views.mitglieder,
+        name="mitglieder",
     )
 ]

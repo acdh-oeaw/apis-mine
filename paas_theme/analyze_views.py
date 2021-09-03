@@ -5,9 +5,33 @@ from django.http import JsonResponse
 
 from apis_core.apis_relations.models import PersonPerson
 from . id_mapping import NSDAP, KLASSEN_IDS
-from . provide_data import NATIONALSOZIALISTEN, get_child_classes, PersonPersonRelation
+from . provide_data import MITGLIEDER, NATIONALSOZIALISTEN, get_child_classes, PersonPersonRelation, KOMMISSIONEN
 
-from . analyze_utils import get_ns, nazi_komm_df, proposed_by_nazi_data
+from . analyze_utils import get_ns, nazi_komm_df, proposed_by_nazi_data, kommission_mitglied_per_year
+
+
+def mitglieder(request):
+    try:
+        start_year = int(request.GET.get('start-year', 1938))
+    except:
+        start_year = 1938
+    end_year = request.GET.get('end-year', 1960)
+    inst = request.GET.get('institutionen', 'all')
+    person = request.GET.get('personen', 'mitglieder')
+    if inst == 'all':
+        inst = KOMMISSIONEN
+    if person == 'mitglieder':
+        person = MITGLIEDER
+    elif person == 'nazi':
+        person = NATIONALSOZIALISTEN
+    series = kommission_mitglied_per_year(start_year=start_year, end_year=end_year, inst=inst, person=person)
+    data = {
+        'title': f'Mitglieder pro Jahr im Zeitraum {start_year} - {end_year}',
+        'years': [x for x in range(start_year-1, end_year)],
+        'series': series
+    }
+    return JsonResponse(data, safe=False)
+    
 
 
 def proposed_by_nazi(request):
