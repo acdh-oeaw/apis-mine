@@ -68,7 +68,7 @@ def kommission_mitglied_per_year(
         item = {
             'name': key
         }
-        item['data'] = [x[1] for x in value.items() if isinstance(x[1], int)]
+        item['data'] = [x[1] for x in value.items() if isinstance(x[0], int)]
         series.append(item)
     return series
 

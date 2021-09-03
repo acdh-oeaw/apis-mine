@@ -13,9 +13,12 @@ from . analyze_utils import get_ns, nazi_komm_df, proposed_by_nazi_data, kommiss
 def mitglieder(request):
     try:
         start_year = int(request.GET.get('start-year', 1938))
-    except:
+    except ValueError:
         start_year = 1938
-    end_year = request.GET.get('end-year', 1960)
+    try:
+        end_year = request.GET.get('end-year', 1960)
+    except ValueError:
+        end_year = 1960
     inst = request.GET.get('institutionen', 'all')
     person = request.GET.get('personen', 'mitglieder')
     if inst == 'all':

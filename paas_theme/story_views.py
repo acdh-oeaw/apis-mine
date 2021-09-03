@@ -1,13 +1,15 @@
+from paas_theme.analyze_views import mitglieder
 from django.views.generic import TemplateView
 
-from . analyze_utils import get_ns, nazi_komm_df, proposed_by_nazi_data, ruhend_gestellt_df
-
+from . analyze_utils import get_ns, nazi_komm_df, proposed_by_nazi_data, ruhend_gestellt_df, kommission_mitglied_per_year
+from . provide_data import NATIONALSOZIALISTEN
 
 class NationalSozialismusStory(TemplateView):
     
     template_name = 'theme/story_ns.html'
 
     def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         proposed_by_nazi_df = proposed_by_nazi_data()
         proposed_by_nazi_grouped_by_nazi = proposed_by_nazi_df.groupby(
             ['NSDAP Mitglied']
@@ -19,7 +21,12 @@ class NationalSozialismusStory(TemplateView):
         komm_grouped = kommissionen.groupby(['related_institution__name']).size().reset_index(name='counts')
         member_grouped = kommissionen.groupby(['related_person__name']).size().reset_index(name='counts')
         
-        context = super().get_context_data(**kwargs)
+        context['mitglieder_kommission'] = kommission_mitglied_per_year(
+            start_year=1936, end_year=1961
+        )
+        context['nazi_kommission'] = kommission_mitglied_per_year(
+            person=NATIONALSOZIALISTEN, start_year=1936, end_year=1961
+        )
         context['ns_members'] = get_ns()
         context['nazi_komm'] = kommissionen.to_dict('records')
         context['komm_grouped_html'] = komm_grouped.sort_values(by=['counts'], ascending=False).set_index('related_institution__name').to_html(table_id='kommByNazi')

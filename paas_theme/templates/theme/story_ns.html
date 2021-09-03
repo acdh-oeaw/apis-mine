@@ -111,6 +111,16 @@
         <figure class="highcharts-figure">
             <div id="naziByKommChart"></div>
         </figure>
+        <p>Der zeitliche Verlauf der der Anzahl (aller) Mitglieder in den Kommissionen ergibt folgende Grafik</p>
+        <h3>Grafik 2a: Verteilung aller Mitglieder über Kommisionen 1936-1960</h3>
+        <figure class="highcharts-figure">
+            <div id="kommMemberTime"></div>
+        </figure>
+        <p>Im Vergleich dazu die Verteilung der (ehemaligen) NSDAP Mitglieder in den Kommissionen</p>
+        <h3>Grafik 2b: Verteilung (ehemaliger) NSDAP Mitglieder über Kommisionen 1936-1960</h3>
+        <figure class="highcharts-figure">
+            <div id="kommNaziTime"></div>
+        </figure>
     </div>
     <div id="nezwerke">
         <h2>NS-Netzwerke - Wer schlägt wen zur Wahl vor</h2>
@@ -182,6 +192,9 @@
 
 {% endblock content %}
 {% block scripts %}
+{{ mitglieder_kommission|json_script:"mitgliedKommData" }}
+{{ nazi_kommission|json_script:"naziKommData" }}
+
 <script>
     $(document).ready(function() {
         $('#nsMemberTable').DataTable( {
@@ -324,6 +337,116 @@
                     text: 'Units'
                 }
             },
+        });
+        Highcharts.chart('kommMemberTime', {
+            title: {
+                text: 'Mitglieder nach Kommissionen'
+            },
+            chart: {
+                zoomType: 'y',
+                height: 800,
+                type: 'line'
+            },
+
+            yAxis: {
+                title: {
+                    text: 'Anzahl der Mitglieder'
+                }
+            },
+
+            xAxis: {
+                accessibility: {
+                    rangeDescription: 'Zeitraum: 1936 bis 1960'
+                }
+            },
+
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle'
+            },
+
+            plotOptions: {
+                series: {
+                    label: {
+                        connectorAllowed: false
+                    },
+                    pointStart: 1936
+                }
+            },
+
+            series: JSON.parse(document.getElementById('mitgliedKommData').textContent),
+
+            responsive: {
+                rules: [{
+                    condition: {
+                        maxWidth: 1500,
+                    },
+                    chartOptions: {
+                        legend: {
+                            layout: 'horizontal',
+                            align: 'center',
+                            verticalAlign: 'bottom'
+                        }
+                    }
+                }]
+            }
+
+        });
+        Highcharts.chart('kommNaziTime', {
+            title: {
+                text: 'NSDAP-Mitglieder nach Kommissionen'
+            },
+            chart: {
+                zoomType: 'y',
+                height: 800,
+                type: 'line'
+            },
+
+            yAxis: {
+                title: {
+                    text: 'Anzahl der NSDAP-Mitglieder'
+                }
+            },
+
+            xAxis: {
+                accessibility: {
+                    rangeDescription: 'Zeitraum: 1936 bis 1960'
+                }
+            },
+
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle'
+            },
+
+            plotOptions: {
+                series: {
+                    label: {
+                        connectorAllowed: false
+                    },
+                    pointStart: 1936
+                }
+            },
+
+            series: JSON.parse(document.getElementById('naziKommData').textContent),
+
+            responsive: {
+                rules: [{
+                    condition: {
+                        maxWidth: 1500,
+                    },
+                    chartOptions: {
+                        legend: {
+                            layout: 'horizontal',
+                            align: 'center',
+                            verticalAlign: 'bottom'
+                        }
+                    }
+                }]
+            }
+
         });
     } );
 </script>
