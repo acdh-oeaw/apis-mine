@@ -1,3 +1,6 @@
 apis_core
 *.pyc
 staticfiles/
+Untitled*.ipynb
+*checkpoint.ipynb
+pandorfer.py
