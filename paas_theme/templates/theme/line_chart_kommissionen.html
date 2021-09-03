@@ -22,28 +22,48 @@
         type: 'linear',
       ticks: {
         callback: function(value, index, values) {
-                        console.log(value)
                         return value.toString();
                     }
       }
       },
     },
+    plugins: {
+        legend: {
+            display: false
+        }
+    }
 }
     };
 
+function hexToRgb(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
+
 function convertData(data){
     var datasets = []
-    console.log(data.results)
     var colors = data.results.length
     var seq = palette('tol-sq', colors);
-    console.log(colors)
-    console.log(seq)
     data.results.forEach(function callback(element, index) {
-        console.log(index)
+        const c1 = hexToRgb(`#${seq[index]}`)
+        var rgba = `rgba(${c1['r']}, ${c1['g']}, ${c1['b']},1)`
+        const data_search = document.getElementById('kommissionen_search').value
+        if (data_search.length > 0){
+            if (element.name.includes(data_search)){
+        rgba = `rgba(${c1['r']}, ${c1['g']}, ${c1['b']},1)`} else {
+        rgba = `rgba(${c1['r']}, ${c1['g']}, ${c1['b']},0.1)`
+        }
+        } else {
+        rgba = `rgba(${c1['r']}, ${c1['g']}, ${c1['b']},1)`
+        }
         datasets.push({
             label: element.name,
             data: element.mitglieder_ns_organisation,
-            borderColor: `#${seq[index]}`
+            borderColor: rgba
         })
     });
     //console.log(datasets)
@@ -61,10 +81,8 @@ function convertData(data){
     .then(convertData)
     .then(datasets => {
         window.chart.data.datasets.push(...datasets[0]);
-        console.log(datasets)
         window.chart.update()
         return datasets[1]})
-  console.log(data2)
   if (data2.next !== null) {
      fetch_commission_data(data2.next)
   }
@@ -82,24 +100,23 @@ function convertData(data){
     document.getElementById('chart_kommissionen'),
     cfg
   );
-fetch_commission_data("/analyze/api/kommissionen?format=json&count_nazis&limit=10")
+
 const search_box = document.getElementById('kommissionen_search');
-search_box.addEventListener('onkeypress', function (event) {
+search_box.addEventListener('keypress', function (event) {
     const search_box = document.getElementById('kommissionen_search');
-    console.log(search_box.value)
+    const reg_rgba = /,[0-9\.]\)/g
     window.chart.data.datasets.forEach(ds => {
-        console.log(ds)
+        if (ds.label.includes(search_box.value)) {
+            ds.borderColor = ds.borderColor.replace(reg_rgba, ",1)")
+        } else {
+            ds.borderColor = ds.borderColor.replace(reg_rgba, ",0.1)")
+        }
+        window.chart.update()
     })
 });
+  fetch_commission_data("/analyze/api/kommissionen?format=json&count_nazis&limit=10")
 };
 
-function searchKommissionen() {
-    const search_box = document.getElementById('kommissionen_search');
-    console.log(search_box.value)
-    window.chart.data.datasets.forEach(ds => {
-        console.log(ds)
-    })
-}
 </script>
 
 <div>
