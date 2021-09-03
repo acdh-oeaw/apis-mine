@@ -1,0 +1,108 @@
+{% load custom_tags %}
+<script src="https://cdn.jsdelivr.net/npm/google-palette@1.1.0/palette.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+
+<script type="module">
+    import 'https://cdn.jsdelivr.net/npm/chart.js'
+
+    const data = [];
+    const cfg = {
+        type: 'line',
+        datasets: data,
+        options: {
+            parsing: {
+                xAxisKey: 'jahr',
+                yAxisKey: 'data.anteil'
+    },
+    scales: {
+      xAxis: {
+        // The axis for this scale is determined from the first letter of the id as `'x'`
+        // It is recommended to specify `position` and / or `axis` explicitly.
+        type: 'linear',
+      ticks: {
+        callback: function(value, index, values) {
+                        console.log(value)
+                        return value.toString();
+                    }
+      }
+      },
+    },
+}
+    };
+
+function convertData(data){
+    var datasets = []
+    console.log(data.results)
+    var colors = data.results.length
+    var seq = palette('tol-sq', colors);
+    console.log(colors)
+    console.log(seq)
+    data.results.forEach(function callback(element, index) {
+        console.log(index)
+        datasets.push({
+            label: element.name,
+            data: element.mitglieder_ns_organisation,
+            borderColor: `#${seq[index]}`
+        })
+    });
+    //console.log(datasets)
+    //chart.data.datasets.push(...datasets)
+    //chart.update()
+    //console.log(chart)
+    return [datasets, data]
+}
+
+
+
+  async function fetch_commission_data (url) { 
+  const data2 = await fetch(url)
+    .then(response => response.json())
+    .then(convertData)
+    .then(datasets => {
+        window.chart.data.datasets.push(...datasets[0]);
+        console.log(datasets)
+        window.chart.update()
+        return datasets[1]})
+  console.log(data2)
+  if (data2.next !== null) {
+     fetch_commission_data(data2.next)
+  }
+}
+
+//   const data2 = fetch('/analyze/api/kommissionen?format=json&count_nazis&limit=10')
+//     .then(response => response.json())
+//     .then(convertData)
+//     .then(datasets => window.chart.data.datasets.push(...datasets) )
+//     .then(() => window.chart.update())
+//     .then(console.log("rab through"))
+
+    window.onload = function() {
+    window.chart = new Chart(
+    document.getElementById('chart_kommissionen'),
+    cfg
+  );
+fetch_commission_data("/analyze/api/kommissionen?format=json&count_nazis&limit=10")
+const search_box = document.getElementById('kommissionen_search');
+search_box.addEventListener('onkeypress', function (event) {
+    const search_box = document.getElementById('kommissionen_search');
+    console.log(search_box.value)
+    window.chart.data.datasets.forEach(ds => {
+        console.log(ds)
+    })
+});
+};
+
+function searchKommissionen() {
+    const search_box = document.getElementById('kommissionen_search');
+    console.log(search_box.value)
+    window.chart.data.datasets.forEach(ds => {
+        console.log(ds)
+    })
+}
+</script>
+
+<div>
+    <canvas id="chart_kommissionen"></canvas>
+    <input id="kommissionen_search">
+</div>

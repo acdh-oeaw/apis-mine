@@ -29,14 +29,15 @@ class KommissionZeitstrahl(serializers.Serializer):
                     mem_end = mem.end_date
                 if year in range(int(mem.start_date.strftime("%Y")), int(mem_end.strftime("%Y"))):
                     res[year] += 1
-        return res
+        res2 = [{"jahr": str(k), "data": {"absolut": v}} for k, v in res.items()]
+        return res2
 
 
 class KommissionenZeitstrahlNazis(KommissionZeitstrahl):
     mitglieder_ns_organisation = serializers.SerializerMethodField(method_name="count_nazi_member")
 
     def count_nazi_member(self, obj):
-        res = dict()
+        res = []
         members = self._members
         members_dict = dict()
         end = obj.end_date
@@ -66,5 +67,5 @@ class KommissionenZeitstrahlNazis(KommissionZeitstrahl):
                             count += 1
                 print("test")
 
-            res[year] = {"absolut": count, "anteil": 0 if count == 0 else count/count_mem}
+            res.append({"jahr": str(year), "data": {"absolut": count, "anteil": 0 if count == 0 else count/count_mem}})
         return res

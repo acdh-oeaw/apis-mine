@@ -92,6 +92,10 @@ class ContactView(TemplateView):
     template_name = "theme/contact.html"
 
 
+class TestView(TemplateView):
+    template_name = "theme/test_template.html"
+
+
 class PersonListView(GenericListView):
     model = Person
     filter_class = PersonListFilter
