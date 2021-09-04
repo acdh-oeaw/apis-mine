@@ -63,7 +63,8 @@ function convertData(data){
         datasets.push({
             label: element.name,
             data: element.mitglieder_ns_organisation,
-            borderColor: rgba
+            borderColor: rgba,
+            tension: 0.4
         })
     });
     //console.log(datasets)
@@ -101,19 +102,37 @@ function convertData(data){
     cfg
   );
 
-const search_box = document.getElementById('kommissionen_search');
-search_box.addEventListener('keypress', function (event) {
+  function debounce(func, wait, immediate) {
+	var timeout;
+	return function() {
+		var context = this, args = arguments;
+		var later = function() {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		};
+		var callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) func.apply(context, args);
+	};
+};
+
+  const search_box = document.getElementById('kommissionen_search');
+search_box.addEventListener('input', debounce (function (event) {
     const search_box = document.getElementById('kommissionen_search');
-    const reg_rgba = /,[0-9\.]\)/g
     window.chart.data.datasets.forEach(ds => {
         if (ds.label.includes(search_box.value)) {
-            ds.borderColor = ds.borderColor.replace(reg_rgba, ",1)")
+            let bc_list = ds.borderColor.split(",").slice(0,3)
+            bc_list.push("1)")
+            ds.borderColor = bc_list.join(",")
         } else {
-            ds.borderColor = ds.borderColor.replace(reg_rgba, ",0.1)")
+            let bc_list = ds.borderColor.split(",").slice(0,3)
+            bc_list.push("0.1)")
+            ds.borderColor = bc_list.join(",")
         }
         window.chart.update()
     })
-});
+}, 250)) ;
   fetch_commission_data("/analyze/api/kommissionen?format=json&count_nazis&limit=10")
 };
 

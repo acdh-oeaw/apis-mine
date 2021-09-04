@@ -29,8 +29,26 @@ class KommissionZeitstrahl(serializers.Serializer):
                     mem_end = mem.end_date
                 if year in range(int(mem.start_date.strftime("%Y")), int(mem_end.strftime("%Y"))):
                     res[year] += 1
-        res2 = [{"jahr": str(k), "data": {"absolut": v}} for k, v in res.items()]
+        res2 = [{"jahr": str(k), "data": {"absolut": v}} for k, v in res.items()] 
+        if not self._include_zeros:
+            c = 0
+            for r in res2:
+                if r["data"]["absolut"] == 0:
+                    c += 1
+                else:
+                    break
+            c2 = len(res)
+            for r in reversed(res2):
+                if r["data"]["absolut"] == 0:
+                    c2 -= 1
+                else:
+                    break
+            res2 = res2[c:c2]
         return res2
+
+    def __init__(self, *args, include_zeros=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._include_zeros = include_zeros
 
 
 class KommissionenZeitstrahlNazis(KommissionZeitstrahl):
@@ -65,7 +83,19 @@ class KommissionenZeitstrahlNazis(KommissionZeitstrahl):
                         r1 = m.related_person.personinstitution_set.filter(relation_type__in=[3452, 3451], start_date__lte=f"{str(year)}-12-31").order_by("start_date")
                         if r1.count() > 0:
                             count += 1
-                print("test")
-
             res.append({"jahr": str(year), "data": {"absolut": count, "anteil": 0 if count == 0 else count/count_mem}})
+        if not self._include_zeros:
+            c = 0
+            for r in res:
+                if r["data"]["absolut"] == 0:
+                    c += 1
+                else:
+                    break
+            c2 = len(res)
+            for r in reversed(res):
+                if r["data"]["absolut"] == 0:
+                    c2 -= 1
+                else:
+                    break
+            res = res[c:c2]
         return res
