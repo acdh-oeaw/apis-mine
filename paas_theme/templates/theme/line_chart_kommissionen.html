@@ -1,8 +1,52 @@
 {% load custom_tags %}
+{% block scriptHeader %}
+<style>
+.spinner {
+  width: 40px;
+  height: 40px;
+  float: right;
+  position: relative;
+  margin: 0px;
+}
+
+.double-bounce1, .double-bounce2 {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #333;
+  opacity: 0.6;
+  position: absolute;
+  top: 0;
+  left: 0;
+  
+  -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
+  animation: sk-bounce 2.0s infinite ease-in-out;
+}
+
+.double-bounce2 {
+  -webkit-animation-delay: -1.0s;
+  animation-delay: -1.0s;
+}
+
+@-webkit-keyframes sk-bounce {
+  0%, 100% { -webkit-transform: scale(0.0) }
+  50% { -webkit-transform: scale(1.0) }
+}
+
+@keyframes sk-bounce {
+  0%, 100% { 
+    transform: scale(0.0);
+    -webkit-transform: scale(0.0);
+  } 50% { 
+    transform: scale(1.0);
+    -webkit-transform: scale(1.0);
+  }
+}
+</style>
 <script src="https://cdn.jsdelivr.net/npm/google-palette@1.1.0/palette.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-
+{% endblock scriptHeader %}
 <script type="module">
     import 'https://cdn.jsdelivr.net/npm/chart.js'
 
@@ -24,6 +68,24 @@
         callback: function(value, index, values) {
                         return value.toString();
                     }
+      },
+      title: {
+        display: true,
+        text: "Jahr"
+      }
+      },
+      yAxis: {
+        // The axis for this scale is determined from the first letter of the id as `'x'`
+        // It is recommended to specify `position` and / or `axis` explicitly.
+        type: 'linear',
+      ticks: {
+        callback: function(value, index, values) {
+                        return `${value*100}%`;
+                    }
+      },
+      title: {
+        display: true,
+        text: "Anteil Mitglieder in NS-Organisationen an Gesamtmitgliedern"
       }
       },
     },
@@ -53,7 +115,7 @@ function convertData(data){
         var rgba = `rgba(${c1['r']}, ${c1['g']}, ${c1['b']},1)`
         const data_search = document.getElementById('kommissionen_search').value
         if (data_search.length > 0){
-            if (element.name.includes(data_search)){
+            if (element.name.toLowerCase().includes(data_search.toLowerCase())){
         rgba = `rgba(${c1['r']}, ${c1['g']}, ${c1['b']},1)`} else {
         rgba = `rgba(${c1['r']}, ${c1['g']}, ${c1['b']},0.1)`
         }
@@ -86,6 +148,8 @@ function convertData(data){
         return datasets[1]})
   if (data2.next !== null) {
      fetch_commission_data(data2.next)
+  } else {
+    document.getElementById("spinner_load_kommissionen").style.visibility = "hidden"
   }
 }
 
@@ -136,5 +200,12 @@ search_box.addEventListener('input', debounce (function (event) {
 
 <div>
     <canvas id="chart_kommissionen"></canvas>
-    <input id="kommissionen_search">
+    <div id="form_kommissionen_search">
+      <label for="kommissionen_search">Filter</label>
+      <input id="kommissionen_search">
+      <div class="spinner" id="spinner_load_kommissionen">
+        <div class="double-bounce1"></div>
+        <div class="double-bounce2"></div>
+      </div>
+    </div>
 </div>
