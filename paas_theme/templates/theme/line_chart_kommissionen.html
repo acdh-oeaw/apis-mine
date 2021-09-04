@@ -114,19 +114,19 @@ function convertData(data){
         const c1 = hexToRgb(`#${seq[index]}`)
         var rgba = `rgba(${c1['r']}, ${c1['g']}, ${c1['b']},1)`
         const data_search = document.getElementById('kommissionen_search').value
+        let hidden = false
         if (data_search.length > 0){
-            if (element.name.toLowerCase().includes(data_search.toLowerCase())){
-        rgba = `rgba(${c1['r']}, ${c1['g']}, ${c1['b']},1)`} else {
-        rgba = `rgba(${c1['r']}, ${c1['g']}, ${c1['b']},0.1)`
+            if (!element.name.toLowerCase().includes(data_search.toLowerCase())){
+              hidden = true
+            }
         }
-        } else {
-        rgba = `rgba(${c1['r']}, ${c1['g']}, ${c1['b']},1)`
-        }
+
         datasets.push({
             label: element.name,
             data: element.mitglieder_ns_organisation,
-            borderColor: rgba,
-            tension: 0.4
+            borderColor: `rgba(${c1['r']}, ${c1['g']}, ${c1['b']},0.8)`,
+            tension: 0.4,
+            hidden: hidden
         })
     });
     //console.log(datasets)
@@ -181,14 +181,10 @@ search_box.addEventListener('input', debounce (function (event) {
       return obj.label.toLowerCase().includes(search_box.value.toLowerCase())
     })
     window.chart.data.datasets.forEach(ds => {
-             let bc_list = ds.borderColor.split(",").slice(0,3)
-             bc_list.push("0.1)")
-             ds.borderColor = bc_list.join(",")
+              ds.hidden = true
     })
     filtered_datasets.forEach(ds => {
-             let bc_list = ds.borderColor.split(",").slice(0,3)
-             bc_list.push("1)")
-             ds.borderColor = bc_list.join(",")
+              ds.hidden = false
     })
         window.chart.update()
     
