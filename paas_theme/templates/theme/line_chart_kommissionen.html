@@ -89,13 +89,6 @@ function convertData(data){
   }
 }
 
-//   const data2 = fetch('/analyze/api/kommissionen?format=json&count_nazis&limit=10')
-//     .then(response => response.json())
-//     .then(convertData)
-//     .then(datasets => window.chart.data.datasets.push(...datasets) )
-//     .then(() => window.chart.update())
-//     .then(console.log("rab through"))
-
     window.onload = function() {
     window.chart = new Chart(
     document.getElementById('chart_kommissionen'),
@@ -120,18 +113,21 @@ function convertData(data){
   const search_box = document.getElementById('kommissionen_search');
 search_box.addEventListener('input', debounce (function (event) {
     const search_box = document.getElementById('kommissionen_search');
-    window.chart.data.datasets.forEach(ds => {
-        if (ds.label.includes(search_box.value)) {
-            let bc_list = ds.borderColor.split(",").slice(0,3)
-            bc_list.push("1)")
-            ds.borderColor = bc_list.join(",")
-        } else {
-            let bc_list = ds.borderColor.split(",").slice(0,3)
-            bc_list.push("0.1)")
-            ds.borderColor = bc_list.join(",")
-        }
-        window.chart.update()
+    const filtered_datasets = window.chart.data.datasets.filter(obj => {
+      return obj.label.toLowerCase().includes(search_box.value.toLowerCase())
     })
+    window.chart.data.datasets.forEach(ds => {
+             let bc_list = ds.borderColor.split(",").slice(0,3)
+             bc_list.push("0.1)")
+             ds.borderColor = bc_list.join(",")
+    })
+    filtered_datasets.forEach(ds => {
+             let bc_list = ds.borderColor.split(",").slice(0,3)
+             bc_list.push("1)")
+             ds.borderColor = bc_list.join(",")
+    })
+        window.chart.update()
+    
 }, 250)) ;
   fetch_commission_data("/analyze/api/kommissionen?format=json&count_nazis&limit=10")
 };
