@@ -1,4 +1,5 @@
 {% extends "theme/base.html" %}
+{% load static %}
 {% block scriptHeader %}
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/jq-3.3.1/jszip-2.5.0/dt-1.11.0/b-2.0.0/b-html5-2.0.0/cr-1.5.4/r-2.2.9/sp-1.4.0/datatables.min.css"/>
 
@@ -8,7 +9,7 @@
 <script src="https://code.highcharts.com/modules/exporting.js"></script>
 <script src="https://code.highcharts.com/modules/export-data.js"></script>
 <script src="https://code.highcharts.com/modules/accessibility.js"></script>
- 
+<script src="{% static 'theme/js/helpers.js' %}"></script>
 {% endblock scriptHeader %}
 {% block content %}
 <div class="container">
@@ -196,57 +197,16 @@
 {{ nazi_kommission|json_script:"naziKommData" }}
 
 <script>
+
+
     $(document).ready(function() {
-        $('#nsMemberTable').DataTable( {
-            dom: 'Bfrtip',
-            responsive: true,
-            buttons: [
-                'copy', 'excel', 'pdf'
-            ]
-        } );
-        $('#nsKommTable').DataTable( {
-            dom: 'Bfrtip',
-            responsive: true,
-            buttons: [
-                'copy', 'excel', 'pdf'
-            ]
-        } );
-        $('#kommByNazi').DataTable( {
-            dom: 'Bfrtip',
-            responsive: true,
-            pageLength: 200,
-            order: [[ 1, "desc" ]],
-            buttons: [
-                'copy', 'excel', 'pdf'
-            ]
-        } );
-        $('#naziByKomm').DataTable( {
-            dom: 'Bfrtip',
-            responsive: true,
-            pageLength: 200,
-            order: [[ 1, "desc" ]],
-            buttons: [
-                'copy', 'excel', 'pdf'
-            ]
-        } );
-        $('#proposedByNaziAll').DataTable( {
-            dom: 'Bfrtip',
-            responsive: true,
-            pageLength: 30,
-            order: [[ 2, "asc" ]],
-            buttons: [
-                'copy', 'excel', 'pdf'
-            ]
-        } );
-        $('#ruhend').DataTable( {
-            dom: 'Bfrtip',
-            responsive: true,
-            pageLength: 30,
-            order: [[ 1, "asc" ]],
-            buttons: [
-                'copy', 'excel', 'pdf'
-            ]
-        } );
+
+        createDataTable('nsMemberTable')
+        createDataTable('nsKommTable')
+        createDataTable('kommByNazi',[[ 1, "desc" ]],200)
+        createDataTable('naziByKomm',[[ 1, "desc" ]],200)
+        createDataTable('proposedByNaziAll',[[ 2, "asc" ]],30)
+        createDataTable('ruhend',[[ 1, "asc" ]],30)
 
         Highcharts.chart('kommByNaziChart', {
             data: {

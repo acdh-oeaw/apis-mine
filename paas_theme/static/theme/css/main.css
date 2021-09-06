@@ -1783,3 +1783,39 @@ svg.feather.feather-chevron-left,svg.feather.feather-chevron-right {
   width:90%;
 }
 
+/*** Datatables ***/
+
+.controlwrapper {
+  align-items:baseline
+}
+
+div.dataTables_filter {
+  text-align:left !important;
+}
+
+.btn-link {
+  font-size:20px;
+}
+
+.exportbuttons {
+  text-align: right;
+}
+
+.dataTables_info {
+  text-align: center;
+}
+
+.filters input {
+  width:100%;
+  padding: 3px;
+  box-sizing: border-box;
+}
+
+.dataTables_wrapper table {
+  width:100%;
+}
+
+/**** Font Aweseome ***/
+.far {
+font-family: "Font Awesome 5 Free" !important;
+}
