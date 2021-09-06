@@ -92,6 +92,18 @@
     plugins: {
         legend: {
             display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: (item) => {
+              var exten
+              if(item.raw.data.absolut > 1) {exten = 'er'} else {exten = ''}
+            return `${item.dataset.label}: ${item.raw.data.absolut} Mitglied${exten} (~${Math.round(item.raw.data.anteil*100)}%)`
+            },
+            title: (items) => {
+              return `Jahr ${items[0].raw.jahr}`
+            }
+          }
         }
     }
 }
