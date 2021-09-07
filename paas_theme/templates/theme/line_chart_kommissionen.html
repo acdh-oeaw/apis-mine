@@ -140,11 +140,18 @@ function convertData(data){
     });
     return [datasets, data]
 }
-
+const fetch_retry = async (url, options, n) => {
+    try {
+        return await fetch(url, options)
+    } catch(err) {
+        if (n === 1) throw err;
+        return await fetch_retry(url, options, n - 1);
+    }
+};
 
 
   async function fetch_commission_data (url) { 
-  const data2 = await fetch(url)
+  const data2 = await fetch_retry(url, {}, 3)
     .then(response => response.json())
     .then(convertData)
     .then(datasets => {
@@ -193,7 +200,7 @@ document.addEventListener("DOMContentLoaded", function() {
         window.chart_kommissionen.update()
     
 }, 250)) ;
-  fetch_commission_data("/analyze/api/kommissionen?format=json&limit=30")
+  fetch_commission_data("/analyze/api/kommissionen?format=json&limit=100")
 })
 
 </script>
