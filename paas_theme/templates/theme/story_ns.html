@@ -1,7 +1,8 @@
 {% extends "theme/base.html" %}
 {% load static %}
 {% block scriptHeader %}
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/jq-3.3.1/jszip-2.5.0/dt-1.11.0/b-2.0.0/b-html5-2.0.0/cr-1.5.4/r-2.2.9/sp-1.4.0/datatables.min.css"/>
+<link rel="stylesheet" type="text/css"
+    href="https://cdn.datatables.net/v/bs4/jq-3.3.1/jszip-2.5.0/dt-1.11.0/b-2.0.0/b-html5-2.0.0/cr-1.5.4/r-2.2.9/sp-1.4.0/datatables.min.css" />
 
 <script src="https://code.highcharts.com/highcharts.js"></script>
 <script src="https://code.highcharts.com/modules/data.js"></script>
@@ -13,178 +14,208 @@
 {% endblock scriptHeader %}
 {% block content %}
 <div class="container">
-    <div class="alert alert-warning" role="alert">
-        Work in Progress;<br />
-        <strong>ToDos</strong>
-        <ul>
-            <li>Link entitites to their detail-views</li>
-            <li>make columns filterable</li>
-            <li>remove blank bars from charts</li>
-        </ul>
-      </div>
-    <h1>Nationalsozialismus und Entnazifizierung</h1>
-<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus perspiciatis voluptatem accusamus ratione nulla, quod similique. Possimus, recusandae soluta nemo itaque, corporis repellat facere obcaecati laborum praesentium, fugiat eum! Exercitationem! </p>
-<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus perspiciatis voluptatem accusamus ratione nulla, quod similique. Possimus, recusandae soluta nemo itaque, corporis repellat facere obcaecati laborum praesentium, fugiat eum! Exercitationem! </p>
-    <div id="nsMember">
-        <h2>Mitglieder in der Akademie - Mitglied in der NSDAP</h2>
-        {% lorem 3 p %}
-        <ul data-sourcepos="1:1-7:87" dir="auto">
-            <li data-sourcepos="1:1-3:66">Welche Akademiemitglieder traten vor dem 13.3.1938 der NSDAP bei? Geordnet nach Wahljahr, aufsteigend (Beitrittsdatum zur Partei). Name, Beitrittsdatum, Wahljahr, nur NSDAP (kmI und wM)
-            <ul data-sourcepos="2:3-3:66">
-            <li data-sourcepos="2:3-2:80">Graphik 1: jene, die zwischen 1939 und 1944 zu kM I oder wM gewählt wurden;</li>
-            <li data-sourcepos="3:3-3:66">Graphik 2: jene, die ab 1945 zu kM I oder wM gewählt wurden?</li>
-            </ul>
-            </li>
-            <li data-sourcepos="4:1-6:66">Welche Akademiemitglieder traten nach dem 13.3.1938 der NSDAP bei? (kmi und wm)
-            <ul data-sourcepos="5:3-6:66">
-            <li data-sourcepos="5:3-5:80">Graphik 1: jene, die zwischen 1939 und 1944 zu kM I oder wM gewählt wurden;</li>
-            <li data-sourcepos="6:3-6:66">Graphik 2: jene, die ab 1945 zu kM I oder wM gewählt wurden?</li>
-            </ul>
-            </li>
-            <li data-sourcepos="7:1-7:87">Welche Mitglieder traten vor ihrer Wahl, welche danach in die NSDAP ein? (kMi und wM)</li>
-        </ul>
-        <h3>Tabelle 1: NSDAP-Mitglieder</h2>
-        <table id="nsMemberTable" class="display" style="width:100%">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Betrittsdatum NSDAP</th>
-                    <th>Beitrittsdatum Akademie</th>
-                    <th>Illegal (Beitritt vor März 1938)</th>
-                    <th>mitglied_vor_ns</th>
-                    <th>mitglied_in_ns</th>
-                    <th>mitglied_nach_ns</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for x in ns_members %}
-                <tr>
-                    <td>{{ x.name }}, {{ x.first_name }} <a href="#{{ x.id }}">-></a></td>
-                    <td>{{ x.beitritt_nsdap }}</td>
-                    <td>{{ x.beitritt_akademie }}</td>
-                    <td>{{ x.illegal }}</td>
-                    <td>{{ x.mitglied_vor_ns }}</td>
-                    <td>{{ x.mitglied_in_ns }}</td>
-                    <td>{{ x.mitglied_nach_ns }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div id="kommissionen">
-        <h2>NSDAP-Mitglieder in den Kommissionen</h2>
-        <ul>
-            <li>In welchen Kommissionen waren ehemalige Mitglieder der NSDAP vertreten?</li>
-            <li>Summe der ehemaligen NSDAP Mitglieder in Kommissionen</li>
-        </ul>
-        <h3>Tabelle 2: Kommissionen und NSDAP-Mitglieder</h2>
-            <table id="nsKommTable" class="display" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>Kommission</th>
-                        <th>Kommissionsmitglied</th>
-                        <th>relation_type__name</th>
-                        <th>start_date</th>
-                        <th>end_date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for x in nazi_komm %}
-                    <tr>
-                        <td>{{ x.related_institution__name }}<a href="#{{ x.related_institution__id }}">-></a></td>
-                        <td>{{ x.related_person__name }}, {{ x.related_person__first_name }} <a href="#{{ x.related_person__id }}">-></a></td>
-                        <td>{{ x.relation_type__name }}</td>
-                        <td>{{ x.start_date|date:"Y-m-d" }}</td>
-                        <td>{{ x.end_date|date:"Y-m-d" }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        <p>Gruppiert man obige Tabelle nach den Kommission so ergibt sich folgende Verteilung von NSDAP-Mitgliedern über die einzelnen Kommissionen:</p>
-        <h3>Grafik 1: Kommissionen nach Anzahl NSDAP-Mitglieder</h3>
-        <div hidden>{{ komm_grouped_html|safe }}</div>
+    <div class="row">
+        <div class="col-sm-3">
+            <nav id="toc" class="sticky-top"></nav>
+        </div>
+        <div class="col-sm-9">
+            <div class="alert alert-warning" role="alert">
+                Work in Progress;<br />
+                <strong>ToDos</strong>
+                <ul>
+                    <li>Link entitites to their detail-views</li>
+                    <li>make columns filterable</li>
+                    <li>remove blank bars from charts</li>
+                </ul>
+            </div>
+            <h1>Nationalsozialismus und Entnazifizierung</h1>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus perspiciatis voluptatem accusamus
+                ratione nulla, quod similique. Possimus, recusandae soluta nemo itaque, corporis repellat facere
+                obcaecati laborum praesentium, fugiat eum! Exercitationem! </p>
+            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus perspiciatis voluptatem accusamus
+                ratione nulla, quod similique. Possimus, recusandae soluta nemo itaque, corporis repellat facere
+                obcaecati laborum praesentium, fugiat eum! Exercitationem! </p>
+            <div id="nsMember">
+                <h2>Mitglieder in der Akademie - Mitglied in der NSDAP</h2>
+                {% lorem 3 p %}
+                <ul data-sourcepos="1:1-7:87" dir="auto">
+                    <li data-sourcepos="1:1-3:66">Welche Akademiemitglieder traten vor dem 13.3.1938 der NSDAP bei?
+                        Geordnet nach Wahljahr, aufsteigend (Beitrittsdatum zur Partei). Name, Beitrittsdatum, Wahljahr,
+                        nur NSDAP (kmI und wM)
+                        <ul data-sourcepos="2:3-3:66">
+                            <li data-sourcepos="2:3-2:80">Graphik 1: jene, die zwischen 1939 und 1944 zu kM I oder wM
+                                gewählt wurden;</li>
+                            <li data-sourcepos="3:3-3:66">Graphik 2: jene, die ab 1945 zu kM I oder wM gewählt wurden?
+                            </li>
+                        </ul>
+                    </li>
+                    <li data-sourcepos="4:1-6:66">Welche Akademiemitglieder traten nach dem 13.3.1938 der NSDAP bei?
+                        (kmi und wm)
+                        <ul data-sourcepos="5:3-6:66">
+                            <li data-sourcepos="5:3-5:80">Graphik 1: jene, die zwischen 1939 und 1944 zu kM I oder wM
+                                gewählt wurden;</li>
+                            <li data-sourcepos="6:3-6:66">Graphik 2: jene, die ab 1945 zu kM I oder wM gewählt wurden?
+                            </li>
+                        </ul>
+                    </li>
+                    <li data-sourcepos="7:1-7:87">Welche Mitglieder traten vor ihrer Wahl, welche danach in die NSDAP
+                        ein? (kMi und wM)</li>
+                </ul>
+                <h3>Tabelle 1: NSDAP-Mitglieder</h2>
+                    <table id="nsMemberTable" class="display" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Betrittsdatum NSDAP</th>
+                                <th>Beitrittsdatum Akademie</th>
+                                <th>Illegal (Beitritt vor März 1938)</th>
+                                <th>mitglied_vor_ns</th>
+                                <th>mitglied_in_ns</th>
+                                <th>mitglied_nach_ns</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for x in ns_members %}
+                            <tr>
+                                <td>{{ x.name }}, {{ x.first_name }} <a href="#{{ x.id }}">-></a></td>
+                                <td>{{ x.beitritt_nsdap }}</td>
+                                <td>{{ x.beitritt_akademie }}</td>
+                                <td>{{ x.illegal }}</td>
+                                <td>{{ x.mitglied_vor_ns }}</td>
+                                <td>{{ x.mitglied_in_ns }}</td>
+                                <td>{{ x.mitglied_nach_ns }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+            </div>
+            <div id="kommissionen">
+                <h2>NSDAP-Mitglieder in den Kommissionen</h2>
+                <ul>
+                    <li>In welchen Kommissionen waren ehemalige Mitglieder der NSDAP vertreten?</li>
+                    <li>Summe der ehemaligen NSDAP Mitglieder in Kommissionen</li>
+                </ul>
+                <h3>Tabelle 2: Kommissionen und NSDAP-Mitglieder</h2>
+                    <table id="nsKommTable" class="display" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Kommission</th>
+                                <th>Kommissionsmitglied</th>
+                                <th>relation_type__name</th>
+                                <th>start_date</th>
+                                <th>end_date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for x in nazi_komm %}
+                            <tr>
+                                <td>{{ x.related_institution__name }}<a href="#{{ x.related_institution__id }}">-></a>
+                                </td>
+                                <td>{{ x.related_person__name }}, {{ x.related_person__first_name }} <a
+                                        href="#{{ x.related_person__id }}">-></a></td>
+                                <td>{{ x.relation_type__name }}</td>
+                                <td>{{ x.start_date|date:"Y-m-d" }}</td>
+                                <td>{{ x.end_date|date:"Y-m-d" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <p>Gruppiert man obige Tabelle nach den Kommission so ergibt sich folgende Verteilung von
+                        NSDAP-Mitgliedern über die einzelnen Kommissionen:</p>
+                    <h3>Grafik 1: Kommissionen nach Anzahl NSDAP-Mitglieder</h3>
+                    <div hidden>{{ komm_grouped_html|safe }}</div>
 
-        <figure class="highcharts-figure">
-            <div id="kommByNaziChart"></div>
-        </figure>
-        <p>Gruppiert man obige Tabelle nach den Mitgliedern so ergibt sich folgende Verteilung:</p>
-        <h3>Grafik 2: NSDAP-Mitglieder und ihre Kommissionen</h3>
-        <div hidden>{{ member_grouped|safe }}</div>
-        <figure class="highcharts-figure">
-            <div id="naziByKommChart"></div>
-        </figure>
-        <p>Der zeitliche Verlauf der der Anzahl (aller) Mitglieder in den Kommissionen ergibt folgende Grafik</p>
-        <h3>Grafik 2a: Verteilung aller Mitglieder über Kommisionen</h3>
-            {% include "theme/line_chart_kommissionen.html" %}
-        <p>Im Vergleich dazu die Verteilung der (ehemaligen) Mitglieder von NS-Organisationen in den Kommissionen</p>
-        <h3>Grafik 2b: Verteilung (ehemaliger) Mitglieder von NS-Organisationen über Kommisionen</h3>    
-            {% include "theme/line_chart_kommissionen_nazis.html" %}
-    </div>
-    <div id="nezwerke">
-        <h2>NS-Netzwerke - Wer schlägt wen zur Wahl vor</h2>
-        <ul>
-            <li>
-                Wen schlagen die ehemaligen Nationalsozialisten nach 1945 erfolgreich zur Wahl vor? (Kriterium: mindestens 2 ehemalige NSDAP-Angehörige als Vorschlagende) Sortierung nach Anzahl der vorschlagenden NSDAP Mitgliedern
-            </li>
-        </ul>
-        <h3>Table 3: Wer schlägt wen vor</h3>
-        {{ proposed_by_nazi_table|safe }}
-        <p>
-            Gruppiert man diese Tabelle nach den vorschlagenden NSDAP Mitgliedern so ergibt sich untenstehende Verteilung:
-        </p>
-        <h3>Grafik 3: Vorschläge nach NSDAP-Mitgliedern gruppiert</h3>
-        <div hidden>{{ proposed_by_nazi_grouped_by_nazi|safe }}</div>
-        <figure class="highcharts-figure">
-            <div id="nazisProposingChart"></div>
-        </figure>
-        <p>
-            Eine Gruppierung nach den Vorgeschlagenen stellt sich folgendermaßen dar:
-        </p>
-        <h3>Grafik 4: Mitglieder nach Anzahl vorschlagender NSDAP-Mitgliedern</h3>
-        <div hidden>{{ proposed_by_nazi|safe }}</div>
-        <figure class="highcharts-figure">
-            <div id="proposedByNaziChart"></div>
-        </figure>
-    </div>
-    <div id="ruhendstellungen">
-        <h2>Entnazifizierung</h2>
-        <ul>
-            <li>
-                Wer wurde ruhendgestellt (August)? Wer wurde im ausgeschlossen? Name, Datum des Ausschlusses/ruhend Stellung, Mitgliedsart (kM I und wM)
-            </li>
-            <li>
-                Wann wurden wessen Ruhendstellungen und Ausschlüsse aufgehoben?
-            </li>
-            <li>
-                Wer ist trotz Ruhendstellung in den veröffentlichen Kommissionslisten? Wer ist Kommissionsmitglied während seiner Ruhendstellung/Ausschlusses?
-            </li>
-        </ul>
-        <h3>Tabelle 4: "Ruhend gestellt"</h2>
-            <table id="ruhend" class="display" style="width:100%">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Klasse</th>
-                        <th>Ruhendstellung Beginn</th>
-                        <th>Ruhendstellung Ende</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for x in ruhend %}
-                    <tr>
-                        <td>{{ x.related_person__name }}, {{ x.related_person__first_name }} <a href="#{{ x.related_person__id }}">-></a></td>
-                        <td>{{ x.related_institution__name }}</td>
-                        <td>{{ x.start_date|date:"Y-m-d" }}</td>
-                        <td>{{ x.end_date|date:"Y-m-d"  }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <h3>Grafik 5: Ruhendstellung nach Klassen</h3>
-        <div hidden>{{ ruhend_by_klasse|safe }}</div>
-        <figure class="highcharts-figure">
-            <div id="ruhendByKlasseChart"></div>
-        </figure>
+                    <figure class="highcharts-figure">
+                        <div id="kommByNaziChart"></div>
+                    </figure>
+                    <p>Gruppiert man obige Tabelle nach den Mitgliedern so ergibt sich folgende Verteilung:</p>
+                    <h3>Grafik 2: NSDAP-Mitglieder und ihre Kommissionen</h3>
+                    <div hidden>{{ member_grouped|safe }}</div>
+                    <figure class="highcharts-figure">
+                        <div id="naziByKommChart"></div>
+                    </figure>
+                    <p>Der zeitliche Verlauf der der Anzahl (aller) Mitglieder in den Kommissionen ergibt folgende
+                        Grafik</p>
+                    <h3>Grafik 2a: Verteilung aller Mitglieder über Kommisionen</h3>
+                    {% include "theme/line_chart_kommissionen.html" %}
+                    <p>Im Vergleich dazu die Verteilung der (ehemaligen) Mitglieder von NS-Organisationen in den
+                        Kommissionen</p>
+                    <h3>Grafik 2b: Verteilung (ehemaliger) Mitglieder von NS-Organisationen über Kommisionen</h3>
+                    {% include "theme/line_chart_kommissionen_nazis.html" %}
+            </div>
+            <div id="nezwerke">
+                <h2>NS-Netzwerke - Wer schlägt wen zur Wahl vor</h2>
+                <ul>
+                    <li>
+                        Wen schlagen die ehemaligen Nationalsozialisten nach 1945 erfolgreich zur Wahl vor? (Kriterium:
+                        mindestens 2 ehemalige NSDAP-Angehörige als Vorschlagende) Sortierung nach Anzahl der
+                        vorschlagenden NSDAP Mitgliedern
+                    </li>
+                </ul>
+                <h3>Table 3: Wer schlägt wen vor</h3>
+                {{ proposed_by_nazi_table|safe }}
+                <p>
+                    Gruppiert man diese Tabelle nach den vorschlagenden NSDAP Mitgliedern so ergibt sich untenstehende
+                    Verteilung:
+                </p>
+                <h3>Grafik 3: Vorschläge nach NSDAP-Mitgliedern gruppiert</h3>
+                <div hidden>{{ proposed_by_nazi_grouped_by_nazi|safe }}</div>
+                <figure class="highcharts-figure">
+                    <div id="nazisProposingChart"></div>
+                </figure>
+                <p>
+                    Eine Gruppierung nach den Vorgeschlagenen stellt sich folgendermaßen dar:
+                </p>
+                <h3>Grafik 4: Mitglieder nach Anzahl vorschlagender NSDAP-Mitgliedern</h3>
+                <div hidden>{{ proposed_by_nazi|safe }}</div>
+                <figure class="highcharts-figure">
+                    <div id="proposedByNaziChart"></div>
+                </figure>
+            </div>
+            <div id="ruhendstellungen">
+                <h2>Entnazifizierung</h2>
+                <ul>
+                    <li>
+                        Wer wurde ruhendgestellt (August)? Wer wurde im ausgeschlossen? Name, Datum des
+                        Ausschlusses/ruhend Stellung, Mitgliedsart (kM I und wM)
+                    </li>
+                    <li>
+                        Wann wurden wessen Ruhendstellungen und Ausschlüsse aufgehoben?
+                    </li>
+                    <li>
+                        Wer ist trotz Ruhendstellung in den veröffentlichen Kommissionslisten? Wer ist
+                        Kommissionsmitglied während seiner Ruhendstellung/Ausschlusses?
+                    </li>
+                </ul>
+                <h3>Tabelle 4: "Ruhend gestellt"</h2>
+                    <table id="ruhend" class="display" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Klasse</th>
+                                <th>Ruhendstellung Beginn</th>
+                                <th>Ruhendstellung Ende</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for x in ruhend %}
+                            <tr>
+                                <td>{{ x.related_person__name }}, {{ x.related_person__first_name }} <a
+                                        href="#{{ x.related_person__id }}">-></a></td>
+                                <td>{{ x.related_institution__name }}</td>
+                                <td>{{ x.start_date|date:"Y-m-d" }}</td>
+                                <td>{{ x.end_date|date:"Y-m-d" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <h3>Grafik 5: Ruhendstellung nach Klassen</h3>
+                    <div hidden>{{ ruhend_by_klasse|safe }}</div>
+                    <figure class="highcharts-figure">
+                        <div id="ruhendByKlasseChart"></div>
+                    </figure>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -196,14 +227,21 @@
 <script>
 
 
-    $(document).ready(function() {
+    $(document).ready(function () {
+
+        var navSelector = "#toc";
+        var $myNav = $(navSelector);
+        Toc.init($myNav);
+        $("body").scrollspy({
+            target: navSelector
+        });
 
         createDataTable('nsMemberTable')
         createDataTable('nsKommTable')
-        createDataTable('kommByNazi',[[ 1, "desc" ]],200)
-        createDataTable('naziByKomm',[[ 1, "desc" ]],200)
-        createDataTable('proposedByNaziAll',[[ 2, "asc" ]],30)
-        createDataTable('ruhend',[[ 1, "asc" ]],30)
+        createDataTable('kommByNazi', [[1, "desc"]], 200)
+        createDataTable('naziByKomm', [[1, "desc"]], 200)
+        createDataTable('proposedByNaziAll', [[2, "asc"]], 30)
+        createDataTable('ruhend', [[1, "asc"]], 30)
 
         Highcharts.chart('kommByNaziChart', {
             data: {
@@ -224,23 +262,23 @@
             },
         });
         Highcharts.chart('naziByKommChart', {
-                data: {
-                    table: 'naziByKomm'
-                },
-                chart: {
-                    type: 'column',
-                    zoomType: 'x'
-                },
+            data: {
+                table: 'naziByKomm'
+            },
+            chart: {
+                type: 'column',
+                zoomType: 'x'
+            },
+            title: {
+                text: 'NSDAP-Mitglieder und die Anzahl ihrer Kommission'
+            },
+            yAxis: {
+                allowDecimals: false,
                 title: {
-                    text: 'NSDAP-Mitglieder und die Anzahl ihrer Kommission'
-                },
-                yAxis: {
-                    allowDecimals: false,
-                    title: {
-                        text: 'Units'
-                    }
-                },
-            });
+                    text: 'Units'
+                }
+            },
+        });
         Highcharts.chart('nazisProposingChart', {
             data: {
                 table: 'nazisProposing'
@@ -405,10 +443,11 @@
             }
 
         });
-    } );
+    });
 </script>
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jq-3.3.1/jszip-2.5.0/dt-1.11.0/b-2.0.0/b-html5-2.0.0/cr-1.5.4/r-2.2.9/sp-1.4.0/datatables.min.js"></script>
+<script type="text/javascript"
+    src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.11.0/b-2.0.0/b-html5-2.0.0/cr-1.5.4/r-2.2.9/sp-1.4.0/datatables.min.js"></script>
 {% endblock scripts %}

@@ -1,4 +1,3 @@
-
 {% load custom_tags %}
 {% block scriptHeader %}
 <style>
@@ -59,7 +58,7 @@
         options: {
             parsing: {
                 xAxisKey: 'jahr',
-                yAxisKey: 'data.absolut'
+                yAxisKey: 'data.anteil'
     },
     scales: {
       xAxis: {
@@ -80,9 +79,14 @@
         // The axis for this scale is determined from the first letter of the id as `'x'`
         // It is recommended to specify `position` and / or `axis` explicitly.
         type: 'linear',
+      ticks: {
+        callback: function(value, index, values) {
+                        return `${value*100}%`;
+                    }
+      },
       title: {
         display: true,
-        text: "Mitlieder"
+        text: "Anteil Mitglieder in NS-Organisationen an Gesamtmitgliedern"
       }
       },
     },
@@ -95,7 +99,7 @@
             label: (item) => {
               var exten
               if(item.raw.data.absolut > 1) {exten = 'er'} else {exten = ''}
-            return `${item.dataset.label}: ${item.raw.data.absolut} Mitglied${exten}`
+            return `${item.dataset.label}: ${item.raw.data.absolut} Mitglied${exten} (~${Math.round(item.raw.data.anteil*100)}%)`
             },
             title: (items) => {
               return `Jahr ${items[0].raw.jahr}`
@@ -132,32 +136,28 @@ function convertData(data){
 
         datasets.push({
             label: element.name,
-            data: element.mitglieder,
+            data: element.mitglieder_ns_organisation,
             borderColor: `rgba(${c1['r']}, ${c1['g']}, ${c1['b']},0.8)`,
             tension: 0.4,
-            hidden: hidden,
-            pointRadius: 0
+            hidden: hidden
         })
     });
+    //console.log(datasets)
+    //chart.data.datasets.push(...datasets)
+    //chart.update()
+    //console.log(chart)
     return [datasets, data]
 }
-const fetch_retry = async (url, options, n) => {
-    try {
-        return await fetch(url, options)
-    } catch(err) {
-        if (n === 1) throw err;
-        return await fetch_retry(url, options, n - 1);
-    }
-};
+
 
 
   async function fetch_commission_data (url) { 
-  const data2 = await fetch_retry(url, {}, 3)
+  const data2 = await fetch(url)
     .then(response => response.json())
     .then(convertData)
     .then(datasets => {
-        window.chart_kommissionen.data.datasets.push(...datasets[0]);
-        window.chart_kommissionen.update()
+        window.chart.data.datasets.push(...datasets[0]);
+        window.chart.update()
         return datasets[1]})
   if (data2.next !== null) {
      fetch_commission_data(data2.next)
@@ -165,6 +165,12 @@ const fetch_retry = async (url, options, n) => {
     document.getElementById("spinner_load_kommissionen").style.visibility = "hidden"
   }
 }
+
+    window.onload = function() {
+    window.chart = new Chart(
+    document.getElementById('chart_kommissionen'),
+    cfg
+  );
 
   function debounce(func, wait, immediate) {
 	var timeout;
@@ -209,22 +215,22 @@ document.addEventListener("DOMContentLoaded", function() {
     cfg
   );
   const search_box = document.getElementById('kommissionen_search');
-  search_box.addEventListener('input', debounce (function (event) {
+search_box.addEventListener('input', debounce (function (event) {
     const search_box = document.getElementById('kommissionen_search');
-    const filtered_datasets = window.chart_kommissionen.data.datasets.filter(obj => {
+    const filtered_datasets = window.chart.data.datasets.filter(obj => {
       return obj.label.toLowerCase().includes(search_box.value.toLowerCase())
     })
-    window.chart_kommissionen.data.datasets.forEach(ds => {
+    window.chart.data.datasets.forEach(ds => {
               ds.hidden = true
     })
     filtered_datasets.forEach(ds => {
               ds.hidden = false
     })
-        window.chart_kommissionen.update()
+        window.chart.update()
     
 }, 250)) ;
-  fetch_commission_data("/analyze/api/kommissionen?format=json&limit=100")
-})
+  fetch_commission_data("/analyze/api/kommissionen?format=json&count_nazis&limit=10")
+};
 
 </script>
 

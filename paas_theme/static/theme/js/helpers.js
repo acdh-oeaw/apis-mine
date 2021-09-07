@@ -56,7 +56,6 @@ function hideSearchInputs(containerElement, columns) {
 
             $(`#${containerElement} .filters th`).eq(i).show();
         } else {
-            console.log($(`#${containerElement} th`).eq(i))
             $(`#${containerElement} .filters th`).eq(i).hide();
 
         }
