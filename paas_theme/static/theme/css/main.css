@@ -1,3 +1,7 @@
+html {
+  scroll-padding-top: 100px;
+}
+
 body {
   font-weight: 300;
   color:black;
@@ -1818,4 +1822,11 @@ div.dataTables_filter {
 /**** Font Aweseome ***/
 .far {
 font-family: "Font Awesome 5 Free" !important;
+}
+
+/*** stories toc ***/
+
+#toc {
+  top:100px;
+  z-index:1;
 }
