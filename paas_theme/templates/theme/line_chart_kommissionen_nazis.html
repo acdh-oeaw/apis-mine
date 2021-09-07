@@ -46,6 +46,7 @@
 <script src="https://cdn.jsdelivr.net/npm/google-palette@1.1.0/palette.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.1/dist/xlsx.min.js"></script>
 {% endblock scriptHeader %}
 <script type="module">
     import 'https://cdn.jsdelivr.net/npm/chart.js'
@@ -183,8 +184,35 @@ const fetch_retry = async (url, options, n) => {
 		if (callNow) func.apply(context, args);
 	};
 };
+
+function downloadXlsNazis(event){
+    event.preventDefault()
+    var wb = XLSX.utils.book_new();
+        const data_download = []
+        const data_download_share = []
+        window.chart_kommissionen_nazis.data.datasets.forEach(item => {
+            const res = {}
+            const res_share = {}
+            console.log(item)
+            res.label = item.label
+            item.data.forEach(d => {
+                res[d.jahr] = d.data.absolut
+                res_share[d.jahr] = d.data.anteil
+            })
+            data_download.push(res)
+            data_download_share.push(res_share)
+        })
+        var ws = XLSX.utils.json_to_sheet(data_download);
+        var ws_share = XLSX.utils.json_to_sheet(data_download_share);
+        XLSX.utils.book_append_sheet(wb, ws, 'Mitgl. NS-Organ. absolut')
+        XLSX.utils.book_append_sheet(wb, ws_share, 'Mitgl. NS-Organ. Anteil')
+        let today = new Date().toISOString().slice(0, 10)
+        XLSX.writeFile(wb, `kommissionen_mitglieder_nationalsozialisten_${today}.xls`)
+}
     
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function() { 
+    const download_button_nazis = document.getElementById("download_xls_kommissionen_nazis")
+    download_button_nazis.addEventListener("click", function(event){downloadXlsNazis(event)})
     window.chart_kommissionen_nazis = new Chart(
     document.getElementById('chart_kommissionen_nazis'),
     cfg_nazis
@@ -212,8 +240,9 @@ document.addEventListener("DOMContentLoaded", function() {
 <div>
     <canvas id="chart_kommissionen_nazis"></canvas>
     <div id="form_kommissionen_search_nazis">
-      <label for="kommissionen_search_nazis">Filter</label>
+      <label for="kommissionen_search_nazis">Filter</label> 
       <input id="kommissionen_search_nazis">
+      <i id="download_xls_kommissionen_nazis" data-feather="download" style="margin: 5px">Download</i>
       <div class="spinner" id="spinner_load_kommissionen_nazis">
         <div class="double-bounce1"></div>
         <div class="double-bounce2"></div>

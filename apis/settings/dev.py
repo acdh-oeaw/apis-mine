@@ -79,3 +79,7 @@ STATICFILES_DIRS = [BASE_DIR + "/member_images"]
 
 
 APIS_RELATIONS_FILTER_EXCLUDE += ["annotation", "annotation_set_relation"]
+
+PAAS_STORIES = [
+    {"title": "Nationalsozialismus und Entnazifizierung", "url": "ns-zeit", "description": "Description <a href='/ns-zeit'>test</a>"},
+]

@@ -1,4 +1,5 @@
 import random
+from typing import Any, Dict
 
 import requests
 from django.views.generic import TemplateView
@@ -38,6 +39,7 @@ from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
 
 from django_tables2.config import RequestConfig
+from django.conf import settings
 
 
 class ImprintView(TemplateView):
@@ -82,6 +84,21 @@ class IndexInstitutionsView(TemplateView):
         context["intro_text"] = "Die Österreichische Akademie der Wissenschaften organisiert ihre Forschungstätigkeit in Kommissionen und Instituten. Hier können Sie nach historischen und gegenwärtigen Forschungseinrichtungen suchen und kombinierte Auswertungen durchführen."
         context["search_form"] = InstitutionFacetedSearchFormNew()
         return context        
+
+class StoriesIndexPage(UserPassesTestMixin, TemplateView):
+    template_name = "theme/stories.html"
+    login_url = "/webpage/accounts/login/"
+
+    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["stories"] = getattr(settings, "PAAS_STORIES", [])
+        return context
+
+    def test_func(self):
+        access = access_for_all(self, viewtype="detail")
+        if access:
+            self.request = set_session_variables(self.request)
+        return access
 
 
 class AboutView(TemplateView):

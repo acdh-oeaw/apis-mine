@@ -1,0 +1,13 @@
+{% extends "theme/base.html" %}
+{% load static %}
+{% block content %}
+<div class="container">
+    <h1>Stories</h1>
+    <p>Die "Stories" bieten neben der offenen kombinierten Abfrage einen vorbereiteten thematischen Einstieg in die Daten der "Geschichte der Österreichischen Akademie der Wissenschaften"</p>
+    <p>Folgende Stories sind momentan verfügbar:</p>
+    {% for story in stories %}
+    <h2><a href="{{story.url}}">{{story.title}}</a></h2>
+    <p>{{story.description|safe}}</p>
+    {% endfor %}
+</div>
+{% endblock content %}

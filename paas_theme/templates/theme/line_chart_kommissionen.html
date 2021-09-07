@@ -47,6 +47,7 @@
 <script src="https://cdn.jsdelivr.net/npm/google-palette@1.1.0/palette.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.1/dist/xlsx.min.js"></script>
 {% endblock scriptHeader %}
 <script type="module">
     import 'https://cdn.jsdelivr.net/npm/chart.js'
@@ -179,8 +180,30 @@ const fetch_retry = async (url, options, n) => {
 		if (callNow) func.apply(context, args);
 	};
 };
-    
+
+function downloadXls(event){
+    event.preventDefault()
+    var wb = XLSX.utils.book_new();
+        const data_download = []
+        window.chart_kommissionen.data.datasets.forEach(item => {
+            const res = {}
+            console.log(item)
+            res.label = item.label
+            item.data.forEach(d => {
+                res[d.jahr] = d.data.absolut
+            })
+            data_download.push(res)
+        })
+        var ws = XLSX.utils.json_to_sheet(data_download);
+        XLSX.utils.book_append_sheet(wb, ws, 'Kommissionen')
+        let today = new Date().toISOString().slice(0, 10)
+        XLSX.writeFile(wb, `kommissionen_mitglieder_${today}.xls`) 
+}
+
+
 document.addEventListener("DOMContentLoaded", function() {
+    const download_button = document.getElementById("download_xls_kommissionen")
+    download_button.addEventListener("click", function(event){downloadXls(event)})
     window.chart_kommissionen = new Chart(
     document.getElementById('chart_kommissionen'),
     cfg
@@ -210,6 +233,7 @@ document.addEventListener("DOMContentLoaded", function() {
     <div id="form_kommissionen_search">
       <label for="kommissionen_search">Filter</label>
       <input id="kommissionen_search">
+      <i id="download_xls_kommissionen" data-feather="download" style="margin: 5px">Download</i>
       <div class="spinner" id="spinner_load_kommissionen">
         <div class="double-bounce1"></div>
         <div class="double-bounce2"></div>

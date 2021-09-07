@@ -22,6 +22,7 @@ urlpatterns = [
     url(r"^network/?$", views.network_viz),
     url(r"^stories/ns-zeit/$", story_views.NationalSozialismusStory.as_view(), name="ns_zeit"),
     url(r"^stories/test/$", views.TestView.as_view(), name="test_view"),
+    url(r"^stories/$", views.StoriesIndexPage.as_view(), name="stories_index"),
     url(r"^api/network/$", api_views.NetVizTheme.as_view()),
     url(r"^api/egonetwork/$", api_views.EgoNetwork.as_view()),
     url(
