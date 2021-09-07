@@ -1,0 +1,222 @@
+{% load custom_tags %}
+{% block scriptHeader %}
+<style>
+.spinner {
+  width: 40px;
+  height: 40px;
+  float: right;
+  position: relative;
+  margin: 0px;
+}
+
+.double-bounce1, .double-bounce2 {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #333;
+  opacity: 0.6;
+  position: absolute;
+  top: 0;
+  left: 0;
+  
+  -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
+  animation: sk-bounce 2.0s infinite ease-in-out;
+}
+
+.double-bounce2 {
+  -webkit-animation-delay: -1.0s;
+  animation-delay: -1.0s;
+}
+
+@-webkit-keyframes sk-bounce {
+  0%, 100% { -webkit-transform: scale(0.0) }
+  50% { -webkit-transform: scale(1.0) }
+}
+
+@keyframes sk-bounce {
+  0%, 100% { 
+    transform: scale(0.0);
+    -webkit-transform: scale(0.0);
+  } 50% { 
+    transform: scale(1.0);
+    -webkit-transform: scale(1.0);
+  }
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/google-palette@1.1.0/palette.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+{% endblock scriptHeader %}
+<script type="module">
+    import 'https://cdn.jsdelivr.net/npm/chart.js'
+
+    const data = [];
+    const cfg_nazis = {
+        type: 'line',
+        datasets: data,
+        options: {
+            parsing: {
+                xAxisKey: 'jahr',
+                yAxisKey: 'data.anteil'
+    },
+    scales: {
+      xAxis: {
+        // The axis for this scale is determined from the first letter of the id as `'x'`
+        // It is recommended to specify `position` and / or `axis` explicitly.
+        type: 'linear',
+      ticks: {
+        callback: function(value, index, values) {
+                        return value.toString();
+                    }
+      },
+      title: {
+        display: true,
+        text: "Jahr"
+      }
+      },
+      yAxis: {
+        // The axis for this scale is determined from the first letter of the id as `'x'`
+        // It is recommended to specify `position` and / or `axis` explicitly.
+        type: 'linear',
+      ticks: {
+        callback: function(value, index, values) {
+                        return `${value*100}%`;
+                    }
+      },
+      title: {
+        display: true,
+        text: "Anteil Mitglieder in NS-Organisationen an Gesamtmitgliedern"
+      }
+      },
+    },
+    plugins: {
+        legend: {
+            display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: (item) => {
+              var exten
+              if(item.raw.data.absolut > 1) {exten = 'er'} else {exten = ''}
+            return `${item.dataset.label}: ${item.raw.data.absolut} Mitglied${exten} (~${Math.round(item.raw.data.anteil*100)}%)`
+            },
+            title: (items) => {
+              return `Jahr ${items[0].raw.jahr}`
+            }
+          }
+        }
+    }
+}
+    };
+
+function hexToRgb(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+}
+
+function convertDataNazis(data){
+    var datasets = []
+    var colors = data.results.length
+    var seq = palette('tol-sq', colors);
+    data.results.forEach(function callback(element, index) {
+        const c1 = hexToRgb(`#${seq[index]}`)
+        var rgba = `rgba(${c1['r']}, ${c1['g']}, ${c1['b']},1)`
+        const data_search = document.getElementById('kommissionen_search_nazis').value
+        let hidden = false
+        if (data_search.length > 0){
+            if (!element.name.toLowerCase().includes(data_search.toLowerCase())){
+              hidden = true
+            }
+        }
+
+        datasets.push({
+            label: element.name,
+            data: element.mitglieder_ns_organisation,
+            borderColor: `rgba(${c1['r']}, ${c1['g']}, ${c1['b']},0.8)`,
+            tension: 0.4,
+            hidden: hidden
+        })
+    });
+    return [datasets, data]
+}
+
+const fetch_retry = async (url, options, n) => {
+    try {
+        return await fetch(url, options)
+    } catch(err) {
+        if (n === 1) throw err;
+        return await fetch_retry(url, options, n - 1);
+    }
+};
+
+
+  async function fetch_commission_data_nazis (url) { 
+  const data2 = await fetch_retry(url, {}, 3)
+    .then(response => response.json())
+    .then(convertDataNazis)
+    .then(datasets => {
+        window.chart_kommissionen_nazis.data.datasets.push(...datasets[0]);
+        window.chart_kommissionen_nazis.update()
+        return datasets[1]})
+  if (data2.next !== null) {
+     fetch_commission_data_nazis(data2.next)
+  } else {
+    document.getElementById("spinner_load_kommissionen_nazis").style.visibility = "hidden"
+  }
+}
+
+  function debounce(func, wait, immediate) {
+	var timeout;
+	return function() {
+		var context = this, args = arguments;
+		var later = function() {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		};
+		var callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) func.apply(context, args);
+	};
+};
+    
+document.addEventListener("DOMContentLoaded", function() {
+    window.chart_kommissionen_nazis = new Chart(
+    document.getElementById('chart_kommissionen_nazis'),
+    cfg_nazis
+  );
+  const search_box = document.getElementById('kommissionen_search_nazis');
+  search_box.addEventListener('input', debounce (function (event) {
+    const search_box = document.getElementById('kommissionen_search_nazis');
+    const filtered_datasets = window.chart_kommissionen_nazis.data.datasets.filter(obj => {
+      return obj.label.toLowerCase().includes(search_box.value.toLowerCase())
+    })
+    window.chart_kommissionen_nazis.data.datasets.forEach(ds => {
+              ds.hidden = true
+    })
+    filtered_datasets.forEach(ds => {
+              ds.hidden = false
+    })
+        window.chart_kommissionen_nazis.update()
+    
+}, 250)) ;
+  fetch_commission_data_nazis("/analyze/api/kommissionen?format=json&count_nazis&limit=30")
+})
+
+</script>
+
+<div>
+    <canvas id="chart_kommissionen_nazis"></canvas>
+    <div id="form_kommissionen_search_nazis">
+      <label for="kommissionen_search_nazis">Filter</label>
+      <input id="kommissionen_search_nazis">
+      <div class="spinner" id="spinner_load_kommissionen_nazis">
+        <div class="double-bounce1"></div>
+        <div class="double-bounce2"></div>
+      </div>
+    </div>
+</div>
