@@ -1,4 +1,3 @@
-
 {% load custom_tags %}
 {% block scriptHeader %}
 <style>
@@ -52,13 +51,13 @@
     import 'https://cdn.jsdelivr.net/npm/chart.js'
 
     const data = [];
-    const cfg = {
+    const cfg_nazis = {
         type: 'line',
         datasets: data,
         options: {
             parsing: {
                 xAxisKey: 'jahr',
-                yAxisKey: 'data.absolut'
+                yAxisKey: 'data.anteil'
     },
     scales: {
       xAxis: {
@@ -79,9 +78,14 @@
         // The axis for this scale is determined from the first letter of the id as `'x'`
         // It is recommended to specify `position` and / or `axis` explicitly.
         type: 'linear',
+      ticks: {
+        callback: function(value, index, values) {
+                        return `${value*100}%`;
+                    }
+      },
       title: {
         display: true,
-        text: "Mitlieder"
+        text: "Anteil Mitglieder in NS-Organisationen an Gesamtmitgliedern"
       }
       },
     },
@@ -94,7 +98,7 @@
             label: (item) => {
               var exten
               if(item.raw.data.absolut > 1) {exten = 'er'} else {exten = ''}
-            return `${item.dataset.label}: ${item.raw.data.absolut} Mitglied${exten}`
+            return `${item.dataset.label}: ${item.raw.data.absolut} Mitglied${exten} (~${Math.round(item.raw.data.anteil*100)}%)`
             },
             title: (items) => {
               return `Jahr ${items[0].raw.jahr}`
@@ -114,14 +118,14 @@ function hexToRgb(hex) {
   } : null;
 }
 
-function convertData(data){
+function convertDataNazis(data){
     var datasets = []
     var colors = data.results.length
     var seq = palette('tol-sq', colors);
     data.results.forEach(function callback(element, index) {
         const c1 = hexToRgb(`#${seq[index]}`)
         var rgba = `rgba(${c1['r']}, ${c1['g']}, ${c1['b']},1)`
-        const data_search = document.getElementById('kommissionen_search').value
+        const data_search = document.getElementById('kommissionen_search_nazis').value
         let hidden = false
         if (data_search.length > 0){
             if (!element.name.toLowerCase().includes(data_search.toLowerCase())){
@@ -131,11 +135,10 @@ function convertData(data){
 
         datasets.push({
             label: element.name,
-            data: element.mitglieder,
+            data: element.mitglieder_ns_organisation,
             borderColor: `rgba(${c1['r']}, ${c1['g']}, ${c1['b']},0.8)`,
             tension: 0.4,
-            hidden: hidden,
-            pointRadius: 0
+            hidden: hidden
         })
     });
     return [datasets, data]
@@ -143,18 +146,18 @@ function convertData(data){
 
 
 
-  async function fetch_commission_data (url) { 
+  async function fetch_commission_data_nazis (url) { 
   const data2 = await fetch(url)
     .then(response => response.json())
-    .then(convertData)
+    .then(convertDataNazis)
     .then(datasets => {
-        window.chart_kommissionen.data.datasets.push(...datasets[0]);
-        window.chart_kommissionen.update()
+        window.chart_kommissionen_nazis.data.datasets.push(...datasets[0]);
+        window.chart_kommissionen_nazis.update()
         return datasets[1]})
   if (data2.next !== null) {
-     fetch_commission_data(data2.next)
+     fetch_commission_data_nazis(data2.next)
   } else {
-    document.getElementById("spinner_load_kommissionen").style.visibility = "hidden"
+    document.getElementById("spinner_load_kommissionen_nazis").style.visibility = "hidden"
   }
 }
 
@@ -174,36 +177,36 @@ function convertData(data){
 };
     
 document.addEventListener("DOMContentLoaded", function() {
-    window.chart_kommissionen = new Chart(
-    document.getElementById('chart_kommissionen'),
-    cfg
+    window.chart_kommissionen_nazis = new Chart(
+    document.getElementById('chart_kommissionen_nazis'),
+    cfg_nazis
   );
-  const search_box = document.getElementById('kommissionen_search');
+  const search_box = document.getElementById('kommissionen_search_nazis');
   search_box.addEventListener('input', debounce (function (event) {
-    const search_box = document.getElementById('kommissionen_search');
-    const filtered_datasets = window.chart_kommissionen.data.datasets.filter(obj => {
+    const search_box = document.getElementById('kommissionen_search_nazis');
+    const filtered_datasets = window.chart_kommissionen_nazis.data.datasets.filter(obj => {
       return obj.label.toLowerCase().includes(search_box.value.toLowerCase())
     })
-    window.chart_kommissionen.data.datasets.forEach(ds => {
+    window.chart_kommissionen_nazis.data.datasets.forEach(ds => {
               ds.hidden = true
     })
     filtered_datasets.forEach(ds => {
               ds.hidden = false
     })
-        window.chart_kommissionen.update()
+        window.chart_kommissionen_nazis.update()
     
 }, 250)) ;
-  fetch_commission_data("/analyze/api/kommissionen?format=json&limit=30")
+  fetch_commission_data_nazis("/analyze/api/kommissionen?format=json&count_nazis&limit=30")
 })
 
 </script>
 
 <div>
-    <canvas id="chart_kommissionen"></canvas>
-    <div id="form_kommissionen_search">
-      <label for="kommissionen_search">Filter</label>
-      <input id="kommissionen_search">
-      <div class="spinner" id="spinner_load_kommissionen">
+    <canvas id="chart_kommissionen_nazis"></canvas>
+    <div id="form_kommissionen_search_nazis">
+      <label for="kommissionen_search_nazis">Filter</label>
+      <input id="kommissionen_search_nazis">
+      <div class="spinner" id="spinner_load_kommissionen_nazis">
         <div class="double-bounce1"></div>
         <div class="double-bounce2"></div>
       </div>

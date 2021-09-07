@@ -102,6 +102,7 @@
         <p>Gruppiert man obige Tabelle nach den Kommission so ergibt sich folgende Verteilung von NSDAP-Mitgliedern über die einzelnen Kommissionen:</p>
         <h3>Grafik 1: Kommissionen nach Anzahl NSDAP-Mitglieder</h3>
         <div hidden>{{ komm_grouped_html|safe }}</div>
+
         <figure class="highcharts-figure">
             <div id="kommByNaziChart"></div>
         </figure>
@@ -112,15 +113,11 @@
             <div id="naziByKommChart"></div>
         </figure>
         <p>Der zeitliche Verlauf der der Anzahl (aller) Mitglieder in den Kommissionen ergibt folgende Grafik</p>
-        <h3>Grafik 2a: Verteilung aller Mitglieder über Kommisionen 1936-1960</h3>
-        <figure class="highcharts-figure">
-            <div id="kommMemberTime"></div>
-        </figure>
-        <p>Im Vergleich dazu die Verteilung der (ehemaligen) NSDAP Mitglieder in den Kommissionen</p>
-        <h3>Grafik 2b: Verteilung (ehemaliger) NSDAP Mitglieder über Kommisionen 1936-1960</h3>
-        <figure class="highcharts-figure">
-            <div id="kommNaziTime"></div>
-        </figure>
+        <h3>Grafik 2a: Verteilung aller Mitglieder über Kommisionen</h3>
+            {% include "theme/line_chart_kommissionen.html" %}
+        <p>Im Vergleich dazu die Verteilung der (ehemaligen) Mitglieder von NS-Organisationen in den Kommissionen</p>
+        <h3>Grafik 2b: Verteilung (ehemaliger) Mitglieder von NS-Organisationen über Kommisionen</h3>    
+            {% include "theme/line_chart_kommissionen_nazis.html" %}
     </div>
     <div id="nezwerke">
         <h2>NS-Netzwerke - Wer schlägt wen zur Wahl vor</h2>
