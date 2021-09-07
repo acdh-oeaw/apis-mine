@@ -58,8 +58,13 @@
         options: {
             parsing: {
                 xAxisKey: 'jahr',
-                yAxisKey: 'data.anteil'
+                yAxisKey: 'data.absolut'
     },
+    elements: {
+                    point:{
+                        radius: 0
+                    }
+                },
     scales: {
       xAxis: {
         // The axis for this scale is determined from the first letter of the id as `'x'`
@@ -79,14 +84,9 @@
         // The axis for this scale is determined from the first letter of the id as `'x'`
         // It is recommended to specify `position` and / or `axis` explicitly.
         type: 'linear',
-      ticks: {
-        callback: function(value, index, values) {
-                        return `${value*100}%`;
-                    }
-      },
       title: {
         display: true,
-        text: "Anteil Mitglieder in NS-Organisationen an Gesamtmitgliedern"
+        text: "Mitglieder"
       }
       },
     },
@@ -99,7 +99,7 @@
             label: (item) => {
               var exten
               if(item.raw.data.absolut > 1) {exten = 'er'} else {exten = ''}
-            return `${item.dataset.label}: ${item.raw.data.absolut} Mitglied${exten} (~${Math.round(item.raw.data.anteil*100)}%)`
+            return `${item.dataset.label}: ${item.raw.data.absolut} Mitglied${exten}`
             },
             title: (items) => {
               return `Jahr ${items[0].raw.jahr}`
@@ -133,10 +133,9 @@ function convertData(data){
               hidden = true
             }
         }
-
         datasets.push({
             label: element.name,
-            data: element.mitglieder_ns_organisation,
+            data: element.mitglieder,
             borderColor: `rgba(${c1['r']}, ${c1['g']}, ${c1['b']},0.8)`,
             tension: 0.4,
             hidden: hidden
@@ -149,15 +148,23 @@ function convertData(data){
     return [datasets, data]
 }
 
+const fetch_retry = async (url, options, n) => {
+    try {
+        return await fetch(url, options)
+    } catch(err) {
+        if (n === 1) throw err;
+        return await fetch_retry(url, options, n - 1);
+    }
+};
 
 
   async function fetch_commission_data (url) { 
-  const data2 = await fetch(url)
+  const data2 = await fetch_retry(url, {}, 3)
     .then(response => response.json())
     .then(convertData)
     .then(datasets => {
-        window.chart.data.datasets.push(...datasets[0]);
-        window.chart.update()
+        window.chart_kommissionen.data.datasets.push(...datasets[0]);
+        window.chart_kommissionen.update()
         return datasets[1]})
   if (data2.next !== null) {
      fetch_commission_data(data2.next)
@@ -166,11 +173,6 @@ function convertData(data){
   }
 }
 
-    window.onload = function() {
-    window.chart = new Chart(
-    document.getElementById('chart_kommissionen'),
-    cfg
-  );
 
   function debounce(func, wait, immediate) {
 	var timeout;
@@ -207,7 +209,7 @@ function downloadXls(event){
 }
 
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function() {  
     const download_button = document.getElementById("download_xls_kommissionen")
     download_button.addEventListener("click", function(event){downloadXls(event)})
     window.chart_kommissionen = new Chart(
@@ -217,20 +219,20 @@ document.addEventListener("DOMContentLoaded", function() {
   const search_box = document.getElementById('kommissionen_search');
 search_box.addEventListener('input', debounce (function (event) {
     const search_box = document.getElementById('kommissionen_search');
-    const filtered_datasets = window.chart.data.datasets.filter(obj => {
+    const filtered_datasets = window.chart_kommissionen.data.datasets.filter(obj => {
       return obj.label.toLowerCase().includes(search_box.value.toLowerCase())
     })
-    window.chart.data.datasets.forEach(ds => {
+    window.chart_kommissionen.data.datasets.forEach(ds => {
               ds.hidden = true
     })
     filtered_datasets.forEach(ds => {
               ds.hidden = false
     })
-        window.chart.update()
+        window.chart_kommissionen.update()
     
 }, 250)) ;
-  fetch_commission_data("/analyze/api/kommissionen?format=json&count_nazis&limit=10")
-};
+  fetch_commission_data("/analyze/api/kommissionen?format=json&limit=50")
+});
 
 </script>
 
