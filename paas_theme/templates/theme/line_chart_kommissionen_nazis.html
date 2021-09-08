@@ -1,47 +1,141 @@
 {% load custom_tags %}
 {% block scriptHeader %}
 <style>
-.spinner {
+.sk-fading-circle {
   width: 40px;
   height: 40px;
-  float: right;
   position: relative;
-  margin: 0px;
 }
 
-.double-bounce1, .double-bounce2 {
+.sk-fading-circle .sk-circle {
   width: 100%;
   height: 100%;
-  border-radius: 50%;
-  background-color: #333;
-  opacity: 0.6;
   position: absolute;
-  top: 0;
   left: 0;
-  
-  -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
-  animation: sk-bounce 2.0s infinite ease-in-out;
+  top: 0;
 }
 
-.double-bounce2 {
-  -webkit-animation-delay: -1.0s;
-  animation-delay: -1.0s;
+.sk-fading-circle .sk-circle:before {
+  content: '';
+  display: block;
+  margin: 0 auto;
+  width: 15%;
+  height: 15%;
+  background-color: #333;
+  border-radius: 100%;
+  -webkit-animation: sk-circleFadeDelay 1.2s infinite ease-in-out both;
+          animation: sk-circleFadeDelay 1.2s infinite ease-in-out both;
+}
+.sk-fading-circle .sk-circle2 {
+  -webkit-transform: rotate(30deg);
+      -ms-transform: rotate(30deg);
+          transform: rotate(30deg);
+}
+.sk-fading-circle .sk-circle3 {
+  -webkit-transform: rotate(60deg);
+      -ms-transform: rotate(60deg);
+          transform: rotate(60deg);
+}
+.sk-fading-circle .sk-circle4 {
+  -webkit-transform: rotate(90deg);
+      -ms-transform: rotate(90deg);
+          transform: rotate(90deg);
+}
+.sk-fading-circle .sk-circle5 {
+  -webkit-transform: rotate(120deg);
+      -ms-transform: rotate(120deg);
+          transform: rotate(120deg);
+}
+.sk-fading-circle .sk-circle6 {
+  -webkit-transform: rotate(150deg);
+      -ms-transform: rotate(150deg);
+          transform: rotate(150deg);
+}
+.sk-fading-circle .sk-circle7 {
+  -webkit-transform: rotate(180deg);
+      -ms-transform: rotate(180deg);
+          transform: rotate(180deg);
+}
+.sk-fading-circle .sk-circle8 {
+  -webkit-transform: rotate(210deg);
+      -ms-transform: rotate(210deg);
+          transform: rotate(210deg);
+}
+.sk-fading-circle .sk-circle9 {
+  -webkit-transform: rotate(240deg);
+      -ms-transform: rotate(240deg);
+          transform: rotate(240deg);
+}
+.sk-fading-circle .sk-circle10 {
+  -webkit-transform: rotate(270deg);
+      -ms-transform: rotate(270deg);
+          transform: rotate(270deg);
+}
+.sk-fading-circle .sk-circle11 {
+  -webkit-transform: rotate(300deg);
+      -ms-transform: rotate(300deg);
+          transform: rotate(300deg); 
+}
+.sk-fading-circle .sk-circle12 {
+  -webkit-transform: rotate(330deg);
+      -ms-transform: rotate(330deg);
+          transform: rotate(330deg); 
+}
+.sk-fading-circle .sk-circle2:before {
+  -webkit-animation-delay: -1.1s;
+          animation-delay: -1.1s; 
+}
+.sk-fading-circle .sk-circle3:before {
+  -webkit-animation-delay: -1s;
+          animation-delay: -1s; 
+}
+.sk-fading-circle .sk-circle4:before {
+  -webkit-animation-delay: -0.9s;
+          animation-delay: -0.9s; 
+}
+.sk-fading-circle .sk-circle5:before {
+  -webkit-animation-delay: -0.8s;
+          animation-delay: -0.8s; 
+}
+.sk-fading-circle .sk-circle6:before {
+  -webkit-animation-delay: -0.7s;
+          animation-delay: -0.7s; 
+}
+.sk-fading-circle .sk-circle7:before {
+  -webkit-animation-delay: -0.6s;
+          animation-delay: -0.6s; 
+}
+.sk-fading-circle .sk-circle8:before {
+  -webkit-animation-delay: -0.5s;
+          animation-delay: -0.5s; 
+}
+.sk-fading-circle .sk-circle9:before {
+  -webkit-animation-delay: -0.4s;
+          animation-delay: -0.4s;
+}
+.sk-fading-circle .sk-circle10:before {
+  -webkit-animation-delay: -0.3s;
+          animation-delay: -0.3s;
+}
+.sk-fading-circle .sk-circle11:before {
+  -webkit-animation-delay: -0.2s;
+          animation-delay: -0.2s;
+}
+.sk-fading-circle .sk-circle12:before {
+  -webkit-animation-delay: -0.1s;
+          animation-delay: -0.1s;
 }
 
-@-webkit-keyframes sk-bounce {
-  0%, 100% { -webkit-transform: scale(0.0) }
-  50% { -webkit-transform: scale(1.0) }
+@-webkit-keyframes sk-circleFadeDelay {
+  0%, 39%, 100% { opacity: 0; }
+  40% { opacity: 1; }
 }
 
-@keyframes sk-bounce {
-  0%, 100% { 
-    transform: scale(0.0);
-    -webkit-transform: scale(0.0);
-  } 50% { 
-    transform: scale(1.0);
-    -webkit-transform: scale(1.0);
-  }
+@keyframes sk-circleFadeDelay {
+  0%, 39%, 100% { opacity: 0; }
+  40% { opacity: 1; } 
 }
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/google-palette@1.1.0/palette.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.min.js"></script>
@@ -185,15 +279,25 @@ const fetch_retry = async (url, options, n) => {
 	};
 };
 
-function downloadXlsNazis(event){
+function downloadPngNazis(event) {
     event.preventDefault()
+    const today = new Date().toISOString().slice(0, 10)
+    const url = window.chart_kommissionen_nazis.toBase64Image();
+    var a = document.createElement("a");
+    a.href = url;
+    a.setAttribute("download", `kommissionen_mitglieder_nationalsozialisten_${today}.png`);
+    a.click();  
+}
+
+function downloadXlsNazis(event, kind, fending){
+    event.preventDefault()
+    console.log(event.srcElement)
     var wb = XLSX.utils.book_new();
         const data_download = []
         const data_download_share = []
         window.chart_kommissionen_nazis.data.datasets.forEach(item => {
             const res = {}
             const res_share = {}
-            console.log(item)
             res.label = item.label
             item.data.forEach(d => {
                 res[d.jahr] = d.data.absolut
@@ -204,15 +308,23 @@ function downloadXlsNazis(event){
         })
         var ws = XLSX.utils.json_to_sheet(data_download);
         var ws_share = XLSX.utils.json_to_sheet(data_download_share);
-        XLSX.utils.book_append_sheet(wb, ws, 'Mitgl. NS-Organ. absolut')
-        XLSX.utils.book_append_sheet(wb, ws_share, 'Mitgl. NS-Organ. Anteil')
+        if (kind.includes("absolut")){
+        XLSX.utils.book_append_sheet(wb, ws, 'Mitgl. NS-Organ. absolut')}
+        if (kind.includes("anteil")){
+        XLSX.utils.book_append_sheet(wb, ws_share, 'Mitgl. NS-Organ. Anteil')}
         let today = new Date().toISOString().slice(0, 10)
-        XLSX.writeFile(wb, `kommissionen_mitglieder_nationalsozialisten_${today}.xls`)
+        XLSX.writeFile(wb, `kommissionen_mitglieder_nationalsozialisten_${today}.${fending}`)
 }
     
 document.addEventListener("DOMContentLoaded", function() { 
     const download_button_nazis = document.getElementById("download_xls_kommissionen_nazis")
-    download_button_nazis.addEventListener("click", function(event){downloadXlsNazis(event)})
+    download_button_nazis.addEventListener("click", function(event){downloadXlsNazis(event, ["anteil", "absolut"], "xls")})
+    const download_button_nazis_csv_anteil = document.getElementById("download_csv_anteil_kommissionen_nazis")
+    download_button_nazis_csv_anteil.addEventListener("click", function(event){downloadXlsNazis(event, ["anteil"], "csv")})
+    const download_button_nazis_csv_absolut = document.getElementById("download_csv_absolut_kommissionen_nazis")
+    download_button_nazis_csv_absolut.addEventListener("click", function(event){downloadXlsNazis(event, ["absolut"], "csv")})
+    const download_button_png_nazis = document.getElementById("download_png_kommissionen_nazis")
+    download_button_png_nazis.addEventListener("click", function(event){downloadPngNazis(event)})
     window.chart_kommissionen_nazis = new Chart(
     document.getElementById('chart_kommissionen_nazis'),
     cfg_nazis
@@ -238,14 +350,38 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 
 <div>
+      <div class="dropdown">
+        <button class="btn btn-light" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="background-color: white; float: right;">
+          <i data-feather="menu" style="margin: 5px"></i>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+          <button id="download_xls_kommissionen_nazis" class="dropdown-item" type="button"><i data-feather="download" style="margin-right: 5px"></i>Excel</button> 
+          <button id="download_csv_anteil_kommissionen_nazis" class="dropdown-item" type="button"><i data-feather="download" style="margin-right: 5px"></i>CSV (Anteil)</button> 
+          <button id="download_csv_absolut_kommissionen_nazis" class="dropdown-item" type="button"><i data-feather="download" style="margin-right: 5px"></i>CSV (absolut)</button> 
+          <button id="download_png_kommissionen_nazis" class="dropdown-item" type="button"><i data-feather="download" style="margin-right: 5px"></i>PNG</button>
+        </div>
+      </div>
     <canvas id="chart_kommissionen_nazis"></canvas>
-    <div id="form_kommissionen_search_nazis">
-      <label for="kommissionen_search_nazis">Filter</label> 
-      <input id="kommissionen_search_nazis">
-      <i id="download_xls_kommissionen_nazis" data-feather="download" style="margin: 5px">Download</i>
-      <div class="spinner" id="spinner_load_kommissionen_nazis">
-        <div class="double-bounce1"></div>
-        <div class="double-bounce2"></div>
+    <div id="form_kommissionen_search_nazis" class="row">
+      <div class="col-md-6">
+      <input id="kommissionen_search_nazis" class="form-control" placeholder="Filter" aria-label="Filter" style="border-color: #f1f1f1;">
+      </div>
+      <div class="col-md-4"></div>
+      <div class="col-md-2">
+        <div class="sk-fading-circle" id="spinner_load_kommissionen_nazis" style="float: right;">
+          <div class="sk-circle1 sk-circle"></div>
+          <div class="sk-circle2 sk-circle"></div>
+          <div class="sk-circle3 sk-circle"></div>
+          <div class="sk-circle4 sk-circle"></div>
+          <div class="sk-circle5 sk-circle"></div>
+          <div class="sk-circle6 sk-circle"></div>
+          <div class="sk-circle7 sk-circle"></div>
+          <div class="sk-circle8 sk-circle"></div>
+          <div class="sk-circle9 sk-circle"></div>
+          <div class="sk-circle10 sk-circle"></div>
+          <div class="sk-circle11 sk-circle"></div>
+          <div class="sk-circle12 sk-circle"></div>
+        </div>
       </div>
     </div>
 </div>
