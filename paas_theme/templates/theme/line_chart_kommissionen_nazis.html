@@ -140,7 +140,7 @@
 <script src="https://cdn.jsdelivr.net/npm/google-palette@1.1.0/palette.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.1/dist/xlsx.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.1/dist/xlsx.full.min.js"></script>
 {% endblock scriptHeader %}
 <script type="module">
     import 'https://cdn.jsdelivr.net/npm/chart.js'
@@ -318,7 +318,7 @@ function downloadXlsNazis(event, kind, fending){
     
 document.addEventListener("DOMContentLoaded", function() { 
     const download_button_nazis = document.getElementById("download_xls_kommissionen_nazis")
-    download_button_nazis.addEventListener("click", function(event){downloadXlsNazis(event, ["anteil", "absolut"], "xls")})
+    download_button_nazis.addEventListener("click", function(event){downloadXlsNazis(event, ["anteil", "absolut"], "xlsx")})
     const download_button_nazis_csv_anteil = document.getElementById("download_csv_anteil_kommissionen_nazis")
     download_button_nazis_csv_anteil.addEventListener("click", function(event){downloadXlsNazis(event, ["anteil"], "csv")})
     const download_button_nazis_csv_absolut = document.getElementById("download_csv_absolut_kommissionen_nazis")

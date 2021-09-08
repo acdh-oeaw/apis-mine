@@ -141,7 +141,7 @@
 <script src="https://cdn.jsdelivr.net/npm/google-palette@1.1.0/palette.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.1/dist/xlsx.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.17.1/dist/xlsx.full.min.js"></script>
 {% endblock scriptHeader %}
 <script type="module">
     import 'https://cdn.jsdelivr.net/npm/chart.js'
@@ -315,7 +315,7 @@ function downloadXls(event, fending){
 
 document.addEventListener("DOMContentLoaded", function() {  
     const download_button = document.getElementById("download_xls_kommissionen")
-    download_button.addEventListener("click", function(event){downloadXls(event, "xls")})
+    download_button.addEventListener("click", function(event){downloadXls(event, "xlsx")})
     const download_button_csv = document.getElementById("download_csv_kommissionen")
     download_button_csv.addEventListener("click", function(event){downloadXls(event, "csv")})
     const download_button_png = document.getElementById("download_png_kommissionen")
