@@ -54,6 +54,8 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap", "acdh_mine")
 # HAYSTACK_DEFAULT_OPERATOR = "OR"
 INSTALLED_APPS += ["haystack", "paas_theme", "leaflet"]
 
+CSP_FRAME_SRC = ["https://sennierer.github.io"]
+
 SECRET_KEY = (
     os.environ.get("APIS_SECRET_KEY", "TO_CHANGE")
 )

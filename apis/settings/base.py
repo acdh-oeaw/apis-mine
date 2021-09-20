@@ -20,33 +20,38 @@ BASE_DIR = os.path.dirname(
 
 SHARED_URL = "https://shared.acdh.oeaw.ac.at/"
 
-ACDH_IMPRINT_URL = "https://shared.acdh.oeaw.ac.at/acdh-common-assets/api/imprint.php?serviceID="
+ACDH_IMPRINT_URL = (
+    "https://shared.acdh.oeaw.ac.at/acdh-common-assets/api/imprint.php?serviceID="
+)
 
 PROJECT_NAME = "apis"
 PROJECT_SHARED = "https://shared.acdh.oeaw.ac.at/apis/"
 PROJECT_DEFAULT_MD = {
-    'title': 'TITLE',
-    'author': 'Matthias Schlögl, Peter Andorfer',
-    'subtitle': 'SUBTITLE',
-    'description': """This is a default metadata file. To change this, provide\
+    "title": "TITLE",
+    "author": "Matthias Schlögl, Peter Andorfer",
+    "subtitle": "SUBTITLE",
+    "description": """This is a default metadata file. To change this, provide\
     provide a following file {PROJECT_SHARED}/{PROJECT_NAME}/metadata.json""",
-    'github': 'https://github.com/acdh-oeaw/apis-webpage-base',
-    'production instance': None,
-    'purpose_de': '',
-    'purpose_en': """""",
-    'version': ['apis_core', 'charts', 'django'],
-    'matomo_id': '',
-    'matomo_url': '',
-    'imprint': '/imprint',
-    'social_media': [
-        ('fab fa-twitter', 'https://twitter.com/ACDH_OeAW'),
-        ('fab fa-youtube', 'https://www.youtube.com/channel/UCgaEMaMbPkULYRI5u6gvG-w'),
+    "github": "https://github.com/acdh-oeaw/apis-webpage-base",
+    "production instance": None,
+    "purpose_de": "",
+    "purpose_en": """""",
+    "version": ["apis_core", "charts", "django"],
+    "matomo_id": "",
+    "matomo_url": "",
+    "imprint": "/imprint",
+    "social_media": [
+        ("fab fa-twitter", "https://twitter.com/ACDH_OeAW"),
+        ("fab fa-youtube", "https://www.youtube.com/channel/UCgaEMaMbPkULYRI5u6gvG-w"),
     ],
-    'social_media': [
-        ('fab fa-twitter fa-2x', 'https://twitter.com/ACDH_OeAW'),
-        ('fab fa-youtube fa-2x', 'https://www.youtube.com/channel/UCgaEMaMbPkULYRI5u6gvG-w'),
+    "social_media": [
+        ("fab fa-twitter fa-2x", "https://twitter.com/ACDH_OeAW"),
+        (
+            "fab fa-youtube fa-2x",
+            "https://www.youtube.com/channel/UCgaEMaMbPkULYRI5u6gvG-w",
+        ),
     ],
-    'app_type': 'database',
+    "app_type": "database",
 }
 
 # Application definition
@@ -75,7 +80,7 @@ INSTALLED_APPS = [
     "apis_core.apis_labels",
     # 'apis_core.apis_vis',
     "rest_framework.authtoken",
-    #"drf_yasg",
+    # "drf_yasg",
     "drf_spectacular",
     "guardian",
     "charts",
@@ -89,10 +94,10 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = ("GET", "OPTIONS")
 
 SPECTACULAR_SETTINGS: Dict[str, Any] = {
-'TITLE': 'APIS generic API',
-'DESCRIPTIOPN': 'Provides access to the main APIS data-model endpoints.',
-'LICENSE': {'name': 'MIT License', 'url': 'https://www.mit.edu/~amini/LICENSE.md'},
-'VERSION': '0.13'
+    "TITLE": "APIS generic API",
+    "DESCRIPTIOPN": "Provides access to the main APIS data-model endpoints.",
+    "LICENSE": {"name": "MIT License", "url": "https://www.mit.edu/~amini/LICENSE.md"},
+    "VERSION": "0.13",
 }
 
 
@@ -102,8 +107,8 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
     "PAGE_SIZE": 50,
     "DEFAULT_PERMISSION_CLASSES": (
-        #"rest_framework.permissions.DjangoModelPermissions",
-        #"rest_framework.permissions.IsAuthenticated",
+        # "rest_framework.permissions.DjangoModelPermissions",
+        # "rest_framework.permissions.IsAuthenticated",
         "rest_framework.permissions.DjangoObjectPermissions",
         # use IsAuthenticated for every logged in user to have global edit rights
     ),
@@ -112,11 +117,11 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
     ),
-    'DEFAULT_FILTER_BACKENDS': (
-    'django_filters.rest_framework.DjangoFilterBackend',
-    'drf_spectacular.contrib.django_filters.DjangoFilterBackend'
+    "DEFAULT_FILTER_BACKENDS": (
+        "django_filters.rest_framework.DjangoFilterBackend",
+        "drf_spectacular.contrib.django_filters.DjangoFilterBackend",
     ),
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 AUTHENTICATION_BACKENDS = (
@@ -135,6 +140,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "csp.middleware.CSPMiddleware",
     "reversion.middleware.RevisionMiddleware",
     "crum.CurrentRequestUserMiddleware",
 ]
@@ -250,7 +256,7 @@ APIS_RELATIONS_FILTER_EXCLUDE = [
     "relation_type__vocab_name",
     "relation_type__name_reverse",
     "__text",
-    'annotation_set_relation',
+    "annotation_set_relation",
 ]
 
 APIS_RELATIONS = {
@@ -432,8 +438,21 @@ APIS_ENTITIES = {
     "Person": {
         "merge": True,
         "search": ["name", "first_name"],
-        "form_order": ["first_name", "name", "start_date_written", "end_date_written", "profession", "status", "collection"],
-        "table_fields": ["name", "first_name", "start_date_written", "end_date_written"],
+        "form_order": [
+            "first_name",
+            "name",
+            "start_date_written",
+            "end_date_written",
+            "profession",
+            "status",
+            "collection",
+        ],
+        "table_fields": [
+            "name",
+            "first_name",
+            "start_date_written",
+            "end_date_written",
+        ],
         "additional_cols": ["id", "profession", "gender"],
         "list_filters": [
             "name",
@@ -450,8 +469,18 @@ APIS_ENTITIES = {
     "Institution": {
         "merge": True,
         "search": ["name"],
-        "form_order": ["name", "start_date_written", "end_date_written", "kind", "status", "collection"],
-        "additional_cols": ["id", "kind", ],
+        "form_order": [
+            "name",
+            "start_date_written",
+            "end_date_written",
+            "kind",
+            "status",
+            "collection",
+        ],
+        "additional_cols": [
+            "id",
+            "kind",
+        ],
         "list_filters": [
             {"name": {"label": "Name or label of institution"}},
             {"kind": {"label": "Kind of Institution"}},
@@ -465,7 +494,10 @@ APIS_ENTITIES = {
     "Work": {
         "merge": True,
         "search": ["name"],
-        "additional_cols": ["id", "kind", ],
+        "additional_cols": [
+            "id",
+            "kind",
+        ],
         "list_filters": [
             {"name": {"label": "Name of work"}},
             {"kind": {"label": "Kind of Work"}},
@@ -478,7 +510,9 @@ APIS_ENTITIES = {
     "Event": {
         "merge": True,
         "search": ["name"],
-        "additional_cols": ["id", ],
+        "additional_cols": [
+            "id",
+        ],
         "list_filters": [
             {"name": {"label": "Name of event"}},
             {"kind": {"label": "Kind of Event"}},
@@ -495,7 +529,7 @@ APIS_API_EXCLUDE_SETS = True  # exclude reverse links to entities
 
 APIS_LIST_VIEWS_ALLOWED = False
 APIS_DETAIL_VIEWS_ALLOWED = False
-MAX_AGE = 60*60
+MAX_AGE = 60 * 60
 
 APIS_LIST_VIEW_TEMPLATE = "browsing/generic_list.html"
 APIS_DELETE_VIEW_TEMPLATE = "webpage/confirm_delete.html"
