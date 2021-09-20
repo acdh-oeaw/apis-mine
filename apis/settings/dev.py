@@ -54,7 +54,7 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap", "acdh_mine")
 # HAYSTACK_DEFAULT_OPERATOR = "OR"
 INSTALLED_APPS += ["haystack", "paas_theme", "leaflet"]
 
-CSP_DEFAULT_SRC = ("'self'", 'cdnjs.cloudflare.com', 'cdn.jsdelivr.net', 'fonts.googleapis.com', 'cdn.rawgit.com', 'shared.acdh.oeaw.ac.at' "'unsafe-inline'")
+CSP_DEFAULT_SRC = ("'self'", 'cdnjs.cloudflare.com', 'cdn.jsdelivr.net', 'fonts.googleapis.com', 'cdn.rawgit.com', 'shared.acdh.oeaw.ac.at', "'unsafe-inline'")
 CSP_FRAME_SRC = ('sennierer.github.io',)
 
 SECRET_KEY = (
