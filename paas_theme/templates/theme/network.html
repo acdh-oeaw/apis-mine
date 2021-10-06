@@ -1,222 +1,351 @@
 {% extends "theme/base.html" %}
 {% block scriptHeader %}
-<script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
-<script
-  crossorigin
-  src="https://unpkg.com//three@0.132.2/build/three.min.js"
-></script>
+{% load static %}
+
+<script crossorigin src="https://unpkg.com/preact@latest/dist/preact.umd.js"></script>
+<script crossorigin src="https://unpkg.com/preact@latest/hooks/dist/hooks.umd.js"></script>
+<script crossorigin src="https://unpkg.com/preact@latest/compat/dist/compat.umd.js"></script>
+
+<script crossorigin src="https://unpkg.com/three@0.132.2/build/three.min.js"></script>
+<script>
+    var React = preactCompat
+</script>
 <script src="https://unpkg.com/@acdh/network-visualization@0/lib/network-visualization.umd.js"></script>
+
+<script>
+    window.nouislider = window.noUiSlider
+</script>
+<script src="https://unpkg.com/nouislider-react@3.4.1/dist/nouislider-react.umd.production.min.js"></script>
+
 <style>
-#loader {
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  border: 16px solid #f3f3f3; /* Light grey */
-  border-top: 16px solid #125794; /* Blue */
-  border-radius: 50%;
-  width: 120px;
-  height: 120px;
-  animation: spin 2s linear infinite;
-}
+   /* #loader {
+        position: absolute;
+        top: 40%;
+        left: 50%;
+    }*/
 
-#details-nodes {
-    border-radius: 10px;
-}
+    #details-nodes {
+        border-radius: 10px;
+    }
 
-.node-list-link {
-    color: rgb(220 53 69);
-    font-size: 0.8em;
-}
+    .node-list-link {
+        color: rgb(220 53 69);
+        font-size: 0.8em;
+    }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+    #ntw-metainfo [data-nerv-legend] {
+        position:relative;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .footer {
+        margin-top:0;
+    }
 </style>
 {% endblock scriptHeader %}
 {% block content %}
 <div style="height: 100%; position: relative">
-<div id="details-nodes" style="position: absolute; right: 10px; top: 80px; display: none; z-index: 1000; min-width: 200px; max-width: 300px">
-<ul id="details-nodes-list" style="list-style-type: none; padding: 5px"></ul>
-</div>
-<div id="banner_viz" style></div>
-<div id="visualization" style="overflow: hidden; position: relative; flex: 1 1; height: 100%"><div id="loader"></div>
-</div>
+    <div id="details-nodes"
+        style="position: absolute; right: 10px; top: 80px; display: none; z-index: 1000; min-width: 200px; max-width: 300px">
+        <ul id="details-nodes-list" style="list-style-type: none; padding: 5px"></ul>
+    </div>
+    <div id="banner_viz" style></div>
+    <div id="visualization" style="overflow: hidden; position: relative; flex: 1 1; height: 100%">
+        <div class="d-flex h-100 justify-content-center">
+        <div id="loader" class="spinner-grow" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    </div>
 </div>
 {% endblock content %}
 {% block scripts %}
 <script>
-        const getNetworkViz = (rel_type, offset) => {
-            let urlParams = new URLSearchParams(window.location.search) ;
-            const endpoint = '/api/network/';
-            let selectedNodes = {};
-            let nodesDetails = {};
 
-            urlParams.append('format', 'json+net');
-            urlParams.append('limit', '1000')
-            urlParams.append('offset', offset)
+    const { createElement: h, render, useState } = preactCompat
+    const { SelectionControls, ExportButton, Legend } = NetworkVisualization
+
+
+
+
+
+
+    const getNetworkViz = (rel_type, offset) => {
+        let urlParams = new URLSearchParams(window.location.search);
+        const endpoint = '/api/network/';
+        let selectedNodes = {};
+        let nodesDetails = {};
+
+        urlParams.append('format', 'json+net');
+        urlParams.append('limit', '1000')
+        urlParams.append('offset', offset)
         console.log(window.location.search)
-      let url = new URL(endpoint, window.location.origin)
-      console.log(urlParams.get('q'))
-      urlParams.forEach((value, key) => {
-          console.log(key);
-        url.searchParams.set(key, value)
-      });
-      console.log(url);
-          fetch(url)
-              .then(response => {
-                  if (!response.ok) {
-                      throw new Error(response.statusText)
-                  }
-                  let loader = document.getElementById("loader");
-                    if (loader) {
-                    loader.remove();}
-                  return response.json()
-              })
-              .then(data => {
-                  if (data['next']){
-                      let urlparams = new URLSearchParams(data['next'])
-                      if (!document.getElementById('loadmore')) {
-                      console.log('more than 1000')
-                      let b_more = document.createElement('DIV')
-                      b_more.id = "loadmore"
-                      b_more.style = "width:100%; height:50px; color: grey;"
-                      b_more.append(document.createTextNode('Mehr als 1000 Verbindungen geladen! '))
-                      let b_more_link = document.createElement('Button')
-                      b_more_link.onclick = function() {getNetworkViz("test", urlparams.get('offset'))};
-                      b_more_link.append(document.createTextNode('Clicken um weiter zu laden.'))
-                      b_more.append(b_more_link)
-                      let cv = document.getElementById('banner_viz')
+        let url = new URL(endpoint, window.location.origin)
+        console.log(urlParams.get('q'))
+        urlParams.forEach((value, key) => {
+            console.log(key);
+            url.searchParams.set(key, value)
+        });
+        console.log(url);
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(response.statusText)
+                }
+                let loader = document.getElementById("loader");
+                if (loader) {
+                    loader.remove();
+                }
+                return response.json()
+            })
+            .then(data => {
+                if (data['next']) {
+                    let urlparams = new URLSearchParams(data['next'])
+                    if (!document.getElementById('loadmore')) {
+                        console.log('more than 1000')
+                        let b_more = document.createElement('DIV')
+                        b_more.id = "loadmore"
+                        b_more.style = "width:100%; height:50px; color: grey;"
+                        b_more.append(document.createTextNode('Mehr als 1000 Verbindungen geladen! '))
+                        let b_more_link = document.createElement('Button')
+                        b_more_link.onclick = function () { getNetworkViz("test", urlparams.get('offset')) };
+                        b_more_link.append(document.createTextNode('Clicken um weiter zu laden.'))
+                        b_more.append(b_more_link)
+                        let cv = document.getElementById('banner_viz')
                         cv.prepend(b_more)
-                      } else {
+                    } else {
                         let b_more_link = document.querySelector('#loadmore > a:first-of-type')
-                        b_more_link.onclick = function() {getNetworkViz("test", urlparams.get('offset'))}
-                      }
-                  } else if (document.getElementById('loadmore')) {
-                      document.getElementById('loadmore').remove()
-                  }
-                  const edges = {}
-                  const nodes = {}
-                  const types = {edges: {}, nodes: {}}
-                  let type_source
-                  let type_target
-                      const type_definitions = {
-                          "Person": {
-                              id: "Person",
-                              label: "Person",
-                              color: "#c80000"
-                          },
-                          "Place": {
-                          id: 'Place',
-                          label: 'Ort',
-                          color: 'rebeccapurple',},
-                          
-                          "Institution": {
-                          id: 'Institution',
-                          label: 'Institution',
-                          color: 'green',
-                      }
-                      }
-                  var match_entities = /entities\/(\w+)/;
-                  var base_url = window.location;
-                  data.results.forEach(relation => {
-                      const {id, source, target, relation_type: relationType} = relation
-                      type_source = match_entities.exec(source.url)[1]
-                      type_target = match_entities.exec(target.url)[1]
-                      type_source = type_source.charAt(0).toUpperCase() + type_source.slice(1)
-                      type_target = type_target.charAt(0).toUpperCase() + type_target.slice(1)
-                      edges[id] = {
-                          id,
-                          source: source.id,
-                          target: target.id,
-                          type: relationType.id,
-                      }
-                      nodes[source.id] = {
-                          id: source.id,
-                          label: source.label,
-                          type: type_source,
-                          url: `${base_url.protocol}//${base_url.host}/${type_source.toLowerCase()}/${source.id}` 
-                      }
-                      nodes[target.id] = {
-                          id: target.id,
-                          label: target.label,
-                          type: type_target,
-                          url: `${base_url.protocol}//${base_url.host}/${type_target.toLowerCase()}/${target.id}` 
-                      }
-                      types.edges[relationType.id] = {
-                          id: relationType.id,
-                          label: relationType.label,
-                      }
-                  })
-                  types.nodes[type_source] = type_definitions[type_source]
-                  types.nodes[type_target] = type_definitions[type_target]
-                  ReactDOM.render(
-                      React.createElement(NetworkVisualization.SelectionControls, {
-                          graph: {
-                              edges,
-                              nodes,
-                              types,
-                          },
-                        
-                            simulation: {
-                            charge: -50
-                            },
-                          onNodeSelect: (node, selected) => {console.log(node);
-                          console.log(selected);
-                          if (!selectedNodes.hasOwnProperty(node.id)) {
-                              console.log("if hit");
-                              selectedNodes[node.id] = node;
-                              let listitem = document.createElement("li")
-                              listitem.setAttribute("data-nodeid", node.id);
-                              listitem.setAttribute("class", "node-detail-entry");
-                              let heading = document.createElement("span")
-                              heading.setAttribute("class", "node-list-heading")
-                              let textnode = document.createTextNode(node.label)
-                              heading.append(textnode)
-                              listitem.append(heading)
-                              listitem.append(document.createElement("br"))
-                              let kind = document.createElement("span")
-                              kind.setAttribute("class", "node-list-kind")
-                              kind.append(document.createTextNode(node.type))
-                              listitem.append(kind)
-                              listitem.append(document.createElement("br"))
-                              let link = document.createElement("a")
-                              link.setAttribute("class", "node-list-link")
-                              link.setAttribute("href", node.url)
-                              link.setAttribute("target", "_blank")
-                              link.append(document.createTextNode(node.url))
-                              listitem.append(link)
-                              listitem.append(document.createElement("hr"))
-                              let uldetails = document.getElementById("details-nodes-list")
-                              uldetails.append(listitem)
-                              document.getElementById("details-nodes").style.display = "block"
-                          }
-                          console.log(selectedNodes)
-                          },
-                          onNodeDeselect: node => {console.log(node);
-                          document.querySelector(`[data-nodeid="${node.id}"]`).remove();
-                          delete selectedNodes[node.id]
-                          if (Object.keys(selectedNodes).length === 0) {
-                              document.getElementById("details-nodes").style.display = "none"
+                        b_more_link.onclick = function () { getNetworkViz("test", urlparams.get('offset')) }
+                    }
+                } else if (document.getElementById('loadmore')) {
+                    document.getElementById('loadmore').remove()
+                }
+                const edges = {}
+                const nodes = {}
+                const types = { edges: {}, nodes: {} }
+                let type_source
+                let type_target
+                const type_definitions = {
+                    "Person": {
+                        id: "Person",
+                        label: "Person",
+                        color: "#DB2B39"
+                    },
+                    "Place": {
+                        id: 'Place',
+                        label: 'Ort',
+                        color: 'rebeccapurple',
+                    },
 
-                          }
-                          },
-                          children: props => [
-            React.createElement(NetworkVisualization.ExportButton, props),
-            React.createElement(NetworkVisualization.Legend, props),
-          ],
-                      }),
-                      document.getElementById('visualization')
-                  );
-              })
-              .catch(error => {
-                  console.error(error)
-              })
-      };
+                    "Institution": {
+                        id: 'Institution',
+                        label: 'Institution',
+                        color: '#344055',
+                    }
+                }
+                var match_entities = /entities\/(\w+)/;
+                var base_url = window.location;
+                data.results.forEach(relation => {
+                    const { id, source, target, relation_type: relationType } = relation
+                    type_source = match_entities.exec(source.url)[1]
+                    type_target = match_entities.exec(target.url)[1]
+                    type_source = type_source.charAt(0).toUpperCase() + type_source.slice(1)
+                    type_target = type_target.charAt(0).toUpperCase() + type_target.slice(1)
+                    edges[id] = {
+                        id,
+                        source: source.id,
+                        target: target.id,
+                        type: relationType.id,
+                    }
+                    nodes[source.id] = {
+                        id: source.id,
+                        label: source.label,
+                        type: type_source,
+                        url: `${base_url.protocol}//${base_url.host}/${type_source.toLowerCase()}/${source.id}`
+                    }
+                    nodes[target.id] = {
+                        id: target.id,
+                        label: target.label,
+                        type: type_target,
+                        url: `${base_url.protocol}//${base_url.host}/${type_target.toLowerCase()}/${target.id}`
+                    }
+                    types.edges[relationType.id] = {
+                        id: relationType.id,
+                        label: relationType.label,
+                    }
+                })
+                types.nodes[type_source] = type_definitions[type_source]
+                types.nodes[type_target] = type_definitions[type_target]
 
-    </script>
+                const Applet = () => {
+                    const [charge, setCharge] = useState(-50)
+                    const [distance, setDistance] = useState(10)
+                    const [nodeInfo, setNodeInfo] = useState({})
+                    const [nodeDetails, setNodeDetails] = useState({})
+                    
+                    const [loading,setLoader] = useState(false)
+
+                    const setValue = (_value, cb) => {
+                        const value = parseInt(_value, 10)
+                        if (Number.isInteger(value)) {
+                            cb(value)
+                        }
+                    }
+                    
+
+                    return h(
+                        'div',
+                        {
+                            style: {
+                                display: 'flex',
+                                minHeight: '100vh',
+                                position: 'relative',
+                            }
+                        },
+                        [
+                            h(
+                                'form',
+                                undefined,
+                                h('fieldset', undefined, [
+                                    h(
+                                        'div',
+                                        {
+                                            style: {
+                                                alignItems: 'center',
+                                                display: 'grid',
+                                                gridGap: '1rem',
+                                                gridTemplateColumns: 'auto 1fr',
+                                            },
+                                        },
+                                        [
+
+                                        ]
+                                    ),
+                                ])
+                            ),
+                            h(
+                                'div',
+                                { style: { flex: 1, position: 'relative' } },
+                                h(SelectionControls, {
+                                    graph: {
+                                        edges,
+                                        nodes,
+                                        types,
+                                    },
+                                    colors:{ selected: '#a8a8ad'},
+                                    onNodeSelect: (node, selected) => {
+                                        //console.log(node);
+                                        //console.log(selected);
+                                        setNodeInfo({});
+                                        setNodeDetails({});
+                                        let selArray = [...selected];
+                                        if (selArray.length > 1) {
+                                            selected.delete(selArray[selArray.length - 1]);
+                                        }
+                                        if (!selectedNodes.hasOwnProperty(node.id)) {
+                                            console.log("if hit");
+                                            setNodeInfo(node)
+                                            const detailsEndpoint = `${window.location.origin}/apis/api/entities/${node.type.toLowerCase()}/${node.id}/`
+                                            setLoader(true)
+                                          fetch(`${detailsEndpoint}`).then(response => {
+                                              
+                                                if (!response.ok) {
+                                                    throw new Error(response.statusText)
+                                                }
+                                                return response.json()
+                                            }).then(data => {
+                                                setLoader(false)
+                                                setNodeDetails(data)
+                                                console.log(data)
+                                            })
+
+
+                                        }
+                                        console.log(selectedNodes)
+                                    },
+                                    onNodeDeselect: node => {
+                                     
+                                        setNodeInfo({});
+                                        setNodeDetails({});
+                                    },
+                                    simulation: { charge, distance },
+                                    children: props => [
+                                        //h(ExportButton, props),
+                                        h('div', {
+                                            style: {
+                                                display: 'inline-flex',
+                                                'flex-direction': 'column',
+                                                position: 'absolute',
+                                                top: '2.5rem'
+                                            }
+                                        },
+
+                                        
+                                            h('div', {},
+                                                h(ReactNouislider, {
+                                                    onUpdate: setCharge,
+                                                    tooltips: true,
+                                                    range: { min: -120, max: 0 },
+                                                    start: -60,
+                                                    style: { height: '4px', width: '80px' }
+                                                }),
+                                                h('small', undefined, 'Charge')),
+                                            h('div', {
+                                                style: { 'margin-top': '40px' }
+                                            },
+                                                h(ReactNouislider, {
+                                                    onUpdate: setDistance,
+                                                    tooltips: true,
+                                                    range: { min: 0, max: 100 },
+                                                    start: 30,
+                                                    style: { height: '4px', width: '80px' }
+                                                }),
+                                                h('small', undefined, 'Distance'))),
+                                        
+                                        h('div', {
+                                            id: 'ntw-metainfo',
+                                            className: 'bg-mine',
+                                            style: {
+                                                position: 'absolute',
+                                                right: '30px',
+                                                width:'10rem'
+                                            },
+                                        },
+                                        h(Legend, props),
+                                        h('small',{},
+                                                h('a', { href: nodeInfo.url }, nodeInfo.label)),
+                                                h('small', {className: 'd-block'}, nodeInfo.type),
+                                                h('div',{className:loading ?'spinner-grow-sm':'d-none' },h('span',{className:'sr-only'},'Lädt...')),
+                                                h('small', {className:'d-block'}, nodeDetails.start_date_written),
+                                                h('small', {className:'d-block'}, nodeDetails.end_date_written),
+                                            )
+
+                                    ]
+                                }))]
+                    )
+
+                }
+                render(h(Applet), document.getElementById('visualization'))
+
+
+
+
+            }).catch(error => {
+                console.error(error)
+            })
+    };
+
+</script>
 <script>
-window.onload = getNetworkViz('personinstitution', 0)
+    window.onload = getNetworkViz('personinstitution', 0)
 </script>
 {% endblock scripts %}
