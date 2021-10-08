@@ -65,7 +65,7 @@ class PersonFilterFormHelperNew(FormHelper):
         self.form_method = "GET"
         self.helper.form_tag = False
         # self.template = "forms/template_person_form.html"
-        self.add_input(Submit("Filter", "Kombinierte Auswertung starten", css_class="rounded-0 mt-1"))
+        self.add_input(Submit("", "Kombinierte Auswertung starten", css_class="rounded-0 mt-1"))
         self.layout = Layout(
             Fieldset("", "q", css_class="bg-mine", css_id="basic_search_fields"),
             Div(
@@ -515,7 +515,7 @@ class InstitutionFilterFormHelperNew(FormHelper):
         self.form_method = "GET"
         self.helper.form_tag = False
         # self.template = "forms/template_person_form.html"
-        self.add_input(Submit("Filter", "Kombinierte Auswertung starten", css_class="rounded-0 mt-2"))
+        self.add_input(Submit("", "Kombinierte Auswertung starten", css_class="rounded-0 mt-2"))
         self.layout = Layout(
             Fieldset("", "q", css_class="bg-mine", css_id="basic_search_fields"),
             Div(
