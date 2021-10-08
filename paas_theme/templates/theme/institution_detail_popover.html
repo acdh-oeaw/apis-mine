@@ -1,0 +1,74 @@
+{% load static %}
+{% load leaflet_tags %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <p class="text-right mb-0">
+                <a href="/institution/{{object.pk}}" target="_blank" rel="no-referrer noopener">
+                    <i data-feather="external-link" class="feather-16" title="link to details"></i>
+                </a>
+            </p>
+            <small class="font-weight-bold d-block  pt-1 pb-4">
+                {{ object.name }}
+            </small>
+            <small class="d-block">{{untertitel}}</small>
+            {% if akademie %}
+            <small class="d-block">Akademieinstitution</small>
+            {% endif %}
+            <p class="profession-date-of-birth">
+
+                <small class="font-weight-normal">{% if object.start_date_written is not None %}
+                    {{object.start_date_written }}{% endif %}
+                    {% if object.end_date_written is not None %}
+                    &ndash;
+                    {{object.end_date_written }}{% endif %}
+                </small>
+            </p>
+
+
+            {% if struktur %}
+            <div class="section">
+                <small class="font-weight-bold">Struktur der Komission</small>
+                <ul class="relentities">
+                    {% for x in struktur %}
+                    <li class="pl-0 font-weight-normal pb-0" style="padding-bottom: 0.8em">
+                        <small>{{x|safe}}</small>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            {% if gelegen_in %}
+            <div class="section">
+                <small class="font-weight-bold">Ort</small>
+                <div id="institution_map" data-lat={{gelegen_in.0}} data-lng={{gelegen_in.1}}>{% leaflet_map
+                    "institution_map" callback="window.map_institution" %}</div>
+            </div>
+            {% endif %}
+
+
+            {% if normdaten %}
+            <div class="section">
+                <small class="font-weight-bold">Online-Ressourcen</small>
+                <ul class="uris pl-0">
+                    {% for nd in normdaten %}
+                    <li class="pl-0 font-weight-normal"><small>{{nd.kind}} <a target="_blank" rel="noopener noreferrer"
+                                href="{{nd.uri}}">{{nd.identifier}}</a></small></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            <div class="section">
+                <small class="font-weight-bold">Downloads</small>
+                <ul class="uris pl-0">
+                    <li class="pl-0 font-weight-normal"><small><a target="_blank" rel="noopener noreferrer"
+                                href="/apis/api/entities/institution/{{object.pk}}/?format=json">Json</a></small></li>
+                    <li class="pl-0 font-weight-normal"><small><a target="_blank" rel="noopener noreferrer"
+                                href="/apis/api2/entity/{{object.pk}}/?format=rdf%2Bturtle">RDF/Turtle</a></small></li>
+                    <li class="pl-0 font-weight-normal"><small><a target="_blank" rel="noopener noreferrer"
+                                href="/apis/api2/entity/{{object.pk}}/?format=tei">TEI</a></small></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

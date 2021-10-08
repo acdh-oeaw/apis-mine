@@ -18,11 +18,20 @@
 <script src="https://unpkg.com/nouislider-react@3.4.1/dist/nouislider-react.umd.production.min.js"></script>
 
 <style>
-   /* #loader {
+    /* #loader {
         position: absolute;
         top: 40%;
         left: 50%;
     }*/
+
+    [data-nerv-filter-controls] {
+        right: 0;
+    }
+
+    .popoverInnerWrapper {
+        display:flex;
+        flex-direction: column;
+    }
 
     #details-nodes {
         border-radius: 10px;
@@ -33,8 +42,14 @@
         font-size: 0.8em;
     }
 
+    #loadmore {
+        background: white;
+        border: 1px solid rgb(221, 221, 221);
+        font-size: 12px;
+    }
+
     #ntw-metainfo [data-nerv-legend] {
-        position:relative;
+        position: relative;
     }
 
     @keyframes spin {
@@ -48,7 +63,7 @@
     }
 
     .footer {
-        margin-top:0;
+        margin-top: 0;
     }
 </style>
 {% endblock scriptHeader %}
@@ -59,34 +74,117 @@
         <ul id="details-nodes-list" style="list-style-type: none; padding: 5px"></ul>
     </div>
     <div id="banner_viz" style></div>
-    <div id="visualization" style="overflow: hidden; position: relative; flex: 1 1; height: 100%">
+    <div id="visualization" class="mt-3" style="overflow: hidden; position: relative; flex: 1 1; height: 100%">
         <div class="d-flex h-100 justify-content-center">
-        <div id="loader" class="spinner-grow" role="status">
-            <span class="sr-only">Loading...</span>
+            <div id="loader" class="spinner-grow" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
         </div>
-    </div>
     </div>
 </div>
 {% endblock content %}
 {% block scripts %}
+<script src="{%static 'theme/js/helpers.network.js'%}"></script>
 <script>
 
-    const { createElement: h, render, useState } = preactCompat
-    const { SelectionControls, ExportButton, Legend } = NetworkVisualization
+    const { createElement: h, render, useState, useRef } = preactCompat
+    const { SelectionControls, Visualization, ExportButton, Legend, FilterControls } = NetworkVisualization
 
+    const type_definitions = {
+        "Person": {
+            id: "Person",
+            label: "Person",
+            color: "#DB2B39"
+        },
+        "Place": {
+            id: 'Place',
+            label: 'Ort',
+            color: 'rebeccapurple',
+        },
 
+        "Institution": {
+            id: 'Institution',
+            label: 'Institution',
+            color: '#344055',
+        }
+    }
 
+    const loadMoreNodes = (nextPage, setNextPage, graph, setGraph, setLoadedEdges) => {
+        // url.searchParams.set('offset', parseInt(offset) + parseInt(limit));
+        if (nextPage !== null) {
+            fetch(nextPage)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(response.statusText)
+                    }
+                    let loader = document.getElementById("loader");
+                    if (loader) {
+                        loader.remove();
+                    }
+                    return response.json()
+                }).then(data => {
+                    setNextPage(data.next)
+                    additionalNodes = generateGraphFromApisRelations(type_definitions, data.results);
+                    mergeGraphs(graph, additionalNodes, setGraph)
+                    //setLoadedEdges(parseInt(offset) + parseInt(limit))
+                })
+        }
+    }
 
+    const mergeGraphs = (graph, additionalNodes, setGraph) => {
+        const merged = { ...graph, ...additionalNodes };
+        setGraph(merged);
+    }
 
+    const generateGraphFromApisRelations = (typedefinitions, relations) => {
+        var match_entities = /entities\/(\w+)/;
+        let graph = { edges: {}, nodes: {}, types: { edges: {}, nodes: {} } }
+
+        let type_source
+        let type_target
+        var base_url = window.location;
+        relations.forEach(relation => {
+            const { id, source, target, relation_type: relationType } = relation
+            type_source = match_entities.exec(source.url)[1]
+            type_target = match_entities.exec(target.url)[1]
+            type_source = type_source.charAt(0).toUpperCase() + type_source.slice(1)
+            type_target = type_target.charAt(0).toUpperCase() + type_target.slice(1)
+            graph.edges[id] = {
+                id,
+                source: source.id,
+                target: target.id,
+                type: relationType.id,
+            }
+            graph.nodes[source.id] = {
+                id: source.id,
+                label: source.label,
+                type: type_source,
+                url: `${base_url.protocol}//${base_url.host}/${type_source.toLowerCase()}/${source.id}`
+            }
+            graph.nodes[target.id] = {
+                id: target.id,
+                label: target.label,
+                type: type_target,
+                url: `${base_url.protocol}//${base_url.host}/${type_target.toLowerCase()}/${target.id}`
+            }
+            graph.types.edges[relationType.id] = {
+                id: relationType.id,
+                label: relationType.label,
+            }
+        })
+        graph.types.nodes[type_source] = typedefinitions[type_source]
+        graph.types.nodes[type_target] = typedefinitions[type_target]
+        return graph;
+    }
 
     const getNetworkViz = (rel_type, offset) => {
         let urlParams = new URLSearchParams(window.location.search);
         const endpoint = '/api/network/';
         let selectedNodes = {};
         let nodesDetails = {};
-
+        const limit = 500;
         urlParams.append('format', 'json+net');
-        urlParams.append('limit', '1000')
+        urlParams.append('limit', limit)
         urlParams.append('offset', offset)
         console.log(window.location.search)
         let url = new URL(endpoint, window.location.origin)
@@ -113,13 +211,13 @@
                     if (!document.getElementById('loadmore')) {
                         console.log('more than 1000')
                         let b_more = document.createElement('DIV')
-                        b_more.id = "loadmore"
-                        b_more.style = "width:100%; height:50px; color: grey;"
-                        b_more.append(document.createTextNode('Mehr als 1000 Verbindungen geladen! '))
-                        let b_more_link = document.createElement('Button')
-                        b_more_link.onclick = function () { getNetworkViz("test", urlparams.get('offset')) };
-                        b_more_link.append(document.createTextNode('Clicken um weiter zu laden.'))
-                        b_more.append(b_more_link)
+                        /* b_more.id = "loadmore"
+                         b_more.style = "width:100%; height:50px; color: grey;"
+                         b_more.append(document.createTextNode(`${limit} von ${data.count} Verbindungen`))
+                         let b_more_link = document.createElement('Button')
+                         b_more_link.onclick = function () { getNetworkViz("test", urlparams.get('offset')) };
+                         b_more_link.append(document.createTextNode('Clicken um weiter zu laden.'))
+                         b_more.append(b_more_link)*/
                         let cv = document.getElementById('banner_viz')
                         cv.prepend(b_more)
                     } else {
@@ -129,70 +227,21 @@
                 } else if (document.getElementById('loadmore')) {
                     document.getElementById('loadmore').remove()
                 }
-                const edges = {}
-                const nodes = {}
-                const types = { edges: {}, nodes: {} }
-                let type_source
-                let type_target
-                const type_definitions = {
-                    "Person": {
-                        id: "Person",
-                        label: "Person",
-                        color: "#DB2B39"
-                    },
-                    "Place": {
-                        id: 'Place',
-                        label: 'Ort',
-                        color: 'rebeccapurple',
-                    },
 
-                    "Institution": {
-                        id: 'Institution',
-                        label: 'Institution',
-                        color: '#344055',
-                    }
-                }
-                var match_entities = /entities\/(\w+)/;
-                var base_url = window.location;
-                data.results.forEach(relation => {
-                    const { id, source, target, relation_type: relationType } = relation
-                    type_source = match_entities.exec(source.url)[1]
-                    type_target = match_entities.exec(target.url)[1]
-                    type_source = type_source.charAt(0).toUpperCase() + type_source.slice(1)
-                    type_target = type_target.charAt(0).toUpperCase() + type_target.slice(1)
-                    edges[id] = {
-                        id,
-                        source: source.id,
-                        target: target.id,
-                        type: relationType.id,
-                    }
-                    nodes[source.id] = {
-                        id: source.id,
-                        label: source.label,
-                        type: type_source,
-                        url: `${base_url.protocol}//${base_url.host}/${type_source.toLowerCase()}/${source.id}`
-                    }
-                    nodes[target.id] = {
-                        id: target.id,
-                        label: target.label,
-                        type: type_target,
-                        url: `${base_url.protocol}//${base_url.host}/${type_target.toLowerCase()}/${target.id}`
-                    }
-                    types.edges[relationType.id] = {
-                        id: relationType.id,
-                        label: relationType.label,
-                    }
-                })
-                types.nodes[type_source] = type_definitions[type_source]
-                types.nodes[type_target] = type_definitions[type_target]
+
+
+                const graphFromApis = generateGraphFromApisRelations(type_definitions, data.results)
 
                 const Applet = () => {
                     const [charge, setCharge] = useState(-50)
                     const [distance, setDistance] = useState(10)
                     const [nodeInfo, setNodeInfo] = useState({})
                     const [nodeDetails, setNodeDetails] = useState({})
-                    
-                    const [loading,setLoader] = useState(false)
+                    const [graph, setGraph] = useState(graphFromApis)
+                    const [loading, setLoader] = useState(false)
+                    const [loadedEdges, setLoadedEdges] = useState(limit)
+                    const [nextPage, setNextPage] = useState(data.next)
+                    const selectionControlRef = useRef(null);
 
                     const setValue = (_value, cb) => {
                         const value = parseInt(_value, 10)
@@ -200,7 +249,9 @@
                             cb(value)
                         }
                     }
-                    
+
+
+
 
                     return h(
                         'div',
@@ -235,102 +286,101 @@
                             h(
                                 'div',
                                 { style: { flex: 1, position: 'relative' } },
-                                h(SelectionControls, {
-                                    graph: {
-                                        edges,
-                                        nodes,
-                                        types,
-                                    },
-                                    colors:{ selected: '#a8a8ad'},
-                                    onNodeSelect: (node, selected) => {
-                                        //console.log(node);
-                                        //console.log(selected);
-                                        setNodeInfo({});
-                                        setNodeDetails({});
-                                        let selArray = [...selected];
-                                        if (selArray.length > 1) {
-                                            selected.delete(selArray[selArray.length - 1]);
-                                        }
-                                        if (!selectedNodes.hasOwnProperty(node.id)) {
-                                            console.log("if hit");
-                                            setNodeInfo(node)
-                                            const detailsEndpoint = `${window.location.origin}/apis/api/entities/${node.type.toLowerCase()}/${node.id}/`
-                                            setLoader(true)
-                                          fetch(`${detailsEndpoint}`).then(response => {
-                                              
-                                                if (!response.ok) {
-                                                    throw new Error(response.statusText)
-                                                }
-                                                return response.json()
-                                            }).then(data => {
-                                                setLoader(false)
-                                                setNodeDetails(data)
-                                                console.log(data)
-                                            })
-
-
-                                        }
-                                        console.log(selectedNodes)
-                                    },
-                                    onNodeDeselect: node => {
-                                     
-                                        setNodeInfo({});
-                                        setNodeDetails({});
-                                    },
-                                    simulation: { charge, distance },
-                                    children: props => [
-                                        //h(ExportButton, props),
-                                        h('div', {
-                                            style: {
-                                                display: 'inline-flex',
-                                                'flex-direction': 'column',
-                                                position: 'absolute',
-                                                top: '2.5rem'
+                                h(FilterControls, {
+                                    centerAt:false,
+                                    children: props => [h(Visualization, {
+                                        graph: graph,
+                                        style: {
+                                            right: 0
+                                        },
+                                        dagMode:null,
+                                        selectedNodeIds: props.filteredNodeIds,
+                                        showNeighborsOnly: Boolean(props.filteredNodeIds.size),
+                                        colors: { selected: '#a8a8ad' },
+                                        onNodeClick: handleNodeClick(createPopoverContent),
+                                            
+                                        /* onNodeSelect: (node, selected) => {
+                                           
+                                           let selArray = [...selected];
+                                            if (selArray.length > 1) {
+                                                selected.delete(selArray[selArray.length - 1]);
                                             }
+                                        
                                         },
+                                        onNodeDeselect: node => {
 
-                                        
-                                            h('div', {},
-                                                h(ReactNouislider, {
-                                                    onUpdate: setCharge,
-                                                    tooltips: true,
-                                                    range: { min: -120, max: 0 },
-                                                    start: -60,
-                                                    style: { height: '4px', width: '80px' }
-                                                }),
-                                                h('small', undefined, 'Charge')),
+                                            setNodeInfo({});
+                                            setNodeDetails({});
+                                        },*/
+                                        simulation: { charge, distance },
+                                        children: props => [
+                                            //h(ExportButton, props),
                                             h('div', {
-                                                style: { 'margin-top': '40px' }
+                                                style: {
+                                                    display: 'inline-flex',
+                                                    'flex-direction': 'column',
+                                                    position: 'absolute',
+                                                }
                                             },
-                                                h(ReactNouislider, {
-                                                    onUpdate: setDistance,
-                                                    tooltips: true,
-                                                    range: { min: 0, max: 100 },
-                                                    start: 30,
-                                                    style: { height: '4px', width: '80px' }
-                                                }),
-                                                h('small', undefined, 'Distance'))),
-                                        
-                                        h('div', {
-                                            id: 'ntw-metainfo',
-                                            className: 'bg-mine',
-                                            style: {
-                                                position: 'absolute',
-                                                right: '30px',
-                                                width:'10rem'
+
+                                                h('div', {},
+                                                    h('small', { className: 'd-block' }, `${loadedEdges} von ${data.count} Verbindungen geladen`),
+                                                    h('button', {
+                                                        id: 'loadmore',
+                                                        onClick: loadMoreNodes.bind(this, nextPage, setNextPage, graph, setGraph, setLoadedEdges)
+                                                    }, 'mehr laden')),
+                                                h('div', { style: { 'margin-top': '60px' } },
+
+                                                    h(ReactNouislider, {
+                                                        onUpdate: setCharge,
+                                                        tooltips: true,
+                                                        range: { min: -120, max: 0 },
+                                                        start: -60,
+                                                        style: { height: '4px', width: '80px' }
+                                                    }),
+                                                    h('small', undefined, 'Charge')),
+                                                h('div', {
+                                                    style: { 'margin-top': '40px' }
+                                                },
+                                                    h(ReactNouislider, {
+                                                        onUpdate: setDistance,
+                                                        tooltips: true,
+                                                        range: { min: 0, max: 100 },
+                                                        start: 30,
+                                                        style: { height: '4px', width: '80px' }
+                                                    }),
+                                                    h('small', undefined, 'Distance')),
+                                            ),
+                                            h('div', {
+                                                id: 'ntw-metainfo',
+                                                className: 'bg-mine',
+                                                style: {
+                                                    position: 'absolute',
+                                                    right: '30px',
+                                                    width: '10rem',
+                                                    top: '3rem'
+                                                },
                                             },
-                                        },
-                                        h(Legend, props),
-                                        h('small',{},
-                                                h('a', { href: nodeInfo.url }, nodeInfo.label)),
-                                                h('small', {className: 'd-block'}, nodeInfo.type),
-                                                h('div',{className:loading ?'spinner-grow-sm':'d-none' },h('span',{className:'sr-only'},'Lädt...')),
-                                                h('small', {className:'d-block'}, nodeDetails.start_date_written),
-                                                h('small', {className:'d-block'}, nodeDetails.end_date_written),
+                                                /*  h(FilterControls,{
+                                                      graph: {
+                                                  edges,
+                                                  nodes,
+                                                  types,
+                                              }
+                                                  }),*/
+                                                h(Legend, props),
+                                                h('div', {},
+                                                    h('a', { href: nodeInfo.url }, nodeInfo.label)),
+                                                h('small', { className: 'd-block' }, nodeInfo.type),
+                                                h('div', { className: loading ? 'spinner-grow-sm' : 'd-none' }, h('span', { className: 'sr-only' }, 'Lädt...')),
+                                                h('small', { className: 'd-block' }, nodeDetails.start_date_written),
+                                                h('small', { className: 'd-block' }, nodeDetails.end_date_written),
                                             )
 
-                                    ]
-                                }))]
+                                        ]
+                                    })], graph: graph
+                                }
+                                ))]
                     )
 
                 }
@@ -345,6 +395,7 @@
     };
 
 </script>
+
 <script>
     window.onload = getNetworkViz('personinstitution', 0)
 </script>
