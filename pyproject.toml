@@ -7,15 +7,8 @@ license = "MIT"
 
 
 [tool.poetry.dependencies]
-python = "~3.6"
-Django = "==3.1.8"
-djangorestframework = "^3.12.2"
+python = "~3.8"
 whitenoise = "^5.2.0"
-django-filter = "^2.4.0"
-django-autocomplete-light = "^3.8.1"
-django-cors-headers = "^3.5.0"
-django-crum = "^0.7.9"
-django-crispy-forms = "^1.10.0"
 django-haystack = "^3.0"
 django-gm2m = "^1.1.1"
 django-guardian = "^2.3.0"
