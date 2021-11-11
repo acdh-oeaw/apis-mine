@@ -1,0 +1,217 @@
+.nav-tabs {
+    .nav-link {
+        border-width: 7px 0 0 0;
+        border-color: transparent;
+    }
+    .nav-link.active {
+        border-width: 7px 0 0 0;
+        border-color: $mine-red;
+    }
+}
+
+#institutionTab.nav-tabs {
+    .nav-link {
+        border-width: 7px 0 0 0;
+        border-color: transparent;
+    }
+    .nav-link.active {
+        border-width: 7px 0 0 0;
+        border-color: $mine-green;
+    }
+}
+
+#egonetwork_visualization {
+    min-height: 300px;
+}
+
+#egonetspinner {
+    min-height: 300px;
+}
+
+#moveegontwbtn {
+    right: $spacer;
+    z-index: 2;
+}
+
+#egonetwork_visualization [data-nerv-legend] {
+    top: 0;
+    left: 0;
+    width: fit-content;
+    li {
+        float: left;
+        clear: left;
+    }
+}
+
+.select2-container {
+    min-width: 90% !important;
+    .custom-select {
+        min-height: 2rem;
+        height: unset;
+        border-radius: 0;
+    }
+    .select2-selection {
+        border-radius: 0 !important;
+    }
+}
+
+.select2-container--default,
+.select2-container--bootstrap {
+    .select2-results__option--highlighted[aria-selected] {
+        background-color: $oeaw-blue !important;
+    }
+}
+
+.select2-container--bootstrap4 {
+    .select2-dropdown.select2-dropdown--below {
+        border-radius: 0;
+    }
+    .select2-results__option--highlighted {
+        background: $oeaw-blue;
+    }
+}
+
+fieldset legend {
+    font-size: $font-size-base;
+    font-weight: bold;
+}
+
+.filter-wrapper {
+    label:first-child {
+        font-weight: bold;
+    }
+}
+
+.custom-table {
+    border-spacing: 0 $spacer * 0.25;
+    border-collapse: separate;
+}
+
+.custom-table {
+    tbody {
+        tr {
+            background-color: white;
+        }
+        tr:hover {
+            background-color: $mine-lighter;
+        }
+    }
+}
+
+.show-limited-number {
+    .facet-group-item:nth-child(n + 6) {
+        display: none;
+    }
+}
+
+.inline-map {
+    overflow: hidden;
+    border-radius: 14px;
+    position: relative;
+    transform: translateZ(0); /* damn you safari */
+}
+
+ul.maps-list li {
+    padding-left: 0px;
+    font-weight: normal;
+}
+
+div.leaflet-pane svg.feather {
+    width: unset;
+}
+
+div.leaflet-marker-icon path {
+    fill: #326ba8;
+    fill-opacity: 70%;
+}
+
+div.leaflet-marker-icon circle {
+    fill: white;
+    fill-opacity: 100%;
+}
+
+div.leaflet-marker-icon.activated path {
+    fill: darkred;
+}
+
+div.leaflet-marker-icon svg.feather-map-pin {
+    height: 100%;
+}
+
+/*** spinner ***/
+@keyframes spinner-grow {
+    0% {
+        transform: scale(0);
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+.spinner-grow {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    margin: auto;
+    vertical-align: text-bottom;
+    background-color: currentColor;
+    border-radius: 50%;
+    opacity: 0;
+    -webkit-animation: spinner-grow 0.75s linear infinite;
+    animation: spinner-grow 0.75s linear infinite;
+}
+.spinner-grow-sm {
+    height: 1rem;
+    border-width: 0.2em;
+}
+
+/*** stories toc ***/
+
+#toc {
+    top: 100px;
+    z-index: 1;
+}
+
+/*** Datatables ***/
+
+.controlwrapper {
+    align-items: baseline;
+}
+
+div.dataTables_filter {
+    text-align: left !important;
+}
+
+
+.exportbuttons {
+    text-align: right;
+}
+
+.dataTables_wrapper  {
+    font-size:$smaller-text-font-size
+}
+
+.dataTables_info {
+    text-align: center;
+}
+
+.filters input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+
+.dtr-control:before {
+    background-color:unset !important;
+    font-family: 'Font Awesome 5 Free' !important;
+    font-size:x-large !important;
+    box-shadow:unset !important;
+    color:black !important;
+    border:none !important;
+}
+
+/**** Font Aweseome ***/
+.far {
+    font-family: "Font Awesome 5 Free" !important;
+}

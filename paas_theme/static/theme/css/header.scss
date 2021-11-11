@@ -1,0 +1,30 @@
+.navbar {
+    border-bottom: unset;
+    box-shadow: unset;
+    .navbar-collapse {
+        .navbar-search {
+            background:$mine-bg;
+            width: 15rem;
+        }
+    }
+    button.navbar-search-icon {
+        color: $oeaw-blue;
+        left: 14.75rem;
+    }
+}
+
+
+
+
+.navbar-light {
+    .navbar-nav {
+        .nav-link {
+            color: $oeaw-blue;
+            font-size: 0.8rem;
+        }
+    }
+}
+
+#wrapper-navbar {
+    border-top-style: none;
+}

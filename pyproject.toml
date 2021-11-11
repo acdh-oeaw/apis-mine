@@ -54,6 +54,8 @@ openpyxl = "^3.0.7"
 graphviz = "^0.17"
 scikit-learn = "^0.24.2"
 django-csp = "^3.7"
+libsass = "^0.21.0"
+django-sass-processor = "^1.1"
 
 [tool.poetry.dev-dependencies]
 black = "^20.8b1"

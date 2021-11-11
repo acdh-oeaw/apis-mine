@@ -1,0 +1,11 @@
+.btn.collapsed {
+        .chevron-up {
+            transform: rotate(180deg);
+        }
+    }
+
+.btn {
+    svg {
+        float:right;
+    }
+}

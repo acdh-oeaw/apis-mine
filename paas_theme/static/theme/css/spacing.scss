@@ -1,0 +1,25 @@
+@function negativify-map($map) {
+    $result: ();
+    @each $key, $value in $map {
+      @if $key != 0 {
+        $result: map-merge($result, ("n" + $key: (-$value)));
+      }
+    }
+    @return $result;
+  }
+
+
+/* https://github.com/twbs/bootstrap/blob/c331a150cdc2834f08bcf458cdb1b104cc510b67/scss/_variables.scss */
+
+$negative-spacers: negativify-map($spacers) !default;  
+
+
+
+@include breakpoint-up($md) {
+    .pr-md-custom {
+        padding-right: $spacer !important;
+    }
+    .pl-md-custom {
+        padding-left: $spacer !important;
+    }
+}
