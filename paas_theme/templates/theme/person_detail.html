@@ -27,7 +27,6 @@
           </a>
           {% endif %}
         </div>
-        <div class="col"></div>
         <div class="col-md-auto">
           {% if next.id %}
           <a class="card-link nextentity" href="{% url 'theme:person-detail' pk=next.id %}" title="{{ next }}">
@@ -39,13 +38,6 @@
     </div>
     <div class="col-md-12">
       <article class="bio">
-        <div class="entry-header">
-          <!--<div class="row">
-            <div class="col">
-              <h2>{{ object.name }}{%if object.first_name %}, {{ object.first_name }}{% endif %}</h2>
-            </div>
-          </div>-->
-        </div>
         <div id="main" class="card-body">
           <div class="row">
             <div class="col-md-5 pl-0 pr-md-custom">
@@ -192,9 +184,6 @@
                       <i data-feather="maximize-2"></i>
                     </a>
                     <div class="row m-0">
-                      <!--<div class="col-md-12">
-                      {% include "theme/llmap.html" %}
-                      </div>-->
                         <div class="col-md-7">
                        <div class="inline-map">
                           {% leaflet_map "map-container" %}
