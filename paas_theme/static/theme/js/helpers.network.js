@@ -30,7 +30,6 @@ const createPopoverContainer = () => {
         box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.1);
       }
     `)
-
     const popover = document.createElement('div')
     popover.setAttribute('id', 'nerv-popover')
     popover.setAttribute('data-nerv-popover', true)
@@ -80,7 +79,6 @@ const hidePopover = () => {
 }
 
 const handleNodeClick = createPopoverContent => ({ node, event }) => {
-
     if (isPopoverOpen) return
 
     const onDismiss = event => {
@@ -110,7 +108,7 @@ const handleNodeClick = createPopoverContent => ({ node, event }) => {
 // --- popover content ---
 
 const createPopoverContent = ({ node, onDismiss }) => {
-
+    
     const container = document.createElement('div')
     const detailsEndpoint = `${window.location.origin}/${node.type.toLowerCase()}/${node.id}?subview=minimal`
     //setLoader(true)
@@ -124,8 +122,10 @@ const createPopoverContent = ({ node, onDismiss }) => {
         return response.text()
     }).then(data => {
         loaderDetails.style.display = 'none'
-        container.innerHTML = data;
-        feather.replace()
+        var parser = new DOMParser();
+        var htmlDoc = parser.parseFromString(data, 'text/html');
+        container.appendChild(htmlDoc.getElementById('popovercontent'));
+        feather.replace();
     })
     
     

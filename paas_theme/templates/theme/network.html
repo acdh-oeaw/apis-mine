@@ -1,6 +1,7 @@
 {% extends "theme/base.html" %}
+
 {% block scriptHeader %}
-{% load static %}
+
 
 <script crossorigin src="https://unpkg.com/preact@latest/dist/preact.umd.js"></script>
 <script crossorigin src="https://unpkg.com/preact@latest/hooks/dist/hooks.umd.js"></script>
@@ -17,6 +18,10 @@
 </script>
 <script src="https://unpkg.com/nouislider-react@3.4.1/dist/nouislider-react.umd.production.min.js"></script>
 
+
+{% load static %}
+{% load webpage_extras %}
+{% load custom_tags %}
 <style>
     /* #loader {
         position: absolute;
@@ -24,18 +29,24 @@
         left: 50%;
     }*/
 
+    #vis>div:nth-child(1) {
+        position: relative !important;
+    }
+
     [data-nerv-filter-controls] {
         right: 0;
+        position: relative;
+    }
+
+    [data-nerv-legend] {
+        position: relative;
     }
 
     .popoverInnerWrapper {
-        display:flex;
+        display: flex;
         flex-direction: column;
     }
 
-    #details-nodes {
-        border-radius: 10px;
-    }
 
     .node-list-link {
         color: rgb(220 53 69);
@@ -68,26 +79,26 @@
 </style>
 {% endblock scriptHeader %}
 {% block content %}
-<div style="height: 100%; position: relative">
-    <div id="details-nodes"
-        style="position: absolute; right: 10px; top: 80px; display: none; z-index: 1000; min-width: 200px; max-width: 300px">
-        <ul id="details-nodes-list" style="list-style-type: none; padding: 5px"></ul>
+<div id="loader" class="h-75 d-flex">
+    <div class="spinner-grow d-block my-auto" role="status">
+        <span class="sr-only">Loading...</span>
     </div>
-    <div id="banner_viz" style></div>
-    <div id="visualization" class="mt-3" style="overflow: hidden; position: relative; flex: 1 1; height: 100%">
-        <div class="d-flex h-100 justify-content-center">
-            <div id="loader" class="spinner-grow" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
+</div>
+<div class="container">
+    <div id="banner_viz"></div>
+    <div>
+        <div id="visualization" class="mt-5">
+
         </div>
     </div>
+    <div id="vis" class="mt-3 position-relative" style="overflow: hidden; flex: 1 1;"></div>
 </div>
 {% endblock content %}
 {% block scripts %}
 <script src="{%static 'theme/js/helpers.network.js'%}"></script>
 <script>
 
-    const { createElement: h, render, useState, useRef } = preactCompat
+    const { createElement: h, render, useState, useRef, createPortal } = preactCompat
     const { SelectionControls, Visualization, ExportButton, Legend, FilterControls } = NetworkVisualization
 
     const type_definitions = {
@@ -231,6 +242,7 @@
 
 
                 const graphFromApis = generateGraphFromApisRelations(type_definitions, data.results)
+                const portalContainer = document.getElementById('controls');
 
                 const Applet = () => {
                     const [charge, setCharge] = useState(-50)
@@ -243,6 +255,7 @@
                     const [nextPage, setNextPage] = useState(data.next)
                     const selectionControlRef = useRef(null);
 
+
                     const setValue = (_value, cb) => {
                         const value = parseInt(_value, 10)
                         if (Number.isInteger(value)) {
@@ -250,55 +263,63 @@
                         }
                     }
 
-
-
-
                     return h(
                         'div',
                         {
-                            style: {
-                                display: 'flex',
-                                minHeight: '100vh',
-                                position: 'relative',
-                            }
+                            className: "position-relative d-flex flex-row justify-content-between bg-mine border-mine pt-2"
                         },
                         [
-                            h(
-                                'form',
-                                undefined,
-                                h('fieldset', undefined, [
-                                    h(
-                                        'div',
-                                        {
-                                            style: {
-                                                alignItems: 'center',
-                                                display: 'grid',
-                                                gridGap: '1rem',
-                                                gridTemplateColumns: 'auto 1fr',
-                                            },
-                                        },
-                                        [
 
-                                        ]
-                                    ),
-                                ])
-                            ),
-                            h(
-                                'div',
-                                { style: { flex: 1, position: 'relative' } },
-                                h(FilterControls, {
-                                    centerAt:false,
-                                    children: props => [h(Visualization, {
+
+                            h(FilterControls, {
+                                centerAt: false,
+                                children: props => [
+                                    h('div', {},
+                                        h('small', { className: 'd-block' }, `${loadedEdges} von ${data.count} Verbindungen geladen`),
+                                        h('button', {
+                                            id: 'loadmore',
+                                            onClick: loadMoreNodes.bind(this, nextPage, setNextPage, graph, setGraph, setLoadedEdges)
+                                        }, 'mehr laden')),
+                                    h('div', {
+                                        className: 'ml-2 pt-3'
+                                    },
+                                        h(ReactNouislider, {
+                                            onUpdate: setCharge,
+                                            tooltips: true,
+                                            range: { min: -120, max: 0 },
+                                            start: -60,
+                                            style: { height: '4px', width: '80px' }
+                                        }),
+                                        h('small', undefined, 'Charge')),
+                                    h('div', {
+                                        className: 'ml-2 pt-3'
+                                    },
+                                        h(ReactNouislider, {
+                                            onUpdate: setDistance,
+                                            tooltips: true,
+                                            range: { min: 0, max: 100 },
+                                            start: 30,
+                                            style: { height: '4px', width: '80px' }
+                                        }),
+                                        h('small', undefined, 'Distance')),
+                                        h('div', {},
+                                            h('ul',{},
+                                                Object.keys(graph.types).forEach(type => h('li',{}))
+                                            
+                                            )
+                                        ),
+
+                                    createPortal(h(Visualization, {
                                         graph: graph,
                                         style: {
                                             right: 0
                                         },
-                                        dagMode:null,
+                                        dagMode: null,
                                         selectedNodeIds: props.filteredNodeIds,
                                         showNeighborsOnly: Boolean(props.filteredNodeIds.size),
                                         colors: { selected: '#a8a8ad' },
                                         onNodeClick: handleNodeClick(createPopoverContent),
-                                            
+
                                         /* onNodeSelect: (node, selected) => {
                                            
                                            let selArray = [...selected];
@@ -308,83 +329,33 @@
                                         
                                         },
                                         onNodeDeselect: node => {
-
+ 
                                             setNodeInfo({});
                                             setNodeDetails({});
                                         },*/
                                         simulation: { charge, distance },
                                         children: props => [
                                             //h(ExportButton, props),
-                                            h('div', {
-                                                style: {
-                                                    display: 'inline-flex',
-                                                    'flex-direction': 'column',
-                                                    position: 'absolute',
-                                                }
-                                            },
 
-                                                h('div', {},
-                                                    h('small', { className: 'd-block' }, `${loadedEdges} von ${data.count} Verbindungen geladen`),
-                                                    h('button', {
-                                                        id: 'loadmore',
-                                                        onClick: loadMoreNodes.bind(this, nextPage, setNextPage, graph, setGraph, setLoadedEdges)
-                                                    }, 'mehr laden')),
-                                                h('div', { style: { 'margin-top': '60px' } },
+                                            /*  h(FilterControls,{
+                                                  graph: {
+                                              edges,
+                                              nodes,
+                                              types,
+                                          }
+                                              }),*/
+                                          //  h(Legend, props)
+                                            //h(Legend, props),
 
-                                                    h(ReactNouislider, {
-                                                        onUpdate: setCharge,
-                                                        tooltips: true,
-                                                        range: { min: -120, max: 0 },
-                                                        start: -60,
-                                                        style: { height: '4px', width: '80px' }
-                                                    }),
-                                                    h('small', undefined, 'Charge')),
-                                                h('div', {
-                                                    style: { 'margin-top': '40px' }
-                                                },
-                                                    h(ReactNouislider, {
-                                                        onUpdate: setDistance,
-                                                        tooltips: true,
-                                                        range: { min: 0, max: 100 },
-                                                        start: 30,
-                                                        style: { height: '4px', width: '80px' }
-                                                    }),
-                                                    h('small', undefined, 'Distance')),
-                                            ),
-                                            h('div', {
-                                                id: 'ntw-metainfo',
-                                                className: 'bg-mine',
-                                                style: {
-                                                    position: 'absolute',
-                                                    right: '30px',
-                                                    width: '10rem',
-                                                    top: '3rem'
-                                                },
-                                            },
-                                                /*  h(FilterControls,{
-                                                      graph: {
-                                                  edges,
-                                                  nodes,
-                                                  types,
-                                              }
-                                                  }),*/
-                                                h(Legend, props),
-                                                h('div', {},
-                                                    h('a', { href: nodeInfo.url }, nodeInfo.label)),
-                                                h('small', { className: 'd-block' }, nodeInfo.type),
-                                                h('div', { className: loading ? 'spinner-grow-sm' : 'd-none' }, h('span', { className: 'sr-only' }, 'Lädt...')),
-                                                h('small', { className: 'd-block' }, nodeDetails.start_date_written),
-                                                h('small', { className: 'd-block' }, nodeDetails.end_date_written),
-                                            )
 
                                         ]
-                                    })], graph: graph
-                                }
-                                ))]
+                                    }), document.getElementById("vis"))], graph: graph
+                            }
+                            )]
                     )
 
                 }
-                render(h(Applet), document.getElementById('visualization'))
+                render(h(Applet), document.getElementById("visualization"))
 
 
 
