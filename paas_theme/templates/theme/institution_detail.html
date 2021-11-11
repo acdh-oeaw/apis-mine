@@ -16,7 +16,7 @@
 {% load custom_tags %}
 {% block title %}{{ object }}{% endblock %}
 {% block content %}
-<div id="contentDetails" class="container">
+<div id="contentDetails" class="container  px-5 smaller-font-size">
   <div class="row bio-outer">
     <div class="col-md-12 pb-4">
       <div class="row justify-content-between pt-3">
@@ -53,7 +53,8 @@
         </div>
         <div id="main" class="card-body">
           <div class="row">
-            <div class="col-md-5 bg-mine border-mine-green pl-1 pr-0">
+            <div class="col-md-5 pl-0 pr-md-custom">
+              <div class="bg-mine border-mine-institutions pl-1">
               <h1 class="font-weight-normal  pt-1 pb-4" style="width:calc(100% - 110px)">
                 <!--{{ object.name }}{%if object.first_name %}, {{ object.first_name }}{% endif %}-->
                 {{ object.name }}
@@ -85,7 +86,7 @@
               {% if struktur %}
               <div class="section">
                 <span class="font-weight-bold">Struktur der Komission</span>
-                <ul class="relentities">
+                <ul class="relentities  list-unstyled">
                   {% for x in struktur %}
                   <li class="pl-0 font-weight-normal pb-0" style="padding-bottom: 0.8em">
                     {{x|safe}}
@@ -105,7 +106,7 @@
               {% if normdaten %}
               <div class="section">
                 <span class="font-weight-bold">Online-Ressourcen</span>
-                <ul class="uris pl-0">
+                <ul class="uris pl-0 list-unstyled">
                   {% for nd in normdaten %}
                   <li class="pl-0 font-weight-normal">{{nd.kind}} <a target="_blank" rel="noopener noreferrer"
                       href="{{nd.uri}}">{{nd.identifier}}</a></li>
@@ -115,7 +116,7 @@
               {% endif %}
               <div class="section">
                 <span class="font-weight-bold">Downloads</span>
-                <ul class="uris pl-0">
+                <ul class="uris pl-0 list-unstyled">
                   <li class="pl-0 font-weight-normal"><a target="_blank" rel="noopener noreferrer"
                       href="/apis/api/entities/institution/{{object.pk}}/?format=json">Json</a></li>
                   <li class="pl-0 font-weight-normal"><a target="_blank" rel="noopener noreferrer"
@@ -125,7 +126,8 @@
                 </ul>
               </div>
             </div>
-            <div class="col-md-7 pr-0  mine-pl-30">
+            </div>
+            <div class="col-md-7 pr-0 pl-md-custom">
               <ul class="nav nav-tabs border-0" id="institutionTab" role="tablist">
                 <li class="nav-item p-0 font-weight-bold" role="presentation">
                   <a class="nav-link rounded-0 active text-uppercase" data-toggle="tab" id="daten-tab" href="#daten"

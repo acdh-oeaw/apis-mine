@@ -2,8 +2,8 @@
 {% load leaflet_tags %}
 {% block scriptHeader %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
-<script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/three@latest/build/three.min.js"></script>
 <script crossorigin
   src="https://unpkg.com/@acdh/network-visualization@latest/lib/network-visualization.umd.js"></script>
@@ -16,7 +16,7 @@
 {% load custom_tags %}
 {% block title %}{{ object }}{% endblock %}
 {% block content %}
-<div id="contentDetails" class="container">
+<div id="contentDetails" class="container px-5 smaller-font-size">
   <div class="row bio-outer">
     <div class="col-md-12 pb-4">
       <div class="row justify-content-between pt-3">
@@ -48,7 +48,8 @@
         </div>
         <div id="main" class="card-body">
           <div class="row">
-            <div class="col-md-5 bg-mine border-mine pl-1 pr-0">
+            <div class="col-md-5 pl-0 pr-md-custom">
+              <div class="bg-mine border-mine pl-1">
               <h1 class="font-weight-normal float-md-left pt-1 pb-4" style="width:calc(100% - 110px)">
                 <!--{{ object.name }}{%if object.first_name %}, {{ object.first_name }}{% endif %}-->
                 {%if object.first_name %}{{ object.first_name }}{% endif %}<br />
@@ -62,14 +63,16 @@
                 {% else %}
                 <figure class="float-md-right" style="max-width:110px;">
                   <img src="{{image.1}}">
+                  
                   <figcaption id="photocredit" class="figure-caption text-08 text-center" data-photourl="{{image.1}}"></figcaption>
+                  
                 </figure>
                 {% endif %}
                 {% else %}
-                <img class="float-md-right" style="max-width:110px;" src="https://via.placeholder.com/110x134">
+                <img class="float-md-right" style="max-width:110px;" src="{% static 'theme/img/placeholder_110-134.png' %}">
                 {% endif %}
+                
               </div>
-
               <p class="profession-date-of-birth">
                 {% if profession %}<span class="font-weight-bold">{{ profession }}</span> <br />{% endif %}
                 <span class="font-weight-normal"><abbr
@@ -86,7 +89,7 @@
               {% if mitgliedschaften %}
               <div class="section">
                 <span class="font-weight-bold">Mitgliedschaft</span>
-                <ul class="relentities">
+                <ul class="relentities list-unstyled">
                   {% for x in mitgliedschaften %}
                   <li class="pl-0 font-weight-normal pb-0" style="padding-bottom: 0.8em">
                     {{x|safe}}
@@ -99,7 +102,7 @@
               {% if normdaten %}
               <div class="section">
                 <span class="font-weight-bold">Online-Ressourcen</span>
-                <ul class="uris pl-0">
+                <ul class="uris pl-0 list-unstyled">
                   {% for nd in normdaten %}
                   <li class="pl-0 font-weight-normal">{{nd.kind}} <a target="_blank" rel="noopener noreferrer"
                       href="{{nd.uri}}">{{nd.identifier}}</a></li>
@@ -109,7 +112,7 @@
               {% endif %}
               <div class="section">
                 <span class="font-weight-bold">Downloads</span>
-                <ul class="uris pl-0">
+                <ul class="uris pl-0 list-unstyled">
                   <li class="pl-0 font-weight-normal"><a target="_blank" rel="noopener noreferrer"
                       href="/apis/api/entities/person/{{object.pk}}/?format=json">Json</a></li>
                   <li class="pl-0 font-weight-normal"><a target="_blank" rel="noopener noreferrer"
@@ -117,9 +120,10 @@
                   <li class="pl-0 font-weight-normal"><a target="_blank" rel="noopener noreferrer"
                       href="/apis/api2/entity/{{object.pk}}/?format=tei">TEI</a></li>
                 </ul>
+                </div>
               </div>
             </div>
-            <div class="col-md-7 pr-0  mine-pl-30">
+            <div class="col-md-7 pr-0 pl-md-custom">
               <ul class="nav nav-tabs border-0" id="myTab" role="tablist">
                 <li class="nav-item p-0 font-weight-bold" role="presentation">
                   <a class="nav-link rounded-0 active text-uppercase" data-toggle="tab" id="daten-tab" href="#daten"
@@ -134,7 +138,7 @@
                     role="tab" aria-controls="map" aria-selected="false">Karte</a>
                 </li>
               </ul>
-              <div class="tab-content bg-mine" id="myTabContent">
+              <div class="tab-content bg-mine p-3" id="myTabContent">
                 <div class="tab-pane fade show active" id="daten" role="tabpanel" aria-labelledby="daten-tab">
                   {% for key, value in daten_akademie.items %}
                   {% if value|length > 0 %}
@@ -142,7 +146,7 @@
                     <div class="card-header p-0 bg-white" id="heading{{key}}">
                       <h5 class="mb-0">
                         <button type="button"
-                          class="btn btn-link collapsebtn w-100 text-left collapsed p-0 pl-1 text-09"
+                          class="btn btn-link text-decoration-none collapsebtn w-100 text-left collapsed p-0 pl-1 text-09"
                           data-toggle="collapse" data-target="#{{ key | cut:' '}}" aria-expanded="true"
                           aria-controls="{{key | cut:' '}}">
                           <b>{{ key }}</b>
@@ -166,32 +170,33 @@
                 </div>
                 <div class="tab-pane fade" id="egonet" role="tabpanel" aria-labelledby="egonet-tab">
                   <div id="egonetworkwrapper" class="row m-0" data-status="minimized">
-                    <div id="egonetspinner" class="col-md-12">
+                    <div id="egonetspinner" class="col-md-12 d-flex align-items-center">
                       <div class="spinner-grow" role="status">
                         <span class="sr-only">Loading...</span>
                       </div>
                     </div>
-                    <a class="leaflet-control-zoom-in" id="moveegontwbtn" role="button" onclick="move_network('up')">
+                    <a class="leaflet-control-zoom-in position-absolute" id="moveegontwbtn" role="button" onclick="move_network('up')">
                       <i data-feather="maximize-2"></i>
                     </a>
-                    <div id="egonetwork_visualization" class="col-md-12"></div>
+                    <div id="egonetwork_visualization" class="col-md-12 position-relative"></div>
                     <div id="node-info" class="d-none">
                       <small>Für Zusatzinfos auf Knoten klicken</small>
-                        <ul>
-                          <li data-src='type'></li>
-                          <li><a data-src='link' target="_blank" rel="noopener" href=""></a></li>
-                      </ul>
+                        <div id="node-details">
+                        </div>
                     </div>
                   </div>
                 </div>
                 <div class="tab-pane fade" id="map" role="tabpanel" aria-labelledby="map-tab">
                   <div id="maplifeline">
-                    <a class="leaflet-control-zoom-in" id="maplifelinebtn" role="button" onclick="move_map()">
+                    <a class="leaflet-control-zoom-in float-right" id="maplifelinebtn" role="button" onclick="move_map()">
                       <i data-feather="maximize-2"></i>
                     </a>
                     <div class="row m-0">
-                      <div class="col-md-7">
-                        <div class="inline-map">
+                      <!--<div class="col-md-12">
+                      {% include "theme/llmap.html" %}
+                      </div>-->
+                        <div class="col-md-7">
+                       <div class="inline-map">
                           {% leaflet_map "map-container" %}
                         </div>
                       </div>
@@ -230,6 +235,7 @@
 {% endblock content %}
 {% block scripts %}
 <script type="text/javascript" src="{%static 'theme/js/helpers.js' %}"></script>
+<script src="{%static 'theme/js/helpers.network.js'%}"></script>
 <script type="text/javascript" src="{%static 'theme/js/map.js' %}"></script>
 <script>
   var personPk = "{{object.pk}}";
@@ -246,7 +252,7 @@
 </script>
 <script>
   function getEgoNetworkViz(offset) {
-    document.querySelector("#egonetspinner").style.display = "flex";
+    document.querySelector("#egonetspinner").classList.add = "d-flex";
     console.log("function fired")
     let urlParams = new URLSearchParams(window.location.search);
     const endpoint = '/api/egonetwork/';
@@ -275,7 +281,7 @@
         return response.json()
       })
       .then(data => {
-        document.querySelector("#egonetspinner").style.display = "none";
+        document.querySelector("#egonetspinner").classList = "d-none";
         if (data['next']) {
           let urlparams = new URLSearchParams(data['next'])
           if (!document.getElementById('loadmore')) {
@@ -366,6 +372,8 @@
             simulation: {
               charge: -50
             },
+            
+            
             onNodeSelect: (node, selected) => {
                 let selArray = [...selected];
                 if (selArray.length > 1) {
@@ -377,7 +385,7 @@
               clearNodeInfo();
             },
             children: props => [
-              //React.createElement(NetworkVisualization.ExportButton, props),
+              //React.createElement(NetworkVisualization.ExportButton, props), 
               React.createElement(NetworkVisualization.Legend, props),
             ],
           }),

@@ -65,7 +65,7 @@ class PersonFilterFormHelperNew(FormHelper):
         self.form_method = "GET"
         self.helper.form_tag = False
         # self.template = "forms/template_person_form.html"
-        self.add_input(Submit("", "Kombinierte Auswertung starten", css_class="rounded-0 mt-1"))
+        self.add_input(Submit("", "Kombinierte Auswertung starten", css_class="rounded-0 mt-3 text-uppercase w-100 text-left"))
         self.layout = Layout(
             Fieldset("", "q", css_class="bg-mine", css_id="basic_search_fields"),
             Div(
@@ -76,10 +76,10 @@ class PersonFilterFormHelperNew(FormHelper):
                             "mtgld_mitgliedschaft",
                             "mtgld_klasse",
                             css_id="mitgliedschaft",
-                            css_class="show card-body card",
+                            css_class="show card-body card filter-wrapper",
                         ),
                     ),
-                    css_class="col-md-6 pt-30 pr-0 pr-md-15 pl-0",
+                    css_class="col-md-6 pt-30 pr-0 pr-md-custom pl-0 align-items-md-stretch d-flex",
                 ),
                 Div(
                     Accordion(
@@ -107,7 +107,6 @@ class PersonFilterFormHelperNew(FormHelper):
                                 "beruf_position",
                                 "beruf_institution",
                                 css_id="beruf_subform",
-                                css_class="form-inline",
                             ),
                             "mgld_nsdap",
                             css_id="akademischer_CV",
@@ -129,7 +128,7 @@ class PersonFilterFormHelperNew(FormHelper):
                         ),
                         AccordionGroup("Auszeichnungen", "nobelpreis", "ewk"),
                     ),
-                    css_class="col-md-6 pt-30 pr-0 pl-0 pl-md-15",
+                    css_class="col-md-6 pt-30 pr-0 pl-0 pl-md-custom",
                 ),
                 css_class="row ml-0 mr-0 mt-4",
             ),
@@ -155,6 +154,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     akademiemitgliedschaft = forms.CharField(required=False)
     akademiefunktionen = forms.MultipleChoiceField(
         widget=forms.SelectMultiple(attrs={"class": "select2-main"}),
+        label="",
         required=False,
         choices=[
             ("funk_praesidentin", "Präsident/in"),
@@ -175,7 +175,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     )
     pres_funktionen = forms.MultipleChoiceField(
         required=False,
-        label="Funktionen",
+        label="",
         widget=forms.CheckboxSelectMultiple(),
         choices=[
             ("funk_praesidentin", "Präsident/in"),
@@ -187,12 +187,13 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         ],
     )
     gender = forms.ChoiceField(
-        widget=forms.Select(attrs={"class": "bootstrap-select rounded-0"}),
+        widget=forms.Select(attrs={"class": "select2-main no-search rounded-0"}),
         required=False,
         choices=(("", "-"), ("male", "Männlich"), ("female", "Weiblich")),
-        label="Geschlecht",
+        label="",
     )
     wahl_gender = forms.ChoiceField(
+        widget=forms.Select(attrs={"class": "select2-main no-search rounded-0"}),
         required=False,
         choices=(("", "-"), ("male", "Männlich"), ("female", "Weiblich")),
         label="Geschlecht",
@@ -202,22 +203,31 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     place_of_birth = MultiSolrField(
         required=False,
         label="Geburtsort",
-        widget=autocomplete.Select2Multiple(
+        widget=Select2Multiple(
             url="paas_theme:paas_place_of_birth_autocomplete",
+            attrs =  {
+                "data-theme":"bootstrap4"
+                }
         ),
     )
     place_of_death = MultiSolrField(
         required=False,
         label="Sterbesort",
-        widget=autocomplete.Select2Multiple(
+        widget=Select2Multiple(
             url="paas_theme:paas_place_of_death_autocomplete",
+            attrs =  {
+                "data-theme":"bootstrap4"
+                }
         ),
     )
     profession = MultiSolrField(
         required=False,
         label="Beruf",
-        widget=autocomplete.Select2Multiple(
+        widget=Select2Multiple(
             url="paas_theme:paas_person_beruf_autocomplete",
+            attrs =  {
+                "data-theme":"bootstrap4"
+                }
         ),
     )
     nobelpreis = forms.BooleanField(required=False, label="Nobelpreis")
@@ -225,15 +235,21 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         model_class=PersonInstitutionRelation,
         required=False,
         label="Position",
-        widget=autocomplete.Select2Multiple(
+        widget=Select2Multiple(
             url="paas_theme:paas_position_autocomplete",
+            attrs =  {
+                "data-theme":"bootstrap4"
+                }
         ),
     )
     beruf_institution = MultiSolrField(
         required=False,
         label="Institution",
-        widget=autocomplete.Select2Multiple(
-            url="paas_theme:paas_institution_autocomplete", forward=["beruf_position"]
+        widget=Select2Multiple(
+            url="paas_theme:paas_institution_autocomplete", forward=["beruf_position"],
+            attrs =  {
+                "data-theme":"bootstrap4"
+                }
         ),
     )
     mgld_nsdap = forms.BooleanField(required=False, label="Mitglied der NSDAP")
@@ -268,6 +284,10 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         label="Land",
         widget=autocomplete.Select2Multiple(
             url="paas_theme:paas_place_wiss_austausch_autocomplete",
+            attrs =  {
+                "data-theme":"bootstrap4"
+                }
+            
         ),
     )
     schule = MultiSolrField(
@@ -275,6 +295,9 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         label="Schule",
         widget=autocomplete.Select2Multiple(
             url="paas_theme:paas_institution_schule_autocomplete",
+            attrs =  {
+                "data-theme":"bootstrap4"
+                }
         ),
     )
     uni = MultiSolrField(
@@ -282,6 +305,9 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         label="Universität",
         widget=autocomplete.Select2Multiple(
             url="paas_theme:paas_institution_uni_autocomplete",
+            attrs =  {
+                "data-theme":"bootstrap4"
+                }
         ),
     )
     uni_habil = MultiSolrField(
@@ -289,6 +315,9 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         label="Universität Habilitation",
         widget=autocomplete.Select2Multiple(
             url="paas_theme:paas_institution_uni_habil_autocomplete",
+            attrs =  {
+                "data-theme":"bootstrap4"
+                }
         ),
     )
     fach_habilitation = MultiSolrField(
@@ -296,6 +325,9 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         label="Habilitationsfach",
         widget=autocomplete.Select2Multiple(
             url="paas_theme:paas_institution_habil_fach_autocomplete",
+            attrs =  {
+                "data-theme":"bootstrap4"
+                }
         ),
     )
 
@@ -515,7 +547,7 @@ class InstitutionFilterFormHelperNew(FormHelper):
         self.form_method = "GET"
         self.helper.form_tag = False
         # self.template = "forms/template_person_form.html"
-        self.add_input(Submit("", "Kombinierte Auswertung starten", css_class="rounded-0 mt-2"))
+        self.add_input(Submit("", "Kombinierte Auswertung starten", css_class="rounded-0 mt-3 text-uppercase  w-100 text-left"))
         self.layout = Layout(
             Fieldset("", "q", css_class="bg-mine", css_id="basic_search_fields"),
             Div(
@@ -528,7 +560,7 @@ class InstitutionFilterFormHelperNew(FormHelper):
                             css_id="akademieinstitutionen",
                         ),
                     ),
-                    css_class="col-md-6 pt-30 pr-0 pr-md-15 pl-0",
+                    css_class="col-md-6 pt-30 pr-0 pr-md-custom pl-0",
                 ),
                 Div(
                     Accordion(
@@ -636,13 +668,19 @@ class InstitutionFacetedSearchFormNew(FacetedSearchForm):
         label="Position",
         widget=autocomplete.Select2Multiple(
             url="paas_theme:paas_position_autocomplete",
+            attrs =  {
+                "data-theme":"bootstrap4"
+                }
         ),
     )
     beruf_institution = MultiSolrField(
         required=False,
         label="Institution",
         widget=autocomplete.Select2Multiple(
-            url="paas_theme:paas_institution_autocomplete", forward=["beruf_position"]
+            url="paas_theme:paas_institution_autocomplete", forward=["beruf_position"],
+            attrs =  {
+                "data-theme":"bootstrap4"
+                }
         ),
     )
     mgld_nsdap = forms.BooleanField(required=False, label="Mitglied der NSDAP")

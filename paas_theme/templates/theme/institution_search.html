@@ -7,27 +7,44 @@
 {% load static %}
 {% load render_table from django_tables2 %}
 <div class="container-fluid">
-  <div class="row mx-0">
-    <div class="col-md-12 bg-mine border-mine-green">
-      <h1 class="text-uppercase">Auswertungsergebnis</h1>
-      <div>
-        {% if form.data.selected_facets|length > 0 %}
-          <ul class="facet-group pl-0 mb-0" >
-            {% for fac in form.selected_facets %}
-              <li class="facet-group-item facet-badges pl-0">
-                <a href="{% normalize_facet fac 'filter' request.get_full_path %}" type="button"
-                  class="badge badge-custom badge-pill p-1 oebl-inverted">
-                  <i class="remove-badge ml-1 text-oeaw-blau" data-feather="x"></i>{% normalize_facet fac 'name' %}
-                </a>
-              </li>
-            {% endfor %}
-          </ul>
-        <!-- <a href="{% remove_facets request.get_full_path %}" type="button"
-          class="btn btn-link btn-sm btn-right">Filter zurücksetzen<span
-            class="icon-remove"></span></a>-->
-        {% endif %}
-      </div>
+  <div class="row mx-0 pt-1 bg-mine border-mine-institutions">
+      <div class="col-md-8">
+        <h1 class="text-uppercase font-weight-bold">Auswertungsergebnis</h1>
+        <div>
+          {% if form.data.selected_facets|length > 0 %}
+          <ul class="facet-group pl-2 mb-1 list-unstyled list-inline">
+              {% for fac in form.selected_facets %}
+              <li class="facet-group-item facet-badges list-inline-item pl-0">
+                  <a href="{% normalize_facet fac 'filter' request.get_full_path %}" type="button"
+                    class="badge badge-custom badge-pill p-1 text-dark">
+                    {% normalize_facet fac 'name' %}<i class="remove-badge ml-1  align-text-bottom" data-feather="x"></i>
+                  </a>
+                </li>
+              {% endfor %}
+            </ul>
+          <!-- <a href="{% remove_facets request.get_full_path %}" type="button"
+            class="btn btn-link btn-sm btn-right">Filter zurücksetzen<span
+              class="icon-remove"></span></a>-->
+          {% endif %}
+        </div>
     </div>
+    <div class="col-md-4 text-right text-uppercase d-flex flex-column justify-content-between">
+      <a href="#" onclick="navigateToLandingPage()"><small class="align-top  font-weight-bold"><i class="chevron-left" data-feather="chevron-left"></i> Zurück zur Auswertung</small></a>
+       <!--<h1 class="text-uppercase pt-1"><a href="{% remove_facets request.get_full_path %}" type="button"
+           class="btn btn-link btn-sm btn-right">Filter zurücksetzen<span class="icon-remove"></span></a></h1>
+      -->
+      <!-- <div class="dropdown show  mt-3 mb-2">
+         <a class="btn-primary btn-sm rounded-0 bg-oeaw dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+           <small class="align-text-bottom">Netzwerke</small>
+         </a>
+       
+         <div class="dropdown-menu rounded-0" aria-labelledby="dropdownMenuLink">
+           {% for network in network_buttons %}
+           <a class="dropdown-item smaller-font-size" target="_blank" rel="noopener noreferrer" href="#" onclick="navigateToNetworkPage('{{network.key}}')">{{network.label}}</a>
+         {% endfor %}
+         </div>
+       </div> -->
+   </div>
   </div>
   <div class="row">
     <div class="col-md-4">
@@ -57,7 +74,7 @@
                 </div>-->
                 <!--<div id="lebensdaten" class="collapse show" aria-labelledby="heading_lebensdaten">-->
                   <div class="card-body pt-5 pl-4 pr-4">
-                    <div class="slider-container">
+                    <div class="slider-container pt-3">
                       <div class="range-slider"></div>
                     </div>
                   </div>
@@ -79,10 +96,10 @@
                       </div>
                       <div id="{{field}}" class="collapse show" aria-labelledby="heading{{field}}">
                         <div class="card-body p-2 pl-3 pr-3 show-limited-number">
-                          <ul class="pl-0 mb-0">
+                          <ul class="pl-0 mb-0 list-unstyled smaller-font-size">
                             {% for fv in filtered_vals %}
                               {% if fv.1 > 0 %}
-                                <li class="facet-group-item mt-2 mb-2 pl-0">
+                                <li class="facet-group-item pl-0">
                                   {% check_facet_selection field fv.0 form.selected_facets filtered_vals as facet_selected %}
                                   {% if facet_selected %}
                                     <span class="disabled">{{ fv.0 }} ({{ fv.1 }})</span>
@@ -182,6 +199,14 @@
     qs.set(endKey, end)
     window.location.search = qs.toString()
   })
+  $(".load-more-less").on("click",this,function() {
+    $(this).parent().toggleClass("show-limited-number");
+    if ($(this).parent().hasClass("show-limited-number")) {
+        $(this).text("mehr...");
+    } else {
+        $(this).text("weniger...");
+    }
+  });
 
   document.getElementById("academy_member").addEventListener(
     "click", e => {console.log(e);
@@ -196,14 +221,7 @@
     }
   )
 
-  $(".load-more-less").on("click",this,function() {
-    $(this).parent().toggleClass("show-limited-number");
-    if ($(this).parent().hasClass("show-limited-number")) {
-        $(this).text("mehr...");
-    } else {
-        $(this).text("weniger...");
-    }
-  });
+  
 window.onload = function() {
   const qs = new URLSearchParams(window.location.search)
   let wm = qs.get("academy_member")
@@ -218,6 +236,10 @@ window.onload = function() {
     document.getElementById("academy_member").checked = true;
   }
 }
+
+function navigateToLandingPage() {
+      window.location.href = "/institutionen/" + window.location.search;
+  }
 </script>
 
 {% endblock %}

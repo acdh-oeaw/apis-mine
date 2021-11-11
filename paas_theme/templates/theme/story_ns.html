@@ -10,7 +10,7 @@
 <script src="https://code.highcharts.com/modules/exporting.js"></script>
 <script src="https://code.highcharts.com/modules/export-data.js"></script>
 <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-<script src="{% static 'theme/js/helpers.js' %}"></script>
+<script src="{% static 'theme/js/helpers.tables.js' %}"></script>
 {% endblock scriptHeader %}
 {% block content %}
 <div class="container">
@@ -28,7 +28,7 @@
                     <li>remove blank bars from charts</li>
                 </ul>
             </div>
-            <h1>Nationalsozialismus und Entnazifizierung</h1>
+            <h1 class="font-weight-bold">Nationalsozialismus und Entnazifizierung</h1>
             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus perspiciatis voluptatem accusamus
                 ratione nulla, quod similique. Possimus, recusandae soluta nemo itaque, corporis repellat facere
                 obcaecati laborum praesentium, fugiat eum! Exercitationem! </p>
@@ -36,7 +36,7 @@
                 ratione nulla, quod similique. Possimus, recusandae soluta nemo itaque, corporis repellat facere
                 obcaecati laborum praesentium, fugiat eum! Exercitationem! </p>
             <div id="nsMember">
-                <h2>Mitglieder in der Akademie - Mitglied in der NSDAP</h2>
+                <h2 class="font-weight-bold">Mitglieder in der Akademie - Mitglied in der NSDAP</h2>
                 {% lorem 3 p %}
                 <ul data-sourcepos="1:1-7:87" dir="auto">
                     <li data-sourcepos="1:1-3:66">Welche Akademiemitglieder traten vor dem 13.3.1938 der NSDAP bei?
@@ -61,7 +61,7 @@
                     <li data-sourcepos="7:1-7:87">Welche Mitglieder traten vor ihrer Wahl, welche danach in die NSDAP
                         ein? (kMi und wM)</li>
                 </ul>
-                <h3>Tabelle 1: NSDAP-Mitglieder</h2>
+                <h3 class="font-weight-bold">Tabelle 1: NSDAP-Mitglieder</h2>
                     <table id="nsMemberTable" class="display" style="width:100%">
                         <thead>
                             <tr>
@@ -90,12 +90,12 @@
                     </table>
             </div>
             <div id="kommissionen">
-                <h2>NSDAP-Mitglieder in den Kommissionen</h2>
+                <h2 class="font-weight-bold">NSDAP-Mitglieder in den Kommissionen</h2>
                 <ul>
                     <li>In welchen Kommissionen waren ehemalige Mitglieder der NSDAP vertreten?</li>
                     <li>Summe der ehemaligen NSDAP Mitglieder in Kommissionen</li>
                 </ul>
-                <h3>Tabelle 2: Kommissionen und NSDAP-Mitglieder</h2>
+                <h3 class="font-weight-bold">Tabelle 2: Kommissionen und NSDAP-Mitglieder</h2>
                     <table id="nsKommTable" class="display" style="width:100%">
                         <thead>
                             <tr>
@@ -122,29 +122,29 @@
                     </table>
                     <p>Gruppiert man obige Tabelle nach den Kommission so ergibt sich folgende Verteilung von
                         NSDAP-Mitgliedern über die einzelnen Kommissionen:</p>
-                    <h3>Grafik 1: Kommissionen nach Anzahl NSDAP-Mitglieder</h3>
+                    <h3 class="font-weight-bold">Grafik 1: Kommissionen nach Anzahl NSDAP-Mitglieder</h3>
                     <div hidden>{{ komm_grouped_html|safe }}</div>
 
                     <figure class="highcharts-figure">
                         <div id="kommByNaziChart"></div>
                     </figure>
                     <p>Gruppiert man obige Tabelle nach den Mitgliedern so ergibt sich folgende Verteilung:</p>
-                    <h3>Grafik 2: NSDAP-Mitglieder und ihre Kommissionen</h3>
+                    <h3 class="font-weight-bold">Grafik 2: NSDAP-Mitglieder und ihre Kommissionen</h3>
                     <div hidden>{{ member_grouped|safe }}</div>
                     <figure class="highcharts-figure">
                         <div id="naziByKommChart"></div>
                     </figure>
                     <p>Der zeitliche Verlauf der der Anzahl (aller) Mitglieder in den Kommissionen ergibt folgende
                         Grafik</p>
-                    <h3>Grafik 2a: Verteilung aller Mitglieder über Kommisionen</h3>
+                    <h3 class="font-weight-bold">Grafik 2a: Verteilung aller Mitglieder über Kommisionen</h3>
                     {% include "theme/line_chart_kommissionen.html" %}
                     <p>Im Vergleich dazu die Verteilung der (ehemaligen) Mitglieder von NS-Organisationen in den
                         Kommissionen</p>
-                    <h3>Grafik 2b: Verteilung (ehemaliger) Mitglieder von NS-Organisationen über Kommisionen</h3>
+                    <h3 class="font-weight-bold">Grafik 2b: Verteilung (ehemaliger) Mitglieder von NS-Organisationen über Kommisionen</h3>
                     {% include "theme/line_chart_kommissionen_nazis.html" %}
             </div>
             <div id="nezwerke">
-                <h2>NS-Netzwerke - Wer schlägt wen zur Wahl vor</h2>
+                <h2 class="font-weight-bold">NS-Netzwerke - Wer schlägt wen zur Wahl vor</h2>
                 <ul>
                     <li>
                         Wen schlagen die ehemaligen Nationalsozialisten nach 1945 erfolgreich zur Wahl vor? (Kriterium:
@@ -152,13 +152,13 @@
                         vorschlagenden NSDAP Mitgliedern
                     </li>
                 </ul>
-                <h3>Table 3: Wer schlägt wen vor</h3>
+                <h3 class="font-weight-bold">Table 3: Wer schlägt wen vor</h3>
                 {{ proposed_by_nazi_table|safe }}
                 <p>
                     Gruppiert man diese Tabelle nach den vorschlagenden NSDAP Mitgliedern so ergibt sich untenstehende
                     Verteilung:
                 </p>
-                <h3>Grafik 3: Vorschläge nach NSDAP-Mitgliedern gruppiert</h3>
+                <h3 class="font-weight-bold">Grafik 3: Vorschläge nach NSDAP-Mitgliedern gruppiert</h3>
                 <div hidden>{{ proposed_by_nazi_grouped_by_nazi|safe }}</div>
                 <figure class="highcharts-figure">
                     <div id="nazisProposingChart"></div>
@@ -166,14 +166,14 @@
                 <p>
                     Eine Gruppierung nach den Vorgeschlagenen stellt sich folgendermaßen dar:
                 </p>
-                <h3>Grafik 4: Mitglieder nach Anzahl vorschlagender NSDAP-Mitgliedern</h3>
+                <h3 class="font-weight-bold">Grafik 4: Mitglieder nach Anzahl vorschlagender NSDAP-Mitgliedern</h3>
                 <div hidden>{{ proposed_by_nazi|safe }}</div>
                 <figure class="highcharts-figure">
                     <div id="proposedByNaziChart"></div>
                 </figure>
             </div>
             <div id="ruhendstellungen">
-                <h2>Entnazifizierung</h2>
+                <h2 class="font-weight-bold">Entnazifizierung</h2>
                 <ul>
                     <li>
                         Wer wurde ruhendgestellt (August)? Wer wurde im ausgeschlossen? Name, Datum des
@@ -187,7 +187,7 @@
                         Kommissionsmitglied während seiner Ruhendstellung/Ausschlusses?
                     </li>
                 </ul>
-                <h3>Tabelle 4: "Ruhend gestellt"</h2>
+                <h3 class="font-weight-bold">Tabelle 4: "Ruhend gestellt"</h2>
                     <table id="ruhend" class="display" style="width:100%">
                         <thead>
                             <tr>
@@ -209,7 +209,7 @@
                             {% endfor %}
                         </tbody>
                     </table>
-                    <h3>Grafik 5: Ruhendstellung nach Klassen</h3>
+                    <h3 class="font-weight-bold">Grafik 5: Ruhendstellung nach Klassen</h3>
                     <div hidden>{{ ruhend_by_klasse|safe }}</div>
                     <figure class="highcharts-figure">
                         <div id="ruhendByKlasseChart"></div>
@@ -235,7 +235,9 @@
         $("body").scrollspy({
             target: navSelector
         });
-
+        $.extend($.fn.dataTableExt.oStdClasses, {
+            "sFilterInput": "form-control-sm form-control rounded-0"
+        });
         createDataTable('nsMemberTable')
         createDataTable('nsKommTable')
         createDataTable('kommByNazi', [[1, "desc"]], 200)

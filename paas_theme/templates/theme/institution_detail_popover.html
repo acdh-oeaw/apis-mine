@@ -1,6 +1,6 @@
+<div id="popovercontent">
 {% load static %}
-{% load leaflet_tags %}
-<div class="container-fluid">
+<div  class="container-fluid">
     <div class="row">
         <div class="col-md-12">
             <p class="text-right mb-0">
@@ -29,7 +29,7 @@
             {% if struktur %}
             <div class="section">
                 <small class="font-weight-bold">Struktur der Komission</small>
-                <ul class="relentities">
+                <ul class="relentities list-unstyled">
                     {% for x in struktur %}
                     <li class="pl-0 font-weight-normal pb-0" style="padding-bottom: 0.8em">
                         <small>{{x|safe}}</small>
@@ -38,19 +38,10 @@
                 </ul>
             </div>
             {% endif %}
-            {% if gelegen_in %}
-            <div class="section">
-                <small class="font-weight-bold">Ort</small>
-                <div id="institution_map" data-lat={{gelegen_in.0}} data-lng={{gelegen_in.1}}>{% leaflet_map
-                    "institution_map" callback="window.map_institution" %}</div>
-            </div>
-            {% endif %}
-
-
             {% if normdaten %}
             <div class="section">
                 <small class="font-weight-bold">Online-Ressourcen</small>
-                <ul class="uris pl-0">
+                <ul class="uris pl-0 list-unstyled">
                     {% for nd in normdaten %}
                     <li class="pl-0 font-weight-normal"><small>{{nd.kind}} <a target="_blank" rel="noopener noreferrer"
                                 href="{{nd.uri}}">{{nd.identifier}}</a></small></li>
@@ -60,7 +51,7 @@
             {% endif %}
             <div class="section">
                 <small class="font-weight-bold">Downloads</small>
-                <ul class="uris pl-0">
+                <ul class="uris pl-0 list-unstyled">
                     <li class="pl-0 font-weight-normal"><small><a target="_blank" rel="noopener noreferrer"
                                 href="/apis/api/entities/institution/{{object.pk}}/?format=json">Json</a></small></li>
                     <li class="pl-0 font-weight-normal"><small><a target="_blank" rel="noopener noreferrer"
@@ -71,4 +62,5 @@
             </div>
         </div>
     </div>
+</div>
 </div>
