@@ -42,10 +42,10 @@
         <a class="btn-primary btn-sm rounded-0 bg-oeaw dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           <small class="align-text-bottom">Netzwerke</small>
         </a>
-      
         <div class="dropdown-menu rounded-0" aria-labelledby="dropdownMenuLink">
           {% for network in network_buttons %}
-          <a class="dropdown-item" target="_blank" rel="noopener noreferrer" href="#" onclick="navigateToNetworkPage('{{network.key}}')">{{network.label}}</a>
+          
+          <a class="dropdown-item" target="_blank" rel="noopener noreferrer" href="/network?{{request.META.QUERY_STRING}}&network_type={{network.key}}">{{network.label}}</a>
         {% endfor %}
         </div>
       </div>
@@ -156,6 +156,7 @@
   const [min, max] = [1700, 1990]
 
   if (window.location.search.length > 0) {
+    
     const table_h = document.querySelector('div.table-container > div:first-of-type')
     const html_raw = `<div class="dropdown show" style="float: left">
   <!--<a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownNetworksLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -170,6 +171,7 @@
 </div>`
 
     let bt = document.createElement('A')
+    console.log(bt);
     let ft = document.createElement('I')
     ft.style = 'margin-right: 5px;'
     ft.dataset.feather = 'external-link'
