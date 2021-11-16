@@ -11,6 +11,7 @@
     <div class="col-md-8">
       <h1 class="text-uppercase font-weight-bold">Auswertungsergebnis</h1>
       <div>
+        
         {% if form.data.selected_facets|length > 0 or selected_filters|length > 0 %}
         <ul class="facet-group pl-2 mb-1 list-unstyled list-inline">
           {% for fac in form.selected_facets %}
@@ -39,11 +40,12 @@
           class="btn btn-link btn-sm btn-right">Filter zurücksetzen<span class="icon-remove"></span></a></h1>
      -->
       <div class="dropdown show  mt-3 mb-2">
-        <a class="btn-primary btn-sm rounded-0 bg-oeaw dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <a class="btn-primary btn-sm rounded-0 bg-oeaw dropdown-toggle {% if not table.rows%}disabled{% endif%}" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" {% if not table.rows%}aria-disabled="true" disabled {% endif%} aria-expanded="false">
           <small class="align-text-bottom">Netzwerke</small>
         </a>
         <div class="dropdown-menu rounded-0" aria-labelledby="dropdownMenuLink">
           {% for network in network_buttons %}
+          
           
           <a class="dropdown-item" target="_blank" rel="noopener noreferrer" href="/network?{{request.META.QUERY_STRING}}&network_type={{network.key}}">{{network.label}}</a>
         {% endfor %}

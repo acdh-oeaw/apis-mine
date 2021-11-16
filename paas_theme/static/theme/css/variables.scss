@@ -64,11 +64,20 @@ $nav-tabs-link-hover-border-color: none;
 $dropdown-padding-y: 0.15rem;  
 $dropdown-item-padding-x:0.75rem;
 
+/* select2 */
+$bg: $mine-bg;
+$input-focus-border-color: $mine-bg;
+$input-focus-box-shadow: 0 0 0 0.2rem $mine-bg;
+
+
+
 /* custom vars by bk */
 $badge-remove-icon-width:1em;
 $badge-remove-icon-height:1em;
 
 $dropdown-menu-font-size: $font-size-base * 0.8;
+
+
 
 
 

@@ -215,3 +215,32 @@ div.dataTables_filter {
 .far {
     font-family: "Font Awesome 5 Free" !important;
 }
+
+/*** select2bootstrap4 ***/
+
+.select2-container--bootstrap4 {
+    .select2-selection--multiple {
+        .select2-selection__choice {
+            background-color:$mine-bg;
+            border:unset;
+            color:#000;
+            font-size:smaller;
+            white-space:break-spaces;
+        }
+        .select2-selection__choice__remove {
+            color:#000;
+        }
+        .select2-selection__clear {
+            border: none;
+            color: #333;
+            background-color: unset;
+        }
+    }
+    .select2-results__option--highlighted,
+    .select2-results__option--highlighted.select2-results__option[aria-selected='true']
+    {
+        background-color: $oeaw-blue;
+    }
+}
+
+

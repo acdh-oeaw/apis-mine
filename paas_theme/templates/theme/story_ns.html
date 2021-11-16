@@ -140,7 +140,8 @@
                     {% include "theme/line_chart_kommissionen.html" %}
                     <p>Im Vergleich dazu die Verteilung der (ehemaligen) Mitglieder von NS-Organisationen in den
                         Kommissionen</p>
-                    <h3 class="font-weight-bold">Grafik 2b: Verteilung (ehemaliger) Mitglieder von NS-Organisationen über Kommisionen</h3>
+                    <h3 class="font-weight-bold">Grafik 2b: Verteilung (ehemaliger) Mitglieder von NS-Organisationen
+                        über Kommisionen</h3>
                     {% include "theme/line_chart_kommissionen_nazis.html" %}
             </div>
             <div id="nezwerke">
@@ -245,6 +246,9 @@
         createDataTable('proposedByNaziAll', [[2, "asc"]], 30)
         createDataTable('ruhend', [[1, "asc"]], 30)
 
+        Highcharts.setOptions({
+            colors: ['#0047bb', '#50B432', '#ED561B', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4']
+        });
         Highcharts.chart('kommByNaziChart', {
             data: {
                 table: 'kommByNazi'
@@ -445,6 +449,7 @@
             }
 
         });
+
     });
 </script>
 

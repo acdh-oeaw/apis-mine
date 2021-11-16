@@ -15,6 +15,10 @@ abbr[title] {
     text-decoration: none;
 }
 
+.btn-primary.disabled {
+    opacity:0.5;
+}
+
 .bg-mine {
     background-color: $mine-bg;
 }
