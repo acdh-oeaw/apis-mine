@@ -114,17 +114,8 @@
                 </ul>
               </div>
               {% endif %}
-              <div class="section">
-                <span class="font-weight-bold">Downloads</span>
-                <ul class="uris pl-0 list-unstyled">
-                  <li class="pl-0 font-weight-normal"><a target="_blank" rel="noopener noreferrer"
-                      href="/apis/api/entities/institution/{{object.pk}}/?format=json">Json</a></li>
-                  <li class="pl-0 font-weight-normal"><a target="_blank" rel="noopener noreferrer"
-                      href="/apis/api2/entity/{{object.pk}}/?format=rdf%2Bturtle">RDF/Turtle</a></li>
-                  <li class="pl-0 font-weight-normal"><a target="_blank" rel="noopener noreferrer"
-                      href="/apis/api2/entity/{{object.pk}}/?format=tei">TEI</a></li>
-                </ul>
-              </div>
+              
+              {% include "theme/section_downloads.html" with type='institution' %}
             </div>
             </div>
             <div class="col-md-7 pr-0 pl-md-custom">
