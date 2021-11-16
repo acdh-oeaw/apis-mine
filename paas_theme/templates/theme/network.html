@@ -29,7 +29,7 @@
         left: 50%;
     }*/
 
-    #vis>div:nth-child(1) {
+    #vis>div:nth-child(2) {
         position: relative !important;
     }
 
@@ -59,6 +59,11 @@
         font-size: 12px;
     }
 
+    #loadmoreloader {
+        z-index:2;
+        background:rgb(255,255,255,0.9)
+    }
+
     #ntw-metainfo [data-nerv-legend] {
         position: relative;
     }
@@ -85,13 +90,18 @@
     </div>
 </div>
 <div class="container">
-    <div id="banner_viz"></div>
-    <div>
-        <div id="visualization" class="mt-5">
+    
+        <div id="visualization" class="mt-5 mx-3">
 
         </div>
+   
+    <div id="vis" class="position-relative" style="overflow: hidden; flex: 1 1;">
+        <div id="loadmoreloader" class="h-100 w-100 d-none position-absolute">
+            <div class="spinner-grow d-block my-auto" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
     </div>
-    <div id="vis" class="mt-3 position-relative" style="overflow: hidden; flex: 1 1;"></div>
 </div>
 {% endblock content %}
 {% block scripts %}
@@ -120,9 +130,11 @@
         }
     }
 
-    const loadMoreNodes = (nextPage, setNextPage, graph, setGraph, setLoadedEdges) => {
+    const loadMoreNodes = (nextPage, setNextPage, graph, setGraph, setLoadedEdges, loadedEdges) => {
         // url.searchParams.set('offset', parseInt(offset) + parseInt(limit));
         if (nextPage !== null) {
+            document.getElementById("loadmoreloader").classList.remove("d-none");
+            document.getElementById("loadmoreloader").classList.add("d-flex");
             fetch(nextPage)
                 .then(response => {
                     if (!response.ok) {
@@ -137,7 +149,9 @@
                     setNextPage(data.next)
                     additionalNodes = generateGraphFromApisRelations(type_definitions, data.results);
                     mergeGraphs(graph, additionalNodes, setGraph)
-                    //setLoadedEdges(parseInt(offset) + parseInt(limit))
+                    setLoadedEdges(loadedEdges + data.results.length)
+                    document.getElementById("loadmoreloader").classList.remove("d-flex");
+                    document.getElementById("loadmoreloader").classList.add("d-none");
                 })
         }
     }
@@ -193,7 +207,7 @@
         const endpoint = '/api/network/';
         let selectedNodes = {};
         let nodesDetails = {};
-        const limit = 500;
+        const limit = 1000;
         urlParams.append('format', 'json+net');
         urlParams.append('limit', limit)
         urlParams.append('offset', offset)
@@ -217,29 +231,6 @@
                 return response.json()
             })
             .then(data => {
-                if (data['next']) {
-                    let urlparams = new URLSearchParams(data['next'])
-                    if (!document.getElementById('loadmore')) {
-                        console.log('more than 1000')
-                        let b_more = document.createElement('DIV')
-                        /* b_more.id = "loadmore"
-                         b_more.style = "width:100%; height:50px; color: grey;"
-                         b_more.append(document.createTextNode(`${limit} von ${data.count} Verbindungen`))
-                         let b_more_link = document.createElement('Button')
-                         b_more_link.onclick = function () { getNetworkViz("test", urlparams.get('offset')) };
-                         b_more_link.append(document.createTextNode('Clicken um weiter zu laden.'))
-                         b_more.append(b_more_link)*/
-                        let cv = document.getElementById('banner_viz')
-                        cv.prepend(b_more)
-                    } else {
-                        let b_more_link = document.querySelector('#loadmore > a:first-of-type')
-                        b_more_link.onclick = function () { getNetworkViz("test", urlparams.get('offset')) }
-                    }
-                } else if (document.getElementById('loadmore')) {
-                    document.getElementById('loadmore').remove()
-                }
-
-
 
                 const graphFromApis = generateGraphFromApisRelations(type_definitions, data.results)
                 const portalContainer = document.getElementById('controls');
@@ -251,9 +242,9 @@
                     const [nodeDetails, setNodeDetails] = useState({})
                     const [graph, setGraph] = useState(graphFromApis)
                     const [loading, setLoader] = useState(false)
-                    const [loadedEdges, setLoadedEdges] = useState(limit)
+                    const [loadedEdges, setLoadedEdges] = useState(limit > data.results.length ? data.results.length : limit)
                     const [nextPage, setNextPage] = useState(data.next)
-                    const selectionControlRef = useRef(null);
+                    const graphRef = useRef();
 
 
                     const setValue = (_value, cb) => {
@@ -266,20 +257,13 @@
                     return h(
                         'div',
                         {
-                            className: "position-relative d-flex flex-row justify-content-between bg-mine border-mine pt-2"
+                            className: "position-relative row justify-content-between bg-mine border-mine pt-2"
                         },
                         [
-
-
                             h(FilterControls, {
+                                graph: graph,
                                 centerAt: false,
                                 children: props => [
-                                    h('div', {},
-                                        h('small', { className: 'd-block' }, `${loadedEdges} von ${data.count} Verbindungen geladen`),
-                                        h('button', {
-                                            id: 'loadmore',
-                                            onClick: loadMoreNodes.bind(this, nextPage, setNextPage, graph, setGraph, setLoadedEdges)
-                                        }, 'mehr laden')),
                                     h('div', {
                                         className: 'ml-2 pt-3'
                                     },
@@ -302,14 +286,29 @@
                                             style: { height: '4px', width: '80px' }
                                         }),
                                         h('small', undefined, 'Distance')),
-                                        h('div', {},
-                                            h('ul',{},
-                                                Object.keys(graph.types).forEach(type => h('li',{}))
-                                            
-                                            )
-                                        ),
+                                    h('div', {
+                                        className: 'pl-1'
+                                    },
+
+                                        h('small', { className: 'd-block' }, `${loadedEdges} von ${data.count} Verbindungen geladen`),
+                                        h('button', {
+                                            id: 'loadmore',
+                                            disabled: loadedEdges == data.count,
+                                            onClick: loadMoreNodes.bind(this, nextPage, setNextPage, graph, setGraph, setLoadedEdges, loadedEdges)
+                                        }, 'mehr laden')),
+                                        h('div', {
+                                            className:"order-5"
+                                        },
+                                        h('ul', {
+                                            'data-nerv-legend': true,
+                                            className: 'list-unstyled',
+                                            children: createLegend(graph.types.nodes)
+                                        },
+                                        )
+                                    ),
 
                                     createPortal(h(Visualization, {
+                                        ref: graphRef,
                                         graph: graph,
                                         style: {
                                             right: 0
@@ -319,36 +318,7 @@
                                         showNeighborsOnly: Boolean(props.filteredNodeIds.size),
                                         colors: { selected: '#a8a8ad' },
                                         onNodeClick: handleNodeClick(createPopoverContent),
-
-                                        /* onNodeSelect: (node, selected) => {
-                                           
-                                           let selArray = [...selected];
-                                            if (selArray.length > 1) {
-                                                selected.delete(selArray[selArray.length - 1]);
-                                            }
-                                        
-                                        },
-                                        onNodeDeselect: node => {
- 
-                                            setNodeInfo({});
-                                            setNodeDetails({});
-                                        },*/
                                         simulation: { charge, distance },
-                                        children: props => [
-                                            //h(ExportButton, props),
-
-                                            /*  h(FilterControls,{
-                                                  graph: {
-                                              edges,
-                                              nodes,
-                                              types,
-                                          }
-                                              }),*/
-                                          //  h(Legend, props)
-                                            //h(Legend, props),
-
-
-                                        ]
                                     }), document.getElementById("vis"))], graph: graph
                             }
                             )]
@@ -358,12 +328,29 @@
                 render(h(Applet), document.getElementById("visualization"))
 
 
-
-
             }).catch(error => {
                 console.error(error)
             })
     };
+
+    function createLegend(nodeTypes) {
+        if (!(undefined in nodeTypes)) {
+            console.log(nodeTypes);
+        const listElements = [];
+        for (const [key, value] of Object.entries(nodeTypes)) {
+            listElements.push(h('li', {
+                className: 'text-nowrap',
+                children: [h('span', {
+                    style: `background:${value.color}`
+                }), key]
+            }))
+            console.log(value.color);
+        }
+
+        return listElements;
+    }
+    }
+
 
 </script>
 
