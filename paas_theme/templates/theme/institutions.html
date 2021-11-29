@@ -12,12 +12,12 @@
     <div class="container hero-light" id="wrapper-hero-inner" tabindex="-1">
 
 
-      <div class="row m-0 bg-mine border-mine-green p-1">
+      <div class="row m-0 bg-mine border-mine-institutions p-1">
 
-        <h1 class="w-50 text-uppercase">{{heading}}</h1>
+        <h1 class="w-50 text-uppercase font-weight-bold">{{heading}}</h1>
         <div class="w-75 mx-auto">
-        <p class="font-weight-normal">{{intro_text}}</p>
-      </div>
+          <p class="font-weight-normal">{{intro_text}}</p>
+        </div>
       </div>
     </div><!-- #wrapper-hero-content -->
 
@@ -26,9 +26,9 @@
     <div class="container" id="content" tabindex="-1">
       <form action="/institutionen/search?" class="w-100" method="get">
         <div id="search_form">
-        {% crispy search_form search_form.helper %}
+          {% crispy search_form search_form.helper %}
         </div>
-    </form>
+      </form>
     </div>
   </div>
   <!--<div class="wrapper" id="partners-wrapper">
@@ -45,10 +45,13 @@
 {% endblock %}
 
 {% block scripts2 %}
-<link href="{%static 'theme/vendor/select2-bootstrap4/select2-bootstrap4.min.css' %}" rel="stylesheet" />
+<!--<link href="{%static 'theme/vendor/select2-bootstrap4/select2-bootstrap4.min.css' %}" rel="stylesheet" />-->
 <script type="text/javascript">
-$(document).ready(function() {
-    $('.select2-main').select2();})
+  $(document).ready(function () {
+    $('.select2-main').select2({
+      theme: 'bootstrap4'
+    });
+  })
 </script>
 <script type="text/javascript">
   $('#searchindex').val("personsearch");

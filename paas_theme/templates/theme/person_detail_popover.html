@@ -1,0 +1,89 @@
+<div id="popovercontent">
+    {% load static %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div>
+
+                    <p class="text-right">
+                        <a href="/person/{{object.pk}}" target="_blank" rel="no-referrer noopener">
+                            <i data-feather="external-link" class="feather-16" title="link to details"></i>
+                        </a>
+                    </p>
+                    <small class="font-weight-bold float-md-left pt-1 pb-4" style="width:calc(100% - 90px)">
+                        {%if object.first_name %}{{ object.first_name }}{% endif %}<br />
+                        {{ object.name }}</a>
+                    </small>
+                    <div class="imgcontainer">
+                        {% if image %}
+                        {% if image.0 %}
+                        <img class="float-md-right" style="max-width:90px;" src="{% static image.1 %}">
+                        {% else %}
+                        <figure class="float-md-right" style="max-width:90px;">
+                            <img src="{{image.1}}">
+                            <figcaption id="photocredit" class="figure-caption text-08 text-center"
+                                data-photourl="{{image.1}}"></figcaption>
+                        </figure>
+                        {% endif %}
+                        {% else %}
+                        <img class="float-md-right" style="max-width:90px;"
+                            src="{% static 'theme/img/placeholder_90-110.png' %}">
+                        {% endif %}
+                    </div>
+
+                    <p class="profession-date-of-birth">
+                        {% if profession %}<small class="font-weight-bold">{{ profession }}</small> <br />{% endif %}
+
+                        <small class="font-weight-normal"><abbr title="geboren">*</abbr>
+                            {% if object.start_date_written is not None %}
+                            {{object.start_date_written }}{% if place_of_birth is not None %}
+                            ({{place_of_birth}}){% endif %}{% else %} -{% endif %}</small><br />
+                        <small class="font-weight-normal"><abbr title='gestorben'>&dagger;</abbr>
+                            {% if object.end_date_written is not None %}
+                            {{object.end_date_written }}{% if place_of_death is not None %}
+                            ({{place_of_death}}){% endif %}{% else %} -{% endif %}</small>
+                    </p>
+
+
+                    {% if mitgliedschaften %}
+                    <div class="section">
+                        <small class="font-weight-bold">Mitgliedschaft</small>
+                        <ul class="relentities list-unstyled">
+                            {% for x in mitgliedschaften %}
+                            <li class="pl-0 font-weight-normal pb-0" style="padding-bottom: 0.8em">
+                                <small>{{x|safe}}</small>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    {% endif %}
+                    {% if normdaten %}
+                    <div class="section">
+                        <small class="font-weight-bold">Online-Ressourcen</small>
+                        <ul class="uris pl-0 list-unstyled">
+                            {% for nd in normdaten %}
+                            <li class="pl-0 font-weight-normal"><small>{{nd.kind}} <a target="_blank"
+                                        rel="noopener noreferrer" href="{{nd.uri}}">{{nd.identifier}}</a></small></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    <div class="section">
+                        <small class="font-weight-bold">Downloads</small>
+                        <ul class="uris pl-0 list-unstyled">
+                            <li class="pl-0 font-weight-normal"><small><a target="_blank" rel="noopener noreferrer"
+                                        href="/apis/api/entities/person/{{object.pk}}/?format=json">Json</a></small>
+                            </li>
+                            <li class="pl-0 font-weight-normal"><small><a target="_blank" rel="noopener noreferrer"
+                                        href="/apis/api2/entity/{{object.pk}}/?format=rdf%2Bturtle">RDF/Turtle</a></small>
+                            </li>
+                            <li class="pl-0 font-weight-normal"><small><a target="_blank" rel="noopener noreferrer"
+                                        href="/apis/api2/entity/{{object.pk}}/?format=tei">TEI</a></small></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

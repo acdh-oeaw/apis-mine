@@ -81,6 +81,7 @@ class SearchResultTable(tables.Table):
         attrs = {"class": "table table-hover custom-table bg-mine", "thead": {}}
         template_name = "theme/custom_table.html"
         row_attrs = {"data-member": lambda record: record.academy_member}
+        empty_text = "Keine Ergebnisse"
 
 
 class InstitutionsSearchResultTable(tables.Table):
@@ -124,3 +125,4 @@ class InstitutionsSearchResultTable(tables.Table):
         attrs = {"class": "table table-hover custom-table bg-mine", "thead": {}}
         template_name = "theme/custom_table.html"
         row_attrs = {"data-member": lambda record: record.academy_member}
+        empty_text = "Keine Ergebnisse"

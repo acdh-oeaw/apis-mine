@@ -1,0 +1,83 @@
+.noUi-pips-horizontal {
+    top: -58px;
+}
+
+.noUi-target {
+    font-size: 0.7em;
+    border: none;
+    height: 1px;
+    border-radius: 0;
+    background-color: $oeaw-blue;
+    box-shadow: none;
+}
+
+.noUi-connects {
+    height: 6px;
+    top: -2px;
+    border-radius: 0;
+}
+
+.noUi-connect {
+    background-color: $oeaw-blue;
+}
+.noUi-horizontal {
+    .noUi-handle {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+    }
+    .noUi-handle:focus {
+        outline: none;
+    }
+    .noUi-handle::before,
+    .noUi-handle::after {
+        display: none;
+    }
+    .noUi-tooltip {
+        background: $oeaw-blue;
+        border-radius: 0;
+        padding: 2px;
+        color: white;
+        border: none;
+        bottom: 140%;
+    }
+    .noUi-tooltip:after {
+        content: "";
+        position: absolute;
+        left: 35%;
+        top: 100%;
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid $oeaw-blue;
+        clear: both;
+    }
+}
+
+.noUi-touch-area {
+    display: none;
+}
+
+.noUi-marker {
+    display: none;
+}
+
+.noUi-value {
+    background: white;
+    color: black;
+    padding: 2px;
+}
+
+.noUi-value:after {
+    content: "";
+    position: absolute;
+    left: 35%;
+    top: 100%;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid white;
+    clear: both;
+}

@@ -14,7 +14,8 @@
     <title>{% block title %} Geschichte der Akademie {% endblock %}</title>
 
     <!-- Fundament -->
-    <link href="https://shared.acdh.oeaw.ac.at/fundament/dist/fundament/css/fundament.min.css" rel="stylesheet">
+    <!--<link href="https://shared.acdh.oeaw.ac.at/fundament/dist/fundament/css/fundament.min.css" rel="stylesheet">-->
+    <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css">-->
     <link rel="stylesheet" href="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.css" >
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
@@ -22,15 +23,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;1,400&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://fundament.acdh.oeaw.ac.at/html/dist/fundament/vendor/jquery/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.6.0/nouislider.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.4.0/nouislider.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.full.js" defer></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.6.0/nouislider.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.4.0/nouislider.min.css" />
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Custom styles for this template -->
     <script src="https://unpkg.com/feather-icons@4.28.0/dist/feather.min.js"></script>
-    <link rel="stylesheet" href="{%static 'theme/css/main.css' %}" />
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    {% load sass_tags %}
+    <link href="{% sass_src 'theme.scss' %}" rel="stylesheet" type="text/css" />
+    <!--<link rel="stylesheet" href="{%static 'theme/css/main.css' %}" />-->
+    <!--<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />-->
     <!--
       this global event bus is used as a simple
       means of communication between components.
@@ -85,7 +88,7 @@
     {% endblock %}
 </head>
 
-<body id="body" data-searchtype="erw" class="oebl-background-grey">
+<body id="body" data-searchtype="erw" class="bg-mine">
 <div class="hfeed site bg-white" id="page">
     <!-- NAVBAR
 ================================================== -->
@@ -94,10 +97,10 @@
         <a class="skip-link screen-reader-text sr-only" href="#content">Skip to content</a>
         <nav class="navbar navbar-expand-lg navbar-light">
           <div class="container">
-            <div class="row">
+            <div class="row ml-n5 mr-n5">
               <div class="col-md-5">
-            <a href="/" class="navbar-brand custom-logo-link" rel="home" itemprop="url"><!--<h3>PAAS</h3>-->
-            <img src="{%static 'theme/img/MINE_logo.svg' %}"/>
+            <a href="/" class="navbar-brand custom-logo-link w-100 h-100" rel="home" itemprop="url"><!--<h3>PAAS</h3>-->
+            <img class="w-100 h-100" src="{%static 'theme/img/MINE_logo.svg' %}"/>
             </a><!-- end custom logo -->
           </div>
           <div class="col-md-7">
@@ -106,37 +109,22 @@
               </button>
             <div class="collapse navbar-collapse align-items-start justify-content-start" id="navbarSupportedContent">
               <!-- Your menu goes here -->
-              <ul id="main-menu" class="navbar-nav mr-0 font-weight-bold">
-                <!--<li class="nav-item dropdown">
-                  <a title="Dropdown" href="#" data-toggle="dropdown" class="nav-link dropdown-toggle">Entities <span class="caret"></span></a>
-                  <ul class=" dropdown-menu" role="menu">
-                    <li class="nav-item dropdown-submenu">
-                        {% for ent in entities_list %}
-                      <a title="{{ent|title}}" href="{% url 'apis:apis_entities:generic_entities_list' ent %}" class="nav-link">{{ent|title}}</a>
-                      {% endfor %}
-                      <a title="URIS" href="{% url 'apis:apis_metainfo:uri_browse' %}" class="nav-link">URIs</a>
-                    </li>
-                  </ul>
-                </li>-->
-                <!--<li class="nav-item"><a title="Suche" href="{% url 'theme:search' %}" class="nav-link">Suche</a></li>
-                <li class="nav-item"><a title="UeberOEBL" href="{% url 'theme:about' %}" class="nav-link">Über</a></li>
-                <li class="nav-item"><a title="Kontakt" href="{% url 'theme:contact' %}" class="nav-link">Kontakt</a></li>
-                -->
-                <li class="nav-item"><a title="Mitglieder" href="{% url 'theme:start' %}" class="nav-link">Mitglieder</a></li>
-                <li class="nav-item"><a title="Institutionen" href="{% url 'theme:institutions' %}" class="nav-link">Institutionen</a></li>
-                <li class="nav-item"><a title="Netzwerke" href="{% url 'theme:contact' %}" class="nav-link">Netzwerke</a></li>
-                <li class="nav-item"><a title="Ereignisse" href="{% url 'theme:contact' %}" class="nav-link">Ereignisse</a></li>
+              <ul id="main-menu" class="navbar-nav mr-0 font-weight-bold flex-column text-uppercase">
+                <li class="nav-item"><a title="Mitglieder" href="{% url 'theme:start' %}" class="nav-link p-0">Mitglieder</a></li>
+                <li class="nav-item"><a title="Institutionen" href="{% url 'theme:institutions' %}" class="nav-link p-0">Institutionen</a></li>
+                <li class="nav-item"><a title="Netzwerke" href="{% url 'theme:contact' %}" class="nav-link p-0">Netzwerke</a></li>
+                <li class="nav-item"><a title="Ereignisse" href="{% url 'theme:contact' %}" class="nav-link p-0">Ereignisse</a></li>
               </ul>
               <form class="form-inline my-2 my-lg-0 pt-1 navbar-search-form" method="get" action=" {% if 'institution' in request.path %} /institutionen/search {% else %} /search {% endif %} " role="search">
-                <input class="form-control navbar-search bg-mine border-0" id="s" name="q" type="text" placeholder="" value="" autocomplete="off">
+                <input class="form-control navbar-search rounded-0 border-0" id="s" name="q" type="text" placeholder="" value="" autocomplete="off">
                 <button type="submit" class="navbar-search-icon pt-1">
                   <i data-feather="search"></i>
                 </button>
               </form>
-              <ul id="second-menu" class="navbar-nav mr-0 align-top pl-5">
-                <li class="nav-item"><a title="Über" href="{% url 'theme:about' %}" class="nav-link">Über</a></li>
-                <li class="nav-item"><a title="Kontakt" href="{% url 'theme:contact' %}" class="nav-link">Kontakt</a></li>
-                <li class="nav-item"><a title="Kontakt" href="{% url 'theme:stories_index' %}" class="nav-link">Stories</a></li>
+              <ul id="second-menu" class="navbar-nav mr-0 align-top pl-5 flex-column text-uppercase font-weight-light">
+                <li class="nav-item"><a title="Über" href="{% url 'theme:about' %}" class="nav-link p-0">Über</a></li>
+                <li class="nav-item"><a title="Kontakt" href="{% url 'theme:contact' %}" class="nav-link p-0">Kontakt</a></li>
+                <li class="nav-item"><a title="Kontakt" href="{% url 'theme:stories_index' %}" class="nav-link p-0">Stories</a></li>
               </ul>
             </div>
             <!-- .collapse navbar-collapse -->
@@ -154,7 +142,7 @@
       </div>
 <div>
   
-    <div class="footer {% if 'institution' in request.path %} border-mine-green {% else %} border-mine {%endif%} mlr-30">
+    <div class="footer {% if 'institution' in request.path %} border-mine-institutions {% else %} border-mine {%endif%} mlr-30">
         <div>
             <div class="container">
                 <footer>
@@ -163,7 +151,7 @@
                     <ul class="nav list-inline justify-content-between">
                       <li class="pb-1 pl-0 list-inline-item"><small><a title="Impressum" href="{% url 'theme:imprint' %}">Impressum</a></small></li>
                       <li class="pb-1 pl-0 list-inline-item"><small><a title="Impressum" href="{% url 'theme:imprint' %}">Datenschutz</a></small></li>
-                      <li class=" pl-0 list-inline-item"><small class="text-oeaw-blau">&#xa9; Österreichische Akademie der Wissenschaften</small></li>
+                      <li class=" pl-0 list-inline-item text-oeaw-blue"><small>&#xa9; Österreichische Akademie der Wissenschaften</small></li>
                     </ul>
                   </div>
                   <div class="col-4 text-right">

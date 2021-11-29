@@ -52,10 +52,11 @@ CRISPY_TEMPLATE_PACK = "acdh_mine"
 CRISPY_ALLOWED_TEMPLATE_PACKS = ("bootstrap", "acdh_mine")
 
 # HAYSTACK_DEFAULT_OPERATOR = "OR"
-INSTALLED_APPS += ["haystack", "paas_theme", "leaflet"]
+INSTALLED_APPS += ["haystack", "paas_theme", "leaflet", "sass_processor"]
 
-CSP_DEFAULT_SRC = ("'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com', 'cdn.jsdelivr.net', 'fonts.googleapis.com', 'cdn.rawgit.com', "*.acdh.oeaw.ac.at", "unpkg.com", "fonts.gstatic.com", "cdn.datatables.net", "code.highcharts.com", "*.acdh-dev.oeaw.ac.at")
+CSP_DEFAULT_SRC = ("'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com', 'cdn.jsdelivr.net', 'fonts.googleapis.com', 'cdn.rawgit.com', "*.acdh.oeaw.ac.at", "unpkg.com", "fonts.gstatic.com", "cdn.datatables.net", "code.highcharts.com", "*.acdh-dev.oeaw.ac.at","commons.wikimedia.org","*.openstreetmap.org")
 CSP_FRAME_SRC = ('sennierer.github.io',)
+
 
 SECRET_KEY = (
     os.environ.get("APIS_SECRET_KEY", "TO_CHANGE")
@@ -75,6 +76,19 @@ MAIN_TEXT_NAME = "ÖBL Haupttext"
 LANGUAGE_CODE = "de"
 
 STATICFILES_DIRS = [BASE_DIR + "/member_images"]
+
+SASS_ROOT = os.path.join(BASE_DIR, 'paas_theme', 'static','theme', 'css')
+SASS_PROCESSOR_ROOT = SASS_ROOT
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'sass_processor.finders.CssFinder',
+]
+
+COMPRESS_PRECOMPILERS = (
+    ('text/x-scss', 'django_libsass.SassCompiler'),
+)
 
 # APIS_COMPONENTS = ['deep learning']
 

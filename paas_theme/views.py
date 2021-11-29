@@ -273,6 +273,9 @@ class PersonDetailView(UserPassesTestMixin, DetailView):
         except AttributeError:
             context["next"] = None
         enriched_context = enrich_person_context(self.object, context)
+        
+        if self.request.GET.get('subview') == 'minimal':
+            self.template_name = "theme/person_detail_popover.html"
 
         return enriched_context
 
@@ -309,6 +312,9 @@ class InstitutionDetailView(UserPassesTestMixin, DetailView):
         except AttributeError:
             context["next"] = None
         enriched_context = enrich_institution_context(self.object, context)
+        
+        if self.request.GET.get('subview') == 'minimal':
+            self.template_name = "theme/institution_detail_popover.html"
 
         return enriched_context
 

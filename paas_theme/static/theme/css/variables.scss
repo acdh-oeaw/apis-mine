@@ -1,0 +1,88 @@
+
+$mine-bg: #f0f0f7;
+$mine-darker: #d8d8de;
+$mine-lighter: #f7f7fb;
+$mine-red: #c80000;
+$mine-green: #009c75;
+$oeaw-blue: #0047bb;
+
+
+$theme-colors: (
+  "primary": #0047bb
+); 
+
+$sizes: map-merge((
+  10:10%,
+  25: 25%,
+  50: 50%,
+  75: 75%,
+  100: 100%,
+  90: 90%
+), $sizes);
+
+$font-family-base: 'Lato', -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+
+$h1-font-size:  $font-size-base * 1.2;
+$h2-font-size: $font-size-base * 1.1;
+$h3-font-size: $font-size-base * 1;
+
+$smaller-text-font-size: $font-size-base * 0.9;
+
+$spacer: 15px;
+
+$spacers: (
+  0: 0,
+  1: ($spacer * .25),
+  2: ($spacer * .5),
+  3: $spacer,
+  4: ($spacer * 1.5),
+  5: ($spacer * 2),
+  6: ($spacer * 5)
+);
+
+$pagination-active-bg: $mine-bg;
+$pagination-active-border-color: none;
+$pagination-hover-bg: $mine-darker;
+$pagination-border-width:0;
+$pagination-focus-box-shadow: none;
+
+$badge-font-size: $smaller-text-font-size;
+$badge-font-weight: normal;
+
+$custom-control-indicator-checked-bg: $oeaw-blue;
+$custom-control-indicator-focus-box-shadow:none;
+$custom-control-indicator-active-bg: $oeaw-blue;
+$custom-checkbox-indicator-border-radius: 0;
+$custom-select-padding-y: 0.2rem;
+$custom-select-height: 2rem;
+$custom-select-focus-border-color: none;
+$custom-select-focus-box-shadow:none;
+
+$nav-tabs-link-active-bg: $mine-bg;
+$nav-tabs-link-hover-border-color: none;
+
+$dropdown-padding-y: 0.15rem;  
+$dropdown-item-padding-x:0.75rem;
+
+/* select2 */
+$bg: $mine-bg;
+$input-focus-border-color: $mine-bg;
+$input-focus-box-shadow: 0 0 0 0.2rem $mine-bg;
+
+
+
+/* custom vars by bk */
+$badge-remove-icon-width:1em;
+$badge-remove-icon-height:1em;
+
+$dropdown-menu-font-size: $font-size-base * 0.8;
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,76 @@
+
+/* -----------------------------------------
+	Table of Contents
+--------------------------------------------
+
+.. 01. General
+.. 02. Header
+.. 03. Blocks
+.. 04. Single Posts
+.. 05. Pages
+.. 06. Widgets Styling
+.. 07. Footer
+.. 08. Extras
+*/
+
+
+
+/*
+ ** 01. General
+ */
+ @import 'fundament/_partials/_functions';
+ @import './fundament/_partials/variables';
+ 
+
+ 
+ 
+ @import './variables.scss';
+ @import './fundament/assets.scss';
+
+ @import './fundament/_partials/_01_mixins';
+ @import './fundament/_partials/_02_general';
+ @import './general.scss';
+ /*
+  ** 02. Header
+  */
+ @import './fundament/_partials/_03_header';
+ @import './header.scss';
+ /*
+  ** 03. Blocks
+  */
+ 
+ @import './fundament/_partials/_04_blocks';
+ @import './blocks.scss';
+ /*
+  ** 04. Single Posts
+  */
+ @import './fundament/_partials/_05_posts';
+ /*
+  ** 05. Pages
+  */
+ @import './fundament/_partials/_06_pages';
+ /*
+  ** 06. Widgets
+  */
+ @import './fundament/_partials/_07_widgets';
+ /*
+  ** 07. Footer
+  */
+ @import './fundament/_partials/_08_footer';
+ /*
+  ** 08. Extras
+  */
+ @import './fundament/_partials/_09_extras';
+ @import './select2bootstrap4/select2-bootstrap4.scss';
+ @import './extras.scss';
+
+
+ @import './buttons.scss';
+ @import './spacing.scss';
+ @import './hover.scss';
+ @import './custom_slider.scss';
+ @import './badge.scss';
+ 
+ 
+
+

@@ -1,0 +1,77 @@
+html {
+    scroll-padding-top: 100px;
+}
+
+body {
+    font-family: $font-family-base;
+    border: none;
+}
+
+a {
+    color: $oeaw-blue;
+}
+
+abbr[title] {
+    text-decoration: none;
+}
+
+.btn-primary.disabled {
+    opacity:0.5;
+}
+
+.bg-mine {
+    background-color: $mine-bg;
+}
+
+.border-mine {
+    border-top: 7px solid $mine-red;
+}
+
+.border-mine-institutions {
+    border-top: 7px solid $mine-green;
+}
+
+.text-oeaw-blue {
+    color: $oeaw-blue;
+}
+
+.smaller-font-size {
+    font-size: $smaller-text-font-size;
+}
+
+svg[class*="feather feather-chevron-"] {
+    stroke: none;
+    fill: $oeaw-blue;
+    width: unset;
+}
+
+svg.feather.feather-chevron-left,
+svg.feather.feather-chevron-right {
+    height: 20px;
+}
+
+svg.remove-badge {
+    width: $badge-remove-icon-width;
+    height: $badge-remove-icon-width;
+}
+
+.dropdown-menu {
+    font-size: $dropdown-menu-font-size;
+}
+
+/*** media queries ***/
+
+@include breakpoint-up($md) {
+    .site {
+        max-width: 70%;
+        margin: 0 auto;
+    }
+}
+
+/* print */
+
+@media print {
+    .collapse {
+        display: block;
+    }
+}

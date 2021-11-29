@@ -214,6 +214,13 @@
             "markers": "python_version >= '3.6'",
             "version": "==3.0.9"
         },
+        "django-sass-processor": {
+            "hashes": [
+                "sha256:16ae2116cbf174dbd1dc034b18b5a0abe7b0bb5fda20c33e9f710d47010ec972"
+            ],
+            "index": "pypi",
+            "version": "==1.1"
+        },
         "django-summernote": {
             "hashes": [
                 "sha256:52e9b12438ed9eac0d77729f758f2aae06e468b5cbce133e24100d58ae4e43a8"
@@ -316,6 +323,21 @@
                 "sha256:c8a85b28d377cc7737e46e2d9f2b4f44ee3c0e1deac6bf46ddefc7187d30797a"
             ],
             "version": "==3.2.0"
+        },
+        "libsass": {
+            "hashes": [
+                "sha256:06c8776417fe930714bdc930a3d7e795ae3d72be6ac883ff72a1b8f7c49e5ffb",
+                "sha256:12f39712de38689a8b785b7db41d3ba2ea1d46f9379d81ea4595802d91fa6529",
+                "sha256:1e25dd9047a9392d3c59a0b869e0404f2b325a03871ee45285ee33b3664f5613",
+                "sha256:659ae41af8708681fa3ec73f47b9735a6725e71c3b66ff570bfce78952f2314e",
+                "sha256:6b984510ed94993708c0d697b4fef2d118929bbfffc3b90037be0f5ccadf55e7",
+                "sha256:a005f298f64624f313a3ac618ab03f844c71d84ae4f4a4aec4b68d2a4ffe75eb",
+                "sha256:abc29357ee540849faf1383e1746d40d69ed5cb6d4c346df276b258f5aa8977a",
+                "sha256:d5ba529d9ce668be9380563279f3ffe988f27bc5b299c5a28453df2e0b0fbaf2",
+                "sha256:e2b1a7d093f2e76dc694c17c0c285e846d0b0deb0e8b21dc852ba1a3a4e2f1d6"
+            ],
+            "index": "pypi",
+            "version": "==0.21.0"
         },
         "lxml": {
             "hashes": [
@@ -513,10 +535,11 @@
         },
         "pysolr": {
             "hashes": [
-                "sha256:6ef05feb87c614894243eddc62e9b0a6134a889c159ae868655cf6cd749545e6"
+                "sha256:2538bf0c356a6d8514161eb1240e295bbed9f2ca0cd92f69ff268a30f7b1a968",
+                "sha256:8601224b3e4b3f6785e1c225ca5628099d0f2d86acb2c5138cf47f3820dfcdeb"
             ],
             "index": "pypi",
-            "version": "==3.9.0"
+            "version": "==3.10.0b0"
         },
         "python-dateutil": {
             "hashes": [
