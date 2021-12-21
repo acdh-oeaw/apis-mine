@@ -113,7 +113,7 @@ async function add_histogis_shape() {
   let colors_shapes = ['#302f2f', '#3388ff', '#229c41', '#b8252c', '#d1c847']
   const featHistoGIS = []
   let list_permalinks = [];
-  let histogis_url = new URL('https://histogis.acdh-dev.oeaw.ac.at/api/where-was')
+  let histogis_url = new URL('https://histogis.acdh.oeaw.ac.at/api/where-was')
   const parsed_dates = lst_dates.map(d => Date.parse(d))
   const min_date = Math.min(...parsed_dates)
   const max_date = Math.max(...parsed_dates)
@@ -228,7 +228,7 @@ function move_map() {
   } else {
     mapleaflet.style.height = "500px"
   }
-  spacetime.style.paddingTop = `${document.querySelector('div.entry-header').offsetHeight}px`
+  //spacetime.style.paddingTop = `${document.querySelector('div.entry-header').offsetHeight}px`
 
   //bio.insertBefore(map_element, biotext);
   add_histogis_shape()
