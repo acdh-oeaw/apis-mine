@@ -70,6 +70,9 @@ $input-focus-border-color: $mine-bg;
 $input-focus-box-shadow: 0 0 0 0.2rem $mine-bg;
 
 
+/* csp problem, original bg not loaded */
+$navbar-light-toggler-icon-bg: url('/static/theme/img/bootstrap_toggle_nav_icon.svg');
+
 
 /* custom vars by bk */
 $badge-remove-icon-width:1em;

@@ -97,13 +97,9 @@
         <a class="skip-link screen-reader-text sr-only" href="#content">Skip to content</a>
         <nav class="navbar navbar-expand-lg navbar-light">
           <div class="container">
-            <div class="row ml-n5 mr-n5">
-              <div class="col-md-5">
             <a href="/" class="navbar-brand custom-logo-link w-100 h-100" rel="home" itemprop="url"><!--<h3>PAAS</h3>-->
             <img class="w-100 h-100" src="{%static 'theme/img/MINE_logo.svg' %}"/>
             </a><!-- end custom logo -->
-          </div>
-          <div class="col-md-7">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
               </button>
@@ -121,15 +117,13 @@
                   <i data-feather="search"></i>
                 </button>
               </form>
-              <ul id="second-menu" class="navbar-nav mr-0 align-top pl-5 flex-column text-uppercase font-weight-light">
+              <ul id="second-menu" class="navbar-nav mr-0 align-top pl-lg-5 flex-column text-uppercase font-weight-light">
                 <li class="nav-item"><a title="Über" href="{% url 'theme:about' %}" class="nav-link p-0">Über</a></li>
                 <li class="nav-item"><a title="Kontakt" href="{% url 'theme:contact' %}" class="nav-link p-0">Kontakt</a></li>
                 <li class="nav-item"><a title="Kontakt" href="{% url 'theme:stories_index' %}" class="nav-link p-0">Stories</a></li>
               </ul>
             </div>
             <!-- .collapse navbar-collapse -->
-          </div>
-        </div>
           </div>
 
           <!-- .container -->
