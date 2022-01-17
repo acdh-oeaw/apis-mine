@@ -37,7 +37,8 @@ ALLOWED_CIDR_NETS = ["10.0.0.0/8", "127.0.0.0/8"]
 HAYSTACK_CONNECTIONS = {
     "default": {
         "ENGINE": "haystack.backends.solr_backend.SolrEngine",
-        "URL": f"http://{os.environ.get('PAAS_HAYSTACK_URL', 'paassolr')}:8983/solr/{os.environ.get('PAAS_HAYSTACK_CORE', 'paas_solr')}",
+        "URL": "https://solr.acdh-dev.oeaw.ac.at/solr/#/apis/",
+        #"URL": f"http://{os.environ.get('PAAS_HAYSTACK_URL', 'paassolr')}:8983/solr/{os.environ.get('PAAS_HAYSTACK_CORE', 'paas_solr')}",
         "ADMIN_URL": f"http://{os.environ.get('PAAS_HAYSTACK_URL', 'paassolr')}:8983/solr/admin/cores",
     }
 }
