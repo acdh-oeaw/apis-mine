@@ -20,6 +20,8 @@ APIS_LOCATED_IN_ATTR = ["located in"]
 APIS_BASE_URI = "https://paas.acdh.oeaw.ac.at/"
 # APIS_OEBL_BIO_COLLECTION = "ÖBL Biographie"
 
+LOGIN_URL = "webpage:user_login"
+
 APIS_SKOSMOS = {
     "url": os.environ.get("APIS_SKOSMOS", "https://vocabs.acdh-dev.oeaw.ac.at"),
     "vocabs-name": os.environ.get("APIS_SKOSMOS_THESAURUS", "apisthesaurus"),
