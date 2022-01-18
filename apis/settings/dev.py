@@ -31,7 +31,7 @@ APIS_SKOSMOS = {
 ALLOWED_HOSTS = re.sub(
     r"https?://",
     "",
-    os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1,paas.acdh-dev.oeaw.ac.at"),
+    os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1,paas.acdh-dev.oeaw.ac.at,paas.acdh.oeaw.ac.at"),
 ).split(",")
 # You need to allow '10.0.0.0/8' for service health checks.
 ALLOWED_CIDR_NETS = ["10.0.0.0/8", "127.0.0.0/8"]
@@ -39,8 +39,8 @@ ALLOWED_CIDR_NETS = ["10.0.0.0/8", "127.0.0.0/8"]
 HAYSTACK_CONNECTIONS = {
     "default": {
         "ENGINE": "haystack.backends.solr_backend.SolrEngine",
-        "URL": "https://solr.acdh-dev.oeaw.ac.at/solr/#/apis/",
-        #"URL": f"http://{os.environ.get('PAAS_HAYSTACK_URL', 'paassolr')}:8983/solr/{os.environ.get('PAAS_HAYSTACK_CORE', 'paas_solr')}",
+        #"URL": "https://solr.acdh-dev.oeaw.ac.at/solr/#/apis/",
+        "URL": f"http://{os.environ.get('PAAS_HAYSTACK_URL', 'solr')}:8983/solr/{os.environ.get('PAAS_HAYSTACK_CORE', 'paas_solr')}",
         "ADMIN_URL": f"http://{os.environ.get('PAAS_HAYSTACK_URL', 'paassolr')}:8983/solr/admin/cores",
     }
 }
