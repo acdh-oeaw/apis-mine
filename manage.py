@@ -5,7 +5,7 @@ import sys
 
 if __name__ == "__main__":
     if os.getenv("DJANGO_SETTINGS_MODULE") is None:
-        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apis.settings.base")
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "apis.settings.dev")
     try:
         from django.core.management import execute_from_command_line
     except ImportError:
