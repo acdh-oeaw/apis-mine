@@ -91,8 +91,6 @@
     
     <field name="start_date" type="date" indexed="true" stored="true" multiValued="false" />
     
-    <field name="relation_type_id" type="long" indexed="true" stored="true" multiValued="false" />
-    
     <field name="relation_type" type="text_en" indexed="true" stored="true" multiValued="false" />
     
     <field name="relation_type_full" type="text_en" indexed="true" stored="true" multiValued="false" />
@@ -108,14 +106,6 @@
     <field name="institution_type" type="text_en" indexed="true" stored="true" multiValued="false" />
     
     <field name="name" type="text_en" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="academy" type="boolean" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="kind" type="text_en" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="name_auto" type="edge_ngram" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="relation_types_person_id" type="text_en" indexed="true" stored="true" multiValued="true" />
     
     <field name="academy_member" type="boolean" indexed="true" stored="true" multiValued="false" />
     
@@ -135,17 +125,9 @@
     
     <field name="place_of_birth_exact" type="string" indexed="true" stored="true" multiValued="false" />
     
-    <field name="place_of_birth_id" type="long" indexed="true" stored="true" multiValued="false" />
-    
     <field name="place_of_death" type="text_en" indexed="true" stored="true" multiValued="false" />
     
     <field name="place_of_death_exact" type="string" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="place_of_death_id" type="long" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="klasse_person" type="text_en" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="klasse_person_exact" type="string" indexed="true" stored="true" multiValued="false" />
     
     <field name="gender" type="text_en" indexed="true" stored="true" multiValued="false" />
     
@@ -155,15 +137,9 @@
     
     <field name="profession_exact" type="string" indexed="true" stored="true" multiValued="true" />
     
-    <field name="profession_id" type="text_en" indexed="true" stored="true" multiValued="true" />
-    
     <field name="akademiemitgliedschaft" type="text_en" indexed="true" stored="true" multiValued="true" />
     
     <field name="akademiemitgliedschaft_exact" type="string" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="mitgliedschaft_short" type="text_en" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="mitgliedschaft_short_exact" type="string" indexed="true" stored="true" multiValued="false" />
     
     <field name="funk_praesidentin" type="boolean" indexed="true" stored="true" multiValued="false" />
     
@@ -172,10 +148,6 @@
     <field name="funk_generalsekretaerin" type="boolean" indexed="true" stored="true" multiValued="false" />
     
     <field name="funk_sekretaerin" type="boolean" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="funk_klassenpres_math_nat" type="boolean" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="funk_klassenpres_phils_hist" type="boolean" indexed="true" stored="true" multiValued="false" />
     
     <field name="funk_obfrau" type="boolean" indexed="true" stored="true" multiValued="false" />
     
@@ -200,44 +172,6 @@
     <field name="nobelpreis" type="boolean" indexed="true" stored="true" multiValued="false" />
     
     <field name="ewk" type="boolean" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="schule" type="text_en" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="schule_exact" type="string" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="schule_id" type="text_en" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="universitaet" type="text_en" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="universitaet_exact" type="string" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="universitaet_id" type="text_en" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="universitaet_id_exact" type="string" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="uni_habilitation" type="text_en" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="uni_habilitation_exact" type="string" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="uni_habilitation_id" type="text_en" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="fach_habilitation" type="text_en" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="fach_habilitation_exact" type="string" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="fach_habilitation_id" type="text_en" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="w_austausch" type="text_en" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="w_austausch_exact" type="string" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="w_austausch_id" type="text_en" indexed="true" stored="true" multiValued="true" />
-    
-    <field name="mitglied_nsdap" type="boolean" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="label_auto" type="edge_ngram" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="location" type="location" indexed="true" stored="true" multiValued="false" />
     
     <field name="membership_id" type="long" indexed="true" stored="true" multiValued="false" />
     
