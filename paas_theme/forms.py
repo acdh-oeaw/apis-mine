@@ -189,7 +189,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     gender = forms.ChoiceField(
         widget=forms.Select(attrs={"class": "select2-main no-search rounded-0"}),
         required=False,
-        choices=(("", "-"), ("male", "Männlich"), ("female", "Weiblich")),
+        choices=(("", "-"), ("männlich", "Männlich"), ("weiblich", "Weiblich"), ("unbekannt", "Unbekannt")),
         label="",
     )
     wahl_gender = forms.ChoiceField(
