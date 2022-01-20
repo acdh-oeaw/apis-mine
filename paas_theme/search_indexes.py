@@ -21,7 +21,7 @@ from .provide_data import classes
 
 from . id_mapping import KLASSEN_IDS
 
-coll_id = 2
+coll_id = 16
 
 map_classes_pr_labels = {
     "Habilitation": classes["habilitation"],
@@ -34,6 +34,10 @@ map_classes_pr_labels = {
         item for sublist in classes["berufslaufbahn_map"].values() for item in sublist
     ],
 }
+
+
+class GermanTextField(indexes.CharField):
+    field_type = "text_de"
 
 
 class PersonProfessionIndex(indexes.SearchIndex, indexes.Indexable):
