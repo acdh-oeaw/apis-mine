@@ -112,7 +112,6 @@ def get_main_text(MAIN_TEXT):
 
 
 def abbreviate(value):
-    print(value.name)
     if value.name == "MATHEMATISCH-NATURWISSENSCHAFTLICHE KLASSE":
         return "math.-nat. Klasse"
     elif value.name == "PHILOSOPHISCH-HISTORISCHE KLASSE":
@@ -174,7 +173,11 @@ def get_date_range(
 
 def get_mitgliedschaft_from_relation(rel, abbreviate=True):
     lbl = rel.label.split(">>")[1].strip()
+    if rel.label.split(">>")[0].strip() != "Mitglied":
+        return None
     if abbreviate:
+        if lbl == "Mitglied der Jungen Kurie":
+            return "Junge Kurie/Junge Akademie"
         res = re.search(r"\((.+)\)", lbl)
         return res.group(1)
     else:

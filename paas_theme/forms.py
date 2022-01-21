@@ -262,7 +262,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             ("kM A", "korrespondierendes Mitglied im Ausland"),
             ("wM", "Wirkliches Mitglied"),
             ("em", "Ehrenmitglied"),
-            ("Mitglied der Jungen Kurie", "Junge Kurie/Junge Akademie")
+            ("Junge Kurie/Junge Akademie", "Junge Kurie/Junge Akademie")
         ],
     )
     mtgld_klasse = forms.MultipleChoiceField(
