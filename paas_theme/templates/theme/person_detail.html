@@ -71,10 +71,11 @@
                     title="geboren">*</abbr>{% if object.start_date_written is not None %}
                   {{object.start_date_written }}{% if place_of_birth is not None %}
                   ({{place_of_birth}}){% endif %}{% else %} -{% endif %}</span><br />
+                  {% if object.end_date_written %}
                 <span class="font-weight-normal"><abbr title='gestorben'>&dagger;</abbr>
-                  {% if object.end_date_written is not None %}
                   {{object.end_date_written }}{% if place_of_death is not None %}
-                  ({{place_of_death}}){% endif %}{% else %} -{% endif %}</span>
+                  ({{place_of_death}}){% endif %}</span>
+                {% endif %}
               </p>
 
 
