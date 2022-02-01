@@ -173,7 +173,7 @@ def get_date_range(
 
 def get_mitgliedschaft_from_relation(rel, abbreviate=True):
     lbl = rel.label.split(">>")[1].strip()
-    if rel.label.split(">>")[0].strip() != "Mitglied":
+    if rel.label.split(">>")[0].strip() != "Mitglied" and not rel.label.split(">>")[0].strip().startswith('wird vorgeschlagen von'):
         return None
     if abbreviate:
         if lbl == "Mitglied der Jungen Kurie":
