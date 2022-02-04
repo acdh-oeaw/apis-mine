@@ -88,7 +88,6 @@ MAIN_TEXT_NAME = "ÖBL Haupttext"
 
 LANGUAGE_CODE = "de"
 
-STATICFILES_DIRS = [BASE_DIR + "/member_images"]
 
 SASS_ROOT = os.path.join(BASE_DIR, 'paas_theme', 'static','theme', 'css')
 SASS_PROCESSOR_ROOT = SASS_ROOT
