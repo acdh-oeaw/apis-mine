@@ -18,6 +18,9 @@ BASE_DIR = os.path.dirname(
     os.path.dirname(os.path.abspath(os.path.join(__file__, "../")))
 )
 
+
+SECRET_KEY = os.environ.get("APIS_SECRET_KEY", "TO_CHANGE")
+
 SHARED_URL = "https://shared.acdh.oeaw.ac.at/"
 
 ACDH_IMPRINT_URL = (
