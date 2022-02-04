@@ -612,11 +612,21 @@ def enrich_person_context(person_object, context):
                 "identifier": normdaten_parlament[0].uri.split("_")[-1][:-1],
             }
         )
-    lst_images = glob.glob(
-        getattr(settings, "BASE_DIR") + "/member_images/" + f"/{person_object.pk}.*"
-    )
+    img_fn = person_object.label_set.filter(label_type__name="filename OEAW Archiv")
+    if img_fn.count() == 1:
+        img_fn = img_fn.first().label
+        lst_images = glob.glob(
+            f"{getattr(settings, 'APIS_PAAS_IMAGE_FOLDER')}/{img_fn}"
+        )
+    else:
+        lst_images = []
     if len(lst_images) == 1:
-        context["image"] = (True, lst_images[0].split("/")[-1])
+        fig_caption = person_object.label_set.filter(label_type__name=getattr(settings, "APIS_PAAS_FIGURE_CAPTION", "photocredit OEAW Archiv"))
+        if fig_caption.count() == 1:
+            fig_caption = fig_caption.first().label
+        else:
+            fig_caption = "OEAW"
+        context["image"] = (True, lst_images[0].split("/")[-1], fig_caption)
     elif classes.get("image_wiki", False):
         if (
             person_object.label_set.filter(

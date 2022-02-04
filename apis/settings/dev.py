@@ -45,6 +45,14 @@ HAYSTACK_CONNECTIONS = {
     }
 }
 
+
+APIS_PAAS_IMAGE_FOLDER = "member_images/Portraits_bis_1955"
+
+STATICFILES_DIRS = [
+    f"{BASE_DIR}/{APIS_PAAS_IMAGE_FOLDER}",
+]
+
+
 REST_FRAMEWORK["DEFAULT_PERMISSION_CLASSES"] = (
     # "rest_framework.permissions.DjangoModelPermissions",
     "rest_framework.permissions.IsAuthenticated",
