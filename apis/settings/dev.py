@@ -68,7 +68,7 @@ INSTALLED_APPS += ["haystack", "paas_theme", "leaflet", "sass_processor"]
 CSP_DEFAULT_SRC = ("'self' data:","'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com', 'cdn.jsdelivr.net', 'fonts.googleapis.com', 
                     'ajax.googleapis.com', 'cdn.rawgit.com', "*.acdh.oeaw.ac.at", "unpkg.com", "fonts.gstatic.com", 
                     "cdn.datatables.net", "code.highcharts.com", "*.acdh-dev.oeaw.ac.at", "*.acdh.oeaw.ac.at",
-                    "openstreetmap.org", "*.openstreetmap.org", "oeaw.ac.at", "*.oeaw.ac.at", "commons.wikimedia.org", ".wikimedia.org")
+                    "openstreetmap.org", "*.openstreetmap.org", "oeaw.ac.at", "*.oeaw.ac.at", "commons.wikimedia.org", "*.wikimedia.org")
 CSP_FRAME_SRC = ('sennierer.github.io',)
 
 SECRET_KEY = (
