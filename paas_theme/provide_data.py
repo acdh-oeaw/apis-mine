@@ -401,12 +401,16 @@ classes = create_data_utils()
 
 
 def get_wahlvorschlag(pers, mitgliedschaften):
-    kls = (
-        pers.personinstitution_set.filter(related_institution_id__in=KLASSEN_IDS)
-        .first()
-        .related_institution
-    )
-    kls = abbreviate(kls)
+    rel_inst_1 = pers.personinstitution_set.filter(related_institution_id__in=KLASSEN_IDS)
+    if rel_inst_1.count() > 0:
+        kls = (
+            rel_inst_1
+            .first()
+            .related_institution
+        )
+        kls = abbreviate(kls)
+    else:
+        kls = ""
     res = {}
     umwidm = [56, 57, 58, 59]
     ruhend = RUHEND_GESTELLT
