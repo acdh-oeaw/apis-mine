@@ -51,7 +51,11 @@
               <div class="imgcontainer">
                 {% if image %}
                 {% if image.0 %}
-                <img class="float-md-right" style="max-width:110px;" src="{% static image.1 %}">
+                <figure class="float-md-right" style="max-width:110px;">
+                  <img src="{% static image.1 %}">
+                  <figcaption id="photocredit" class="figure-caption text-08 text-center">{{image.2}}</figcaption>
+                  
+                </figure>
                 {% else %}
                 <figure class="float-md-right" style="max-width:110px;">
                   <img src="{{image.1}}">
