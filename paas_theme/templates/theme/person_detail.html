@@ -226,12 +226,12 @@
   var personPk = "{{object.pk}}";
   var baseURL = "{% url 'apis:apis_api2:GetRelatedPlaces' %}";
 
-
   initMap(baseURL, personPk);
 
   $('#myTab').on('shown.bs.tab', function (e) {
     if (e.target.id === 'map-tab') {
       adjustSize();
+      map.fitBounds($("#map-container").data("bounds"));
     }
   });
 </script>
