@@ -9,9 +9,7 @@ function adjustSize() {
 }
 
 function initMap(baseUrl, pk) {
-  
 
-     
   var dataurl = `${baseUrl}?person_id=${pk}`;
   //var map;
 
@@ -33,7 +31,7 @@ function initMap(baseUrl, pk) {
 
     window.addEventListener("map:init", function (event) {
       map = event.detail.map;
-      
+
       // Download GeoJSON data with Ajax
       fetch(dataurl)
         .then(function (resp) {
@@ -89,21 +87,19 @@ function initMap(baseUrl, pk) {
             }
           });
           jsonLayer.addTo(map);
+
           var bounds = jsonLayer.getBounds();
           if (JSON.stringify(bounds['_northEast']) === JSON.stringify(bounds['_southWest'])) {
             map.setView(bounds['_northEast'], 12);
           } else {
-            
-            map.fitBounds(jsonLayer.getBounds());
-            
+            /* workaround we need because map is initially hidden in tab */
+            $('#map-container').data("bounds", jsonLayer.getBounds());
           }
-
         })
         .then(function () {
           console.log('event issued');
           window.eventBus.emit('apismap.marker.loaded')
         })
-      
     });
 
 }
