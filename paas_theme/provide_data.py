@@ -38,6 +38,11 @@ from . id_mapping import (
     RUHEND_GESTELLT,
 )
 
+from .helper_functions import (
+    abbreviate,
+    get_mitgliedschaft_from_relation
+)
+
 MITGLIEDER = Person.objects.filter(collection__name=MITGLIED_AUSWERTUNG_COL_NAME)
 MITGLIDER_NS = Person.objects.filter(collection__name=MITGLIED_AUSWERTUNG_NS_COL_NAME)
 NATIONALSOZIALISTEN = Person.objects.filter(collection__name=NATIONALSOZIALISTEN_COL_NAME)
@@ -111,23 +116,6 @@ def get_main_text(MAIN_TEXT):
         return None
 
 
-def abbreviate(value):
-    if value.name == "MATHEMATISCH-NATURWISSENSCHAFTLICHE KLASSE":
-        return "math.-nat. Klasse"
-    elif value.name == "PHILOSOPHISCH-HISTORISCHE KLASSE":
-        return "phil.-hist. Klasse"
-    elif value.name == "Nationalsozialistische Deutsche Arbeiterpartei":
-        return "NSDAP"
-    elif value.name == "Nationalsozialistisches Fliegerkorps (NSFK)":
-        return "NSFK"
-    elif value.name == "Nationalsozialistische Volkswohlfahrt":
-        return "NSV"
-    elif value.name == "GESAMTAKADEMIE":
-        return "Gesamtakademie"
-    else:
-        return value
-
-
 def get_date_range(
     rel, time_range_ids, extended=False, original=False, format="%d.%m.%Y"
 ):
@@ -169,19 +157,6 @@ def get_date_range(
         return ""
     res = res.replace("( ", "(").replace(" )", ")")
     return res.strip()
-
-
-def get_mitgliedschaft_from_relation(rel, abbreviate=True):
-    lbl = rel.label.split(">>")[1].strip()
-    if rel.label.split(">>")[0].strip() != "Mitglied" and not rel.label.split(">>")[0].strip().startswith('wird vorgeschlagen von'):
-        return None
-    if abbreviate:
-        if lbl == "Mitglied der Jungen Kurie":
-            return "Junge Kurie/Junge Akademie"
-        res = re.search(r"\((.+)\)", lbl)
-        return res.group(1)
-    else:
-        return lbl
 
 
 def get_gewaehlt(pers, year):

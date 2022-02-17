@@ -8,7 +8,44 @@ KLASSEN_IDS = [
 GESAMTAKADEMIE_UND_KLASSEN = [
     2,
     3,
-    500
+    500,
+    59131,
+    501
+] # added Junge Kurie und junge Akademie
+
+MITGLIEDSCHAFT = [
+    4179, # Mitglied >> Ehrenmitglied (EM) >> gewählt und bestätigt
+    4175, # Mitglied >> Ehrenmitglied (EM) >> gewählt und ernannt
+    50, # Mitglied >> Ehrenmitglied (EM) >> Bestätigt
+    45, # Mitglied >> Ehrenmitglied (EM) >> Ernannt
+    40, # Mitglied >> Ehrenmitglied (EM) >> Genehmigt
+    34, # Mitglied >> Ehrenmitglied (EM) >> Gewählt
+    4180, # Mitglied >> Wirkliches Mitglied (wM) >> gewählt und bestätigt
+    4174, # Mitglied >> Wirkliches Mitglied (wM) >> gewählt und ernannt
+    3459, # Mitglied >> Wirkliches Mitglied (wM) >> reaktiviert
+    129, # Mitglied >> Wirkliches Mitglied (wM) >> eingereiht
+    56, # Mitglied >> Wirkliches Mitglied (wM) >> Umgewidmet
+    46, # Mitglied >> Wirkliches Mitglied (wM) >> Ernannt
+    33, # Mitglied >> Wirkliches Mitglied (wM) >> Gewählt
+    4177, # Mitglied >> Korrespondierendes Mitglied im Ausland (kM A) >> gewählt und bestätigt
+    3471, # Mitglied >> Korrespondierendes Mitglied im Ausland (kM A) >> reaktiviert
+    130, # Mitglied >> Korrespondierendes Mitglied im Ausland (kM A) >> eingereiht
+    57, # Mitglied >> Korrespondierendes Mitglied im Ausland (kM A) >> Umgewidmet
+    52, # Mitglied >> Korrespondierendes Mitglied im Ausland (kM A) >> Bestätigt
+    47, # Mitglied >> Korrespondierendes Mitglied im Ausland (kM A) >> Ernannt
+    42, # Mitglied >> Korrespondierendes Mitglied im Ausland (kM A) >> Genehmigt
+    35, # Mitglied >> Korrespondierendes Mitglied im Ausland (kM A) >> Gewählt
+    4176, # Mitglied >> Korrespondierendes Mitglied im Inland (kM I) >> gewählt und bestätigt
+    3460, # Mitglied >> Korrespondierendes Mitglied im Inland (kM I) >> reaktiviert
+    131, # Mitglied >> Korrespondierendes Mitglied im Inland (kM I) >> eingereiht
+    58, # Mitglied >> Korrespondierendes Mitglied im Inland (kM I) >> Umgewidmet
+    53, # Mitglied >> Korrespondierendes Mitglied im Inland (kM I) >> Bestätigt
+    48, # Mitglied >> Korrespondierendes Mitglied im Inland (kM I) >> Ernannt
+    43, # Mitglied >> Korrespondierendes Mitglied im Inland (kM I) >> Genehmigt
+    36, # Mitglied >> Korrespondierendes Mitglied im Inland (kM I) >> Gewählt
+    19, # Mitglied >> Mitglied der Jungen Kurie,
+    59, # Mitglied >> Ordentliches Mitglied (oM) >> Umgewidmet
+    54 # Mitglied >> Ordentliches Mitglied (oM) >> gewählt und bestätigt
 ]
 
 NSDAP = [
