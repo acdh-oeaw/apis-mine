@@ -127,11 +127,12 @@ def normalize_filter(filter, kind, url=None):
         else:
             val = [filter["value"]]
         for val1 in val:
-            url = re.sub(
-                f"([\&\?]{filter['field']}=)({urllib.parse.quote(val1)})",
-                "",
-                url,
-            )
+            if isinstance(val1, str):
+                url = re.sub(
+                    f"([\&\?]{filter['field']}=)({urllib.parse.quote(val1)})",
+                    "",
+                    url,
+                )
         url = url.replace("search&", "search?")
         return url
 
