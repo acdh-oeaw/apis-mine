@@ -185,7 +185,7 @@ def get_gewaehlt(pers, year):
     return " und ".join(vocs), functions
 
 
-def get_academy_awards(award_type_id=137, rel_id=139, subs_akademie=None):
+def get_academy_awards(award_type_id=137, rel_id=[139, 2] , subs_akademie=None):
     res = []
     awards = Institution.objects.filter(kind_id=award_type_id).values_list(
         "pk", flat=True
@@ -193,7 +193,7 @@ def get_academy_awards(award_type_id=137, rel_id=139, subs_akademie=None):
     for instinst in InstitutionInstitution.objects.filter(
         related_institutionA_id__in=awards,
         related_institutionB_id__in=subs_akademie,
-        relation_type=rel_id,
+        relation_type_id__in=rel_id,
     ):
         if instinst.related_institutionA_id not in res:
             res.append(instinst.related_institutionA_id)
