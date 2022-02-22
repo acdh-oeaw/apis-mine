@@ -52,22 +52,26 @@
                 {% if image %}
                 {% if image.0 %}
                 <figure class="float-md-right" style="max-width:110px;">
-                  <img src="{% static image.1 %}">
+                  <a href="{% static image.1 %}" data-lightbox="images">
+                    <img src="{% static image.1 %}">
+                  </a>
                   <figcaption id="photocredit" class="figure-caption text-08 text-center">{{image.2}}</figcaption>
                   
                 </figure>
                 {% else %}
                 <figure class="float-md-right" style="max-width:110px;">
-                  <img src="{{image.1}}">
-                  
+                  <a href="{{image.1}}" data-lightbox="images">
+                    <img src="{{image.1}}">
+                  </a>
                   <figcaption id="photocredit" class="figure-caption text-08 text-center" data-photourl="{{image.1}}"></figcaption>
                   
                 </figure>
                 {% endif %}
                 {% else %}
-                <img class="float-md-right" style="max-width:110px;" src="{% static 'theme/img/placeholder_110-134.png' %}">
+                <a href="{% static 'theme/img/placeholder_enlarged.png' %}" data-lightbox="images">
+                  <img class="float-md-right" style="max-width:110px;" src="{% static 'theme/img/placeholder_110-134.png' %}">
+                </a>
                 {% endif %}
-                
               </div>
               <p class="profession-date-of-birth">
                 {% if profession %}<span class="font-weight-bold">{{ profession }}</span> <br />{% endif %}

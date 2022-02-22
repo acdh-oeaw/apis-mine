@@ -496,7 +496,7 @@ def create_text_berufslaufbahn(rel):
 
 def get_references_tooltip(rel):
     if len(rel.references) > 0:
-        res = f"<span class='tooltip-mine'>R<span class='tooltiptext'>{rel.references}</span></span>"
+        res = f"<span class='tooltip-mine ml-1'>R<span class='tooltiptext'>{rel.references}</span></span>"
         return res
     else:
         return ""

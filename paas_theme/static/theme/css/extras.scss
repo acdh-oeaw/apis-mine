@@ -211,10 +211,35 @@ div.dataTables_filter {
     border:none !important;
 }
 
-/**** Font Aweseome ***/
+/*** Font Aweseome ***/
 .far {
     font-family: "Font Awesome 5 Free" !important;
 }
+
+/*** tooltip ***/
+
+.tooltip-mine {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+  }
+
+.tooltip-mine .tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: $mine-bg;
+    text-align: center;
+    padding: 3px 0;
+    border: 1px solid $mine-darker;
+   
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+  }
+
+  .tooltip-mine:hover .tooltiptext {
+    visibility: visible;
+  }
 
 /*** select2bootstrap4 ***/
 
