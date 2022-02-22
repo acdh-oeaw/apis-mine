@@ -70,3 +70,5 @@ with open('./paas_theme/relation_mapping.json') as f:
 
 RELATION_TYPE_MITGLIEDER_AUSWERTUNG = rel_mapping['mitglied_auswertung']
 RELATION_TYPE_MITGLIEDER_AUSWERTUNG_NS = rel_mapping['mitglied_auswertung_ns']
+
+NOBEL_PREISE = [44859, 51502, 60045, 60049, 60062, 60072]

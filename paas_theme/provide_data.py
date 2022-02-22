@@ -35,7 +35,9 @@ from . id_mapping import (
     MITGLIED_AUSWERTUNG_COL_NAME,
     MITGLIED_AUSWERTUNG_NS_COL_NAME,
     NATIONALSOZIALISTEN_COL_NAME,
+    NOBEL_PREISE,
     RUHEND_GESTELLT,
+    NOBEL_PREISE
 )
 
 from .helper_functions import (
@@ -625,7 +627,7 @@ def enrich_person_context(person_object, context):
         context["image"] = False
     preise = []
     for nobel in person_object.personinstitution_set.filter(
-        relation_type_id=138, related_institution_id__in=[45721, 44859, 51502]
+        relation_type_id=138, related_institution_id__in=NOBEL_PREISE
     ):
         preise.append(
             f"{nobel.related_institution.name}, {get_date_range(nobel, classes['time_ranges_ids'])[1:-1]}"
