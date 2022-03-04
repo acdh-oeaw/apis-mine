@@ -19,7 +19,7 @@ from .provide_data import (
 )
 from .provide_data import classes
 
-from . id_mapping import KLASSEN_IDS
+from . id_mapping import KLASSEN_IDS, NOBEL_PREISE
 
 coll_id = 16
 
@@ -598,7 +598,7 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
     def prepare_nobelpreis(self, object):
         if (
             object.personinstitution_set.filter(
-                related_institution_id__in=[51502, 44859, 45721], relation_type_id=138
+                related_institution_id__in=NOBEL_PREISE, relation_type_id=138
             ).count()
             > 0
         ):

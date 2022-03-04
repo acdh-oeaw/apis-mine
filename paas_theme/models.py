@@ -138,7 +138,7 @@ class PAASPerson(Person):
             qd["start_date__lte"] = convert_date(end)
             qd["start_date__gte"] = convert_date(start)
         res = []
-        for rel in self.personinstitution_set.filter(**qd):
+        for rel in self.personinstitution_set.filter(**qd).order_by('start_date'):
             kls = abbreviate(rel.related_institution)
             memb = get_mitgliedschaft_from_relation(rel.relation_type)
             res.append(
