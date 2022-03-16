@@ -10,7 +10,30 @@
             "request": "launch",
             "program": "${workspaceFolder}/manage.py",
             "args": [
-                "runserver"
+                "runserver",
+                "--settings=apis.settings.paas_remote"
+            ],
+            "django": true
+        },
+        {
+            "name": "Runserver local",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "runserver",
+                "--settings=apis.settings.dev"
+            ],
+            "django": true
+        },
+        {
+            "name": "runscript",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "runscript",
+                "provide_data_generic"
             ],
             "django": true
         },
@@ -34,6 +57,18 @@
 					"shell_plus",
 					"--notebook",
 					"--settings=apis.settings.paas_remote"
+				],
+				"django": true
+			},
+        {
+				"name": "Paas local Jupyter",
+				"type": "python",
+				"request": "launch",
+				"program": "${workspaceFolder}/manage.py",
+				"args": [
+					"shell_plus",
+					"--notebook",
+					"--settings=apis.settings.dev"
 				],
 				"django": true
 			},

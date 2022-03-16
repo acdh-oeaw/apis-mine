@@ -19,7 +19,7 @@ RUN if [ "${INSTALL_NODE}" = "true" ]; then su vscode -c "umask 0002 && . /usr/l
 #RUN /bin/bash -c "source $HOME/.poetry/env"
 # [Optional] If your requirements rarely change, uncomment this section to add them to the image.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-     && apt-get -y install --no-install-recommends gdal-bin
+     && apt-get -y install --no-install-recommends gdal-bin graphviz
 
 USER vscode
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
