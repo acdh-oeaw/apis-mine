@@ -9,7 +9,7 @@ from django.forms.fields import MultipleChoiceField
 from django.utils.translation import activate
 from haystack.forms import FacetedSearchForm, SearchForm
 from haystack.query import SQ, AutoQuery, SearchQuerySet
-from haystack.inputs import Raw
+from haystack.inputs import Raw, Exact
 from apis_core.helper_functions.DateParser import parse_date
 from apis_core.apis_entities.fields import Select2Multiple, ListSelect2
 from .provide_data import classes, get_child_classes
@@ -381,7 +381,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         ):
             mtgld_dic = SQ()
             for mitgliedschaft in self.cleaned_data["mtgld_mitgliedschaft"]:
-                mtgld_dic.add(SQ(akademiemitgliedschaft=mitgliedschaft), SQ.OR)
+                mtgld_dic.add(SQ(akademiemitgliedschaft_exact=Exact(mitgliedschaft)), SQ.OR)
             kls_dict = SQ()
             for klasse in self.cleaned_data["mtgld_klasse"]:
                 kls_dict.add(SQ(klasse_person=klasse), SQ.OR)
