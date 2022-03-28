@@ -339,7 +339,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     def search(self):
         super().search()
         sqs = self.searchqueryset.filter(
-            django_ct="apis_entities.person", academy_member=True
+            django_ct="paas_theme.paasperson", academy_member=True
         )
         if self.cleaned_data["q"] != "":
             sqs = sqs.filter(content=AutoQuery(self.cleaned_data["q"]))

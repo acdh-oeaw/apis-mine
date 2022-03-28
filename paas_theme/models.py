@@ -219,6 +219,17 @@ class PAASPerson(Person):
             return (birth_place, birth_country)
         return birth_place
 
+    def nobelprizes(self) -> typing.Union[None, typing.List[typing.Tuple[datetime.date, str, Institution]]]:
+        nobelpreise = getattr(id_mapping, "NOBEL_PREISE")
+        preistr = getattr(id_mapping, "RELATION_PREISTRAEGER")
+        nb = self.personinstitution_set.filter(related_institution_id__in=nobelpreise, relation_type_id__in=preistr)
+        if nb.count() == 0:
+            return None
+        else:
+            res = []
+            for nb1 in nb:
+                res.append((nb1.start_date, nb1.related_institution.name, nb1.related_institution))
+            return res
 
     objects = PAASFilterManager()
 

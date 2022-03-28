@@ -9,8 +9,9 @@ from apis_core.apis_vocabularies.models import (
     ProfessionType,
 )
 from apis_core.apis_labels.models import Label
-from apis_core.apis_entities.models import Person, Institution, Place
+from apis_core.apis_entities.models import Institution, Place
 from apis_core.apis_relations.models import PersonInstitution, PersonPerson, PersonEvent
+from paas_theme.models import PAASPerson
 from .provide_data import (
     get_child_classes,
     get_child_institutions_from_parent,
@@ -482,10 +483,10 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
     mitglied_nsdap = indexes.BooleanField(default=False)
 
     def get_model(self):
-        return Person
+        return PAASPerson
 
     def index_queryset(self, using=None):
-        return self.get_model().objects.filter(collection__id=coll_id)
+        return self.get_model().objects.members()
 
     def prepare_gender(self, object):
         if object.gender == "male":
@@ -596,15 +597,10 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
         )
 
     def prepare_nobelpreis(self, object):
-        if (
-            object.personinstitution_set.filter(
-                related_institution_id__in=NOBEL_PREISE, relation_type_id=138
-            ).count()
-            > 0
-        ):
-            return True
-        else:
+        if object.nobelprizes() is None:
             return False
+        else:
+            return True
 
     def prepare_ewk(self, object):
         if (
