@@ -964,7 +964,7 @@ def enrich_institution_context(institution_object, context):
         ]
 
     context["daten_institution"] = {
-        "DIREKTOR/INN/EN": [
+        "OBFRAUEN / OBMÄNNER": [
             f"{pi.start_date.strftime('%Y') if pi.start_date else ''} - {pi.end_date.strftime('%Y') if pi.end_date else ''} <a href='/person/{pi.related_person_id}'>{pi.related_person.first_name} {pi.related_person.name}</a>"
             for pi in institution_object.personinstitution_set.filter(
                 relation_type_id__in=classes["akad_funktionen"]["obfrau/obmann"][0]
