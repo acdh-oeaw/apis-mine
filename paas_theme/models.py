@@ -51,7 +51,7 @@ class PAASPersonQuerySet(models.QuerySet):
         start: typing.Optional[str] = None,
         end: typing.Optional[str] = None,
         **kwargs
-    ) -> "PAASPerson":
+    ) -> "PAASPersonQuerySet":
         """filter for retrieving only members of the academy
 
         Args:
@@ -240,7 +240,7 @@ class PAASMembershipsQuerySet(models.QuerySet):
         start: typing.Optional[str] = None,
         end: typing.Optional[str] = None,
         **kwargs
-    ) -> "PAASMembership":
+    ) -> "PAASMembershipsQuerySet":
         """Adds the possibility to filter for memberships
 
         Args:
@@ -276,11 +276,20 @@ class PAASMembershipsQuerySet(models.QuerySet):
                             break
                 q_dict["related_institution_id__in"] = institutions
         else:
-            q_dict["related_institution_id__in"] = getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN")
+            q_dict["related_institution_id__in"] = getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN") 
+        if start is not None:
+            if end is None:
+                end = datetime.datetime.today().strftime("%Y-%m-%d")
+            if start > end:
+                raise ValueError(f"End date needs to be before start date: {start} > {end}")
+            q_dict["start_date__lte"] = convert_date(end)
+            q_dict["end_date__gte"] = convert_date(start)
+        return self.filter(**q_dict)
 
 
 class PAASMembership(PersonInstitution):
 
+    objects = PAASMembershipsQuerySet.as_manager()
 
     class Meta:
         proxy = True
