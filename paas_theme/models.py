@@ -33,6 +33,13 @@ def convert_date(date):
         return date
 
 
+class MitgliedschaftDict(typing.TypedDict):
+    mitgliedschaft: str
+    klasse: str
+    start: datetime.date
+    end: datetime.date
+
+
 class PaasQuerySet(models.QuerySet):
     """Adds paas specific query options to persons"""
 
@@ -145,11 +152,19 @@ class PAASPerson(Person):
             qd["start_date__gte"] = convert_date(start)
         return self.personinstitution_set.filter(**qd).count() > 0
 
-    def get_memberships(self, relations=None, institutions=None, start=None, end=None):
+    def get_memberships(
+        self,
+        relations: typing.Optional[typing.List[int]] = None,
+        memberships: typing.Optional[typing.List[str]] = None,
+        institutions: typing.Optional[typing.List[int]] = None, 
+        start: typing.Optional[str] = None,
+        end: typing.Optional[str] = None,
+    ) -> typing.List[MitgliedschaftDict]:
         """Function to return list of memberships
 
         Args:
             relations (list, optional): list of ids of PersonInstitutionRelation objects used for the membership. Defaults to MITGLIEDSCHAFT.
+            memberships (list, otional): List of substrings to filter the Mitgliedschaften for, defaults to all.
             institutions (list, optional): list of ids of Institution objects used for membership. Defaults to GESAMTAKADEMIE_UND_KLASSEN.
             start (str, optional): datestring used for limiting the test to a certain perion (YYYY or YYYY-MM-DD). Defaults to None.
             end (str, optional): datestring used for limiting the test to a certain perion (YYYY or YYYY-MM-DD). Defaults to None.
@@ -162,10 +177,14 @@ class PAASPerson(Person):
         if relations is not None:
             ids = []
             for pi in PersonInstitutionRelation.objects.filter(pk__in=getattr(id_mapping, "MITGLIEDSCHAFT")):
-                for t1 in memberships:
-                    if t1.lower() in pi.label.lower():
-                        ids.append(pi.pk)
-                        break
+                if memberships is not None:
+                    for t1 in memberships:
+                        if t1.lower() in pi.label.lower():
+                            ids.append(pi.pk)
+                            break
+                else:
+                    ids.append(pi.pk)
+
         if institutions is None:
             institutions = getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN")
 
