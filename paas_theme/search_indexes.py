@@ -300,16 +300,6 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
     academy_member = indexes.BooleanField(default=False)
     birth_date = indexes.DateField(model_attr="start_date", null=True, faceted=True)
     death_date = indexes.DateField(model_attr="end_date", null=True, faceted=True)
-    start_date_kmi = indexes.DateField(null=True, faceted=True)
-    start_date_kma = indexes.DateField(null=True, faceted=True)
-    start_date_wm = indexes.DateField(null=True, faceted=True)
-    start_date_em = indexes.DateField(null=True, faceted=True)
-    start_date_ja = indexes.DateField(null=True, faceted=True)
-    end_date_kmi = indexes.DateField(null=True, faceted=True)
-    end_date_kma = indexes.DateField(null=True, faceted=True)
-    end_date_wm = indexes.DateField(null=True, faceted=True)
-    end_date_em = indexes.DateField(null=True, faceted=True)
-    end_date_ja = indexes.DateField(null=True, faceted=True)
     birth_date_show = indexes.CharField(model_attr="start_date_written", null=True)
     death_date_show = indexes.CharField(model_attr="end_date_written", null=True)
     place_of_birth = indexes.CharField(null=True, faceted=True)
@@ -363,76 +353,6 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
             return "weiblich"
         else:
             return "unbekannt"
-
-    def prepare_start_date_kmi(self, object):
-        memb = object.get_memberships(relations=["kMI"])
-        if len(memb) > 0:
-            return memb[0]["start"]
-        else:
-            return None
-    
-    def prepare_start_date_kma(self, object):
-        memb = object.get_memberships(relations=["kMA"])
-        if len(memb) > 0:
-            return memb[0]["start"]
-        else:
-            return None
-
-    def prepare_start_date_wm(self, object):
-        memb = object.get_memberships(relations=["wM"])
-        if len(memb) > 0:
-            return memb[0]["start"]
-        else:
-            return None
-    
-    def prepare_start_date_em(self, object):
-        memb = object.get_memberships(relations=["EM"])
-        if len(memb) > 0:
-            return memb[0].get("start", None)
-        else:
-            return None
- 
-    def prepare_start_date_ja(self, object):
-        memb = object.get_memberships(relations=["Junge Akademie"])
-        if len(memb) > 0:
-            return memb[0].get("start", None)
-        else:
-            return None
-    
-    def prepare_end_date_kmi(self, object):
-        memb = object.get_memberships(relations=["kMI"])
-        if len(memb) > 0:
-            return memb[0].get("end", None)
-        else:
-            return None
-    
-    def prepare_end_date_kma(self, object):
-        memb = object.get_memberships(relations=["kMA"])
-        if len(memb) > 0: 
-            return memb[0].get("end", None)
-        else:
-            return None
-
-    def prepare_end_date_wm(self, object):
-        memb = object.get_memberships(relations=["wM"])
-        if len(memb) > 0:
-            return memb[0].get("end", None)
-        else:
-            return None
-    
-    def prepare_end_date_em(self, object):
-        memb = object.get_memberships(relations=["EM"])
-        if len(memb) > 0:
-            return memb[0].get("end", None)
-        else:
-            return None
- 
-    def prepare_end_date_ja(self, object):
-        memb = object.get_memberships(relations=["Junge Akademie"])
-        if len(memb) > 0:
-            return memb[0].get("end", None)
-        else:
-            return None
 
     def prepare_schule(self, object):
         return list(
