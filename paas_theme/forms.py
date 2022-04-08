@@ -338,6 +338,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
 
     def search(self):
         super().search()
+        pers_ids = []
         sqs = self.searchqueryset.filter(
             django_ct="paas_theme.paasperson", academy_member=True
         )
@@ -375,9 +376,9 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             for funk in self.cleaned_data["pres_funktionen"]:
                 pres_funk_dict.add(SQ(**{funk: True}), SQ.OR)
             sqs = sqs.filter(pres_funk_dict)
-        if (
+        if ((
             self.cleaned_data["mtgld_mitgliedschaft"]
-            or self.cleaned_data["mtgld_klasse"]
+            or self.cleaned_data["mtgld_klasse"]) and not self.cleaned_data["start_date_form"]
         ):
             mtgld_dic = SQ()
             for mitgliedschaft in self.cleaned_data["mtgld_mitgliedschaft"]:
@@ -386,6 +387,9 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             for klasse in self.cleaned_data["mtgld_klasse"]:
                 kls_dict.add(SQ(klasse_person=klasse), SQ.OR)
             sqs = sqs.filter(mtgld_dic & kls_dict)
+        elif ((self.cleaned_data["mtgld_mitgliedschaft"]
+            or self.cleaned_data["mtgld_klasse"]) and self.cleaned_data["start_date_form"]):
+
         if self.cleaned_data["ewk"]:
             sqs = sqs.filter(ewk=self.cleaned_data["ewk"])
         if self.cleaned_data["nobelpreis"]:
@@ -407,11 +411,9 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
                     self.cleaned_data["wahl_gender"]
                 )
             sqs2 = SearchQuerySet().filter(**dict_wahl)
-            pers_ids = []
             for pers2 in sqs2:
                 if pers2.elected_by_id not in pers_ids:
                     pers_ids.append(pers2.elected_by_id)
-            sqs = sqs.filter(django_id__in=pers_ids)
         if (
             self.cleaned_data["beruf_position"]
             or self.cleaned_data["beruf_institution"]
@@ -424,10 +426,10 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             if len(self.cleaned_data["beruf_institution"]) > 0:
                 q_dict3["institution_id__in"] = self.cleaned_data["beruf_institution"]
             sqs3 = SearchQuerySet().filter(**q_dict3)
-            pers_ids = []
             for pers2 in sqs3:
                 if pers2.person_id not in pers_ids:
                     pers_ids.append(pers2.person_id)
+        if len(pers_ids) > 0:
             sqs = sqs.filter(django_id__in=pers_ids)
 
         if len(self.selected_facets) == 0 and "selected_facets" in self.data.keys():
