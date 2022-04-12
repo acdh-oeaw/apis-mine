@@ -450,14 +450,14 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
                 sqs = sqs.narrow('%s:"%s"' % (field, sqs.query.clean(value)))
         if not self.is_valid():
             return self.no_query_found()
-        # if self.cleaned_data["start_date_life_form"]:
-        #     sqs = sqs.filter(
-        #         death_date__gte=parse_date(self.cleaned_data["start_date_life_form"])[0]
-        #     )
-        # if self.cleaned_data["end_date_life_form"]:
-        #     sqs = sqs.filter(
-        #         birth_date__lte=parse_date(self.cleaned_data["end_date_life_form"])[0]
-        #     )
+        if self.cleaned_data["start_date_life_form"]:
+            sqs = sqs.filter(
+                death_date__gte=parse_date(self.cleaned_data["start_date_life_form"])[0]
+            )
+        if self.cleaned_data["end_date_life_form"]:
+            sqs = sqs.filter(
+                birth_date__lte=parse_date(self.cleaned_data["end_date_life_form"])[0]
+            )
         return sqs
 
     def __init__(self, *args, **kwargs):
