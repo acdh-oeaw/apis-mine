@@ -81,8 +81,10 @@ def normalize_filter(filter, kind, url=None):
         "wiss_austausch": "Wissenschaftler/innen/austausch",
         "pres_funktionen": "Funktionen im Präsidium",
         "q": "Suche",
-        "start_date_form": "Lebensspanne von",
-        "end_date_form": "Lebensspanne bis",
+        "start_date_form": "Mitgliedschaft von",
+        "end_date_form": "Mitgliedschaft bis",
+        "start_date_birth_form": "Lebensspanne von",
+        "end_date_birth_form": "Lebensspanne bis",
         "mtgld_mitgliedschaft": "Mitgliedschaft",
         "mtgld_klasse": "Klasse",
     }

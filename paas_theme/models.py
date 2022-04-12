@@ -233,6 +233,9 @@ class PAASPerson(Person):
 
 class PAASMembershipsQuerySet(models.QuerySet):
 
+    def get_person_ids(self):
+        return list(self.values_list('related_person_id', flat=True))
+
     def get_memberships(
         self,
         memberships: typing.Union[typing.List[str], typing.List[int], None] = None,
@@ -267,18 +270,21 @@ class PAASMembershipsQuerySet(models.QuerySet):
             elif isinstance(memberships[0], int):
                 q_dict["relation_type_id__in"] = memberships 
         if institutions is not None:
-            ids = []
-            if isinstance(institutions[0], str):
-                for inst in Institution.objects.filter(id__in=getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN")):
-                    for inst2 in institutions:
-                        if inst2.lower() in inst.name.lower():
-                            ids.append(inst.id)
-                            break
-                q_dict["related_institution_id__in"] = institutions
+            if len(institutions) > 0:
+                ids = []
+                if isinstance(institutions[0], str):
+                    for inst in Institution.objects.filter(id__in=getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN")):
+                        for inst2 in institutions:
+                            if inst2.lower() in inst.name.lower():
+                                ids.append(inst.id)
+                                break
+                    q_dict["related_institution_id__in"] = institutions
+            else:
+                q_dict["related_institution_id__in"] = getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN") 
         else:
             q_dict["related_institution_id__in"] = getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN") 
         if start is not None:
-            if end is None:
+            if end is None or end == "":
                 end = datetime.datetime.today().strftime("%Y-%m-%d")
             if start > end:
                 raise ValueError(f"End date needs to be before start date: {start} > {end}")
