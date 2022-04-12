@@ -12,6 +12,8 @@ from haystack.query import SQ, AutoQuery, SearchQuerySet
 from haystack.inputs import Raw, Exact
 from apis_core.helper_functions.DateParser import parse_date
 from apis_core.apis_entities.fields import Select2Multiple, ListSelect2
+
+from paas_theme.models import PAASMembership
 from .provide_data import classes, get_child_classes
 
 
@@ -148,6 +150,8 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     )
     start_date_form = forms.CharField(required=False)
     end_date_form = forms.CharField(required=False)
+    start_date_life_form = forms.CharField(required=False)
+    end_date_life_form = forms.CharField(required=False)
     death_date = forms.DateField(required=False)
     birth_date = forms.DateField(required=False)
     name = forms.CharField(required=False)
@@ -338,6 +342,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
 
     def search(self):
         super().search()
+        pers_ids = []
         sqs = self.searchqueryset.filter(
             django_ct="paas_theme.paasperson", academy_member=True
         )
@@ -375,9 +380,9 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             for funk in self.cleaned_data["pres_funktionen"]:
                 pres_funk_dict.add(SQ(**{funk: True}), SQ.OR)
             sqs = sqs.filter(pres_funk_dict)
-        if (
+        if ((
             self.cleaned_data["mtgld_mitgliedschaft"]
-            or self.cleaned_data["mtgld_klasse"]
+            or self.cleaned_data["mtgld_klasse"]) and not self.cleaned_data["start_date_form"]
         ):
             mtgld_dic = SQ()
             for mitgliedschaft in self.cleaned_data["mtgld_mitgliedschaft"]:
@@ -386,6 +391,10 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             for klasse in self.cleaned_data["mtgld_klasse"]:
                 kls_dict.add(SQ(klasse_person=klasse), SQ.OR)
             sqs = sqs.filter(mtgld_dic & kls_dict)
+        elif ((self.cleaned_data["mtgld_mitgliedschaft"]
+            or self.cleaned_data["mtgld_klasse"]) and self.cleaned_data["start_date_form"]):
+            ids_person = PAASMembership.objects.get_memberships(start=self.cleaned_data["start_date_form"], end=self.cleaned_data["end_date_form"], institutions=self.cleaned_data["mtgld_klasse"], memberships=self.cleaned_data["mtgld_mitgliedschaft"]).get_person_ids()
+            sqs = sqs.filter(django_id__in=ids_person)
         if self.cleaned_data["ewk"]:
             sqs = sqs.filter(ewk=self.cleaned_data["ewk"])
         if self.cleaned_data["nobelpreis"]:
@@ -407,11 +416,9 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
                     self.cleaned_data["wahl_gender"]
                 )
             sqs2 = SearchQuerySet().filter(**dict_wahl)
-            pers_ids = []
             for pers2 in sqs2:
                 if pers2.elected_by_id not in pers_ids:
                     pers_ids.append(pers2.elected_by_id)
-            sqs = sqs.filter(django_id__in=pers_ids)
         if (
             self.cleaned_data["beruf_position"]
             or self.cleaned_data["beruf_institution"]
@@ -424,10 +431,10 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             if len(self.cleaned_data["beruf_institution"]) > 0:
                 q_dict3["institution_id__in"] = self.cleaned_data["beruf_institution"]
             sqs3 = SearchQuerySet().filter(**q_dict3)
-            pers_ids = []
             for pers2 in sqs3:
                 if pers2.person_id not in pers_ids:
                     pers_ids.append(pers2.person_id)
+        if len(pers_ids) > 0:
             sqs = sqs.filter(django_id__in=pers_ids)
 
         if len(self.selected_facets) == 0 and "selected_facets" in self.data.keys():
@@ -443,14 +450,14 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
                 sqs = sqs.narrow('%s:"%s"' % (field, sqs.query.clean(value)))
         if not self.is_valid():
             return self.no_query_found()
-        if self.cleaned_data["start_date_form"]:
-            sqs = sqs.filter(
-                death_date__gte=parse_date(self.cleaned_data["start_date_form"])[0]
-            )
-        if self.cleaned_data["end_date_form"]:
-            sqs = sqs.filter(
-                birth_date__lte=parse_date(self.cleaned_data["end_date_form"])[0]
-            )
+        # if self.cleaned_data["start_date_life_form"]:
+        #     sqs = sqs.filter(
+        #         death_date__gte=parse_date(self.cleaned_data["start_date_life_form"])[0]
+        #     )
+        # if self.cleaned_data["end_date_life_form"]:
+        #     sqs = sqs.filter(
+        #         birth_date__lte=parse_date(self.cleaned_data["end_date_life_form"])[0]
+        #     )
         return sqs
 
     def __init__(self, *args, **kwargs):

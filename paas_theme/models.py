@@ -3,6 +3,7 @@ from collections.abc import Sequence
 import typing
 
 from apis_core.apis_entities.models import Person, Place, Institution
+from apis_core.apis_relations.models import PersonInstitution
 from apis_core.apis_vocabularies.models import PersonInstitutionRelation, PersonPlaceRelation
 import datetime
 import re
@@ -40,7 +41,7 @@ class MitgliedschaftDict(typing.TypedDict):
     end: datetime.date
 
 
-class PaasQuerySet(models.QuerySet):
+class PAASPersonQuerySet(models.QuerySet):
     """Adds paas specific query options to persons"""
 
     def members(
@@ -50,7 +51,7 @@ class PaasQuerySet(models.QuerySet):
         start: typing.Optional[str] = None,
         end: typing.Optional[str] = None,
         **kwargs
-    ) -> "PAASPerson":
+    ) -> "PAASPersonQuerySet":
         """filter for retrieving only members of the academy
 
         Args:
@@ -92,34 +93,6 @@ class PaasQuerySet(models.QuerySet):
         for k, v in kwargs.items():
             qdict2[k] = v
         return qs.filter(**qdict2).distinct()
-
-
-
-class PAASFilterManager(models.Manager):
-    """manager used to carry the additional queries"""
-
-    def get_queryset(self):
-        return PaasQuerySet(self.model, using=self._db)
-
-    def members(
-        self,
-        memberships: typing.Optional[typing.List[str]] = None, 
-        institutions: typing.Optional[typing.Union[str, int]] = None,
-        start: typing.Optional[str] = None,
-        end: typing.Optional[str] = None,
-        **kwargs
-    ) -> "PAASPerson":
-        """filter for members
-
-        Args:
-            memberships (list of strings, optional): list of strings to query for in membership relation labels. Defaults to None.
-
-        Returns:
-            PAASPerson: returns queryset of PAASPersons
-        """
-        return self.get_queryset().members(
-            memberships=memberships, start=start, end=end, institutions=institutions, **kwargs
-        )
 
 
 class PAASPerson(Person):
@@ -250,7 +223,79 @@ class PAASPerson(Person):
                 res.append((nb1.start_date, nb1.related_institution.name, nb1.related_institution))
             return res
 
-    objects = PAASFilterManager()
+    objects = PAASPersonQuerySet.as_manager()
+
+    class Meta:
+        proxy = True
+        default_manager_name = "objects"
+
+
+
+class PAASMembershipsQuerySet(models.QuerySet):
+
+    def get_person_ids(self):
+        return list(self.values_list('related_person_id', flat=True))
+
+    def get_memberships(
+        self,
+        memberships: typing.Union[typing.List[str], typing.List[int], None] = None,
+        institutions: typing.Union[typing.List[str], typing.List[int], None] = None,
+        start: typing.Optional[str] = None,
+        end: typing.Optional[str] = None,
+        **kwargs
+    ) -> "PAASMembershipsQuerySet":
+        """Adds the possibility to filter for memberships
+
+        Args:
+            memberships (list of strings or ints, optional): filters either for substring in the membership label or uses ids when int. Defaults to None.
+            institutions (list of strings or int, optional): filters for the institution (Klasse or Gesamtakademie) either by substring or id. Defaults to None.
+            start (str, optional): start date. Needs to be in YYYY-MM-DD format. Defaults to None.
+            end (str, optional): end date. Needs to be in YYYY-MM-DD format. Defaults to None.
+
+        Returns:
+            PAASMembership: Subclass of apis_core.apis_relations.models.PersonInstitution
+        """
+        q_dict = dict()
+        if memberships is None:
+            q_dict["relation_type_id__in"] = getattr(id_mapping, "MITGLIEDSCHAFT")
+        else:
+            if isinstance(memberships[0], str): 
+                ids = []
+                for pi in PersonInstitutionRelation.objects.filter(pk__in=getattr(id_mapping, "MITGLIEDSCHAFT")):
+                    for t1 in memberships:
+                        if t1.lower() in pi.label.lower():
+                            ids.append(pi.pk)
+                            break
+                q_dict["relation_type_id__in"] = ids
+            elif isinstance(memberships[0], int):
+                q_dict["relation_type_id__in"] = memberships 
+        if institutions is not None:
+            if len(institutions) > 0:
+                ids = []
+                if isinstance(institutions[0], str):
+                    for inst in Institution.objects.filter(id__in=getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN")):
+                        for inst2 in institutions:
+                            if inst2.lower() in inst.name.lower():
+                                ids.append(inst.id)
+                                break
+                    q_dict["related_institution_id__in"] = institutions
+            else:
+                q_dict["related_institution_id__in"] = getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN") 
+        else:
+            q_dict["related_institution_id__in"] = getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN") 
+        if start is not None:
+            if end is None or end == "":
+                end = datetime.datetime.today().strftime("%Y-%m-%d")
+            if start > end:
+                raise ValueError(f"End date needs to be before start date: {start} > {end}")
+            q_dict["start_date__lte"] = convert_date(end)
+            q_dict["end_date__gte"] = convert_date(start)
+        return self.filter(**q_dict)
+
+
+class PAASMembership(PersonInstitution):
+
+    objects = PAASMembershipsQuerySet.as_manager()
 
     class Meta:
         proxy = True
