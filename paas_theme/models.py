@@ -1,12 +1,15 @@
 from django.db import models
 from collections.abc import Sequence
 import typing
+from enum import Enum
 
 from apis_core.apis_entities.models import Person, Place, Institution
 from apis_core.apis_relations.models import PersonInstitution
 from apis_core.apis_vocabularies.models import PersonInstitutionRelation, PersonPlaceRelation
 import datetime
 import re
+
+from zmq import proxy
 
 # from .provide_data import classes
 from paas_theme import id_mapping
@@ -39,6 +42,15 @@ class MitgliedschaftDict(typing.TypedDict):
     klasse: str
     start: datetime.date
     end: datetime.date
+
+
+class MitgliedschaftInstitutionDict(typing.TypedDict):
+    mitgliedschaft: str
+    institution: str
+    klasse: str
+    start: datetime.date
+    end: datetime.date
+
 
 
 class PAASPersonQuerySet(models.QuerySet):
@@ -296,6 +308,83 @@ class PAASMembershipsQuerySet(models.QuerySet):
 class PAASMembership(PersonInstitution):
 
     objects = PAASMembershipsQuerySet.as_manager()
+
+    class Meta:
+        proxy = True
+        default_manager_name = "objects"
+
+
+class PAASInstitution(Institution):
+    """ORM class for Institutions in PAAS
+
+    Args:
+        Institution (_type_): _description_
+    """
+
+    def is_academy_institution(self):
+        """test if institution is an academy institution
+
+        Returns:
+            boolean: True if it is an academy institution, False if it isnt
+        """        
+
+        if self.kind_id in getattr(id_mapping, "INSTITUTION_TYPE_AKADEMIE"):
+            return True
+        else: return False
+
+    def get_members(
+        self,
+        members: typing.Union[typing.List[typing.Literal['president', 'member']], typing.List[int], None] = None,
+        start: typing.Optional[str] = None,
+        end: typing.Optional[str] = None,
+        **kwargs) -> "PersonInstitution":
+
+        q_dict = dict()
+        if members is not None:
+            if len(members) > 0:
+                if isinstance(members[0], str):
+                    members_new = []
+                    for mem in members:
+                        members_new.extend(getattr(id_mapping, "INSTITUTION_MEMBERS_TYPES")[mem])
+                    q_dict["related_person_id__in"] = members_new
+        
+        if start is not None:
+            if end is None or end == "":
+                end = datetime.datetime.today().strftime("%Y-%m-%d")
+            if start > end:
+                raise ValueError(f"End date needs to be before start date: {start} > {end}")
+            q_dict["start_date__lte"] = convert_date(end)
+            q_dict["end_date__gte"] = convert_date(start)
+        return self.personinstitution_set.filter(**q_dict)
+
+    def get_members_persons(
+        self,
+        members: typing.Union[typing.List[typing.Literal['president', 'member']], typing.List[int], None] = None,
+        start: typing.Optional[str] = None,
+        end: typing.Optional[str] = None,
+        **kwargs) -> "PAASPersonQuerySet":
+
+        ids = list(set(self.get_members(members=members, start=start, end=end).values_list("related_person_id", flat=True)))
+        return PAASPerson.objects.filter(id__in=ids)
+
+    def get_memberships_dict(
+        self,
+        members: typing.Union[typing.List[typing.Literal['president', 'member']], typing.List[int], None] = None,
+        start: typing.Optional[str] = None,
+        end: typing.Optional[str] = None,
+        **kwargs) -> typing.Union[typing.List[MitgliedschaftInstitutionDict], None]:
+
+        res = []
+        for memb in self.get_members(members=members, start=start, end=end):
+            res.append({
+                "mitgliedschaft": str(memb.relation_type),
+                "institution": str(self),
+                "klasse": str(self.get_klasse()),
+                "start": memb.start,
+                "end": memb.end
+            })
+
+
 
     class Meta:
         proxy = True
