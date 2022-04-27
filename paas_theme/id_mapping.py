@@ -83,3 +83,10 @@ INSTITUTION_MEMBERS_TYPES = {
     'president': [88, 162, 97, 96, 95, 94],
     'members': [26, 164]
 }
+
+INSTITUTION_STRUCTURE_IDS = [2, 99]
+
+INSTITUTION_HISTORY_IDS = {
+    "Vorläufer": [4205, 161, 7, 6, ],
+    "Nachfolger": [4214, 4204, 4203, 4202, 160, 5, 4, 3]
+}

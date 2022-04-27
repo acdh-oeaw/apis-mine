@@ -46,10 +46,17 @@ class MitgliedschaftDict(typing.TypedDict):
 
 class MitgliedschaftInstitutionDict(typing.TypedDict):
     mitgliedschaft: str
-    institution: str
-    klasse: str
     start: datetime.date
     end: datetime.date
+
+
+class InstitutionInstitutionDict(typing.TypedDict):
+    institution: str
+    institution_link: str
+    relation: str
+    start: typing.Optional[datetime.date]
+    end: typing.Optional[datetime.date]
+
 
 
 
@@ -332,6 +339,12 @@ class PAASInstitution(Institution):
             return True
         else: return False
 
+    def get_class(self):
+        try:
+            return self.related_institutionB.get(relation_type_id=2, related_institutionB_id__in=[1, 2, 3])
+        except:
+            return None
+
     def get_members(
         self,
         members: typing.Union[typing.List[typing.Literal['president', 'member']], typing.List[int], None] = None,
@@ -372,19 +385,115 @@ class PAASInstitution(Institution):
         members: typing.Union[typing.List[typing.Literal['president', 'member']], typing.List[int], None] = None,
         start: typing.Optional[str] = None,
         end: typing.Optional[str] = None,
-        **kwargs) -> typing.Union[typing.List[MitgliedschaftInstitutionDict], None]:
+        **kwargs) -> typing.List[MitgliedschaftInstitutionDict]:
 
         res = []
         for memb in self.get_members(members=members, start=start, end=end):
             res.append({
                 "mitgliedschaft": str(memb.relation_type),
-                "institution": str(self),
-                "klasse": str(self.get_klasse()),
                 "start": memb.start,
                 "end": memb.end
             })
+        return res
+
+    def get_structure(
+        self,
+        relations: typing.Union[typing.List[typing.Literal['ist Teil von', 'hat Untereinheit']], typing.List[int], None] = None,
+        start: typing.Optional[str] = None,
+        end: typing.Optional[str] = None,
+        **kwargs) -> typing.List[InstitutionInstitutionDict]:
+
+        res = []
+        q_dict = {}
+        if relations is None:
+            q_dict["relation_type_id__in"] = getattr(id_mapping, "INSTITUTION_STRUCTURE_IDS")
+        elif isinstance(relations[0], str):
+            q_dict["relation_type__in"] = relations
+        elif isinstance(relations[0], int):
+            q_dict["relation_type_id__in"] = relations
+        if start is not None:
+            if end is None or end == "":
+                end = datetime.datetime.today().strftime("%Y-%m-%d")
+            if start > end:
+                raise ValueError(f"End date needs to be before start date: {start} > {end}")
+            q_dict["start_date__lte"] = convert_date(end)
+            q_dict["end_date__gte"] = convert_date(start)
+        for instinst in self.related_institutionA.filter(**q_dict):
+            res.append({
+                "relation": instinst.relation_type.label if instinst.related_institutionA == self else instinst.relation_type.label_reverse,
+                "institution": str(instinst.related_institutionB) if instinst.related_institutionA == self else str(instinst.related_institutionA),
+                "institution_link": f"/institution/{instinst.related_institutionB_id if instinst.related_institutionA == self else instinst.related_institutionA_id}",
+                "start": instinst.start_date,
+                "end": instinst.end_date
+            })
+        for instinst in self.related_institutionB.filter(**q_dict):
+            res.append({
+                "relation": instinst.relation_type.label if instinst.related_institutionA == self else instinst.relation_type.label_reverse,
+                "institution": str(instinst.related_institutionB) if instinst.related_institutionA == self else str(instinst.related_institutionA),
+                "institution_link": f"/institution/{instinst.related_institutionB_id if instinst.related_institutionA == self else instinst.related_institutionA_id}",
+                "start": instinst.start_date,
+                "end": instinst.end_date
+            })
+        return res
+
+    def _get_relation_label_history(self, relation, relations_query: typing.List[typing.Literal["Vorläufer", "Nachfolger"]] = ["Vorläufer", "Nachfolger"]):
+        if relation.related_institutionA == self: # normal direction
+            if relation.relation_type_id in getattr(id_mapping, "INSTITUTION_HISTORY_IDS")["Vorläufer"] and "Vorläufer" in relations_query:
+                label_relation = "Institutionelle Vorläufer"
+            elif relation.relation_type_id in getattr(id_mapping, "INSTITUTION_HISTORY_IDS")["Nachfolger"] and "Nachfolger" in relations_query:
+                label_relation = "Institutionelle Nachfolger"
+            else:
+                label_relation = None
+        else:
+            if relation.relation_type_id in getattr(id_mapping, "INSTITUTION_HISTORY_IDS")["Vorläufer"] and "Nachfolger" in relations_query:
+                label_relation = "Institutionelle Nachfolger"
+            elif relation.relation_type_id in getattr(id_mapping, "INSTITUTION_HISTORY_IDS")["Nachfolger"] and "Vorläufer" in relations_query:
+                label_relation = "Institutionelle Vorläufer"
+            else:
+                label_relation = None
+        return label_relation
 
 
+    def get_history(
+        self,
+        relations: typing.List[typing.Literal['Vorläufer', 'Nachfolger']] = ['Vorläufer', 'Nachfolger'],
+        start: typing.Optional[str] = None,
+        end: typing.Optional[str] = None,
+        **kwargs) -> typing.List[InstitutionInstitutionDict]:
+
+        res = []
+        q_dict = {}
+        q_dict["relation_type_id__in"] = getattr(id_mapping, "INSTITUTION_HISTORY_IDS")["Vorläufer"] + getattr(id_mapping, "INSTITUTION_HISTORY_IDS")["Nachfolger"]
+        if start is not None:
+            if end is None or end == "":
+                end = datetime.datetime.today().strftime("%Y-%m-%d")
+            if start > end:
+                raise ValueError(f"End date needs to be before start date: {start} > {end}")
+            q_dict["start_date__lte"] = convert_date(end)
+            q_dict["end_date__gte"] = convert_date(start)
+        for instinst in self.related_institutionA.filter(**q_dict):
+            label_relation = self._get_relation_label_history(instinst, relations)
+            if label_relation is None:
+                continue
+            res.append({
+                "relation": label_relation,
+                "institution": str(instinst.related_institutionB) if instinst.related_institutionA == self else str(instinst.related_institutionA),
+                "institution_link": f"/institution/{instinst.related_institutionB_id if instinst.related_institutionA == self else instinst.related_institutionA_id}",
+                "start": instinst.start_date,
+                "end": instinst.end_date
+            })
+        for instinst in self.related_institutionB.filter(**q_dict):
+            label_relation = self._get_relation_label_history(instinst, relations)
+            if label_relation is None:
+                continue
+            res.append({
+                "relation": label_relation,
+                "institution": str(instinst.related_institutionB) if instinst.related_institutionA == self else str(instinst.related_institutionA),
+                "institution_link": f"/institution/{instinst.related_institutionB_id if instinst.related_institutionA == self else instinst.related_institutionA_id}",
+                "start": instinst.start_date,
+                "end": instinst.end_date
+            })
+        return res
 
     class Meta:
         proxy = True
