@@ -12,6 +12,7 @@ from apis_core.apis_entities.models import Institution
 from apis_core.apis_relations.models import PersonPlace
 from apis_core.apis_entities.views import set_session_variables
 from browsing.browsing_utils import GenericListView
+from paas_theme.models import PAASInstitution
 from webpage.views import get_imprint_url
 from .filters import PersonListFilter
 from .forms import (
@@ -188,7 +189,7 @@ class SearchView(SingleTableMixin, PersonSearchView, UserPassesTestMixin):
 
 class InstitutionSearchView(UserPassesTestMixin, FacetedSearchView):
     login_url = "/webpage/accounts/login/"
-    queryset = SearchQuerySet()
+    queryset = SearchQuerySet().models(Institution)
     form_class = InstitutionFacetedSearchFormNew
     facet_fields = [
         # "akademiemitgliedschaft",
@@ -199,6 +200,7 @@ class InstitutionSearchView(UserPassesTestMixin, FacetedSearchView):
         # "education",
         # "career",
     ]
+    
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -291,7 +293,7 @@ class InstitutionDetailView(UserPassesTestMixin, DetailView):
         return access
 
     def get_object(self):
-        obj = Institution.objects.prefetch_related(
+        obj = PAASInstitution.objects.prefetch_related(
             "personinstitution_set",
             "personinstitution_set__relation_type",
             "personinstitution_set__related_institution",
@@ -311,8 +313,8 @@ class InstitutionDetailView(UserPassesTestMixin, DetailView):
             context["next"] = institutions.filter(id__gt=self.object.id).first()
         except AttributeError:
             context["next"] = None
-        enriched_context = enrich_institution_context(self.object, context)
-        
+        #enriched_context = enrich_institution_context(self.object, context)
+        enriched_context = self.object.get_website_data(context)
         if self.request.GET.get('subview') == 'minimal':
             self.template_name = "theme/institution_detail_popover.html"
 

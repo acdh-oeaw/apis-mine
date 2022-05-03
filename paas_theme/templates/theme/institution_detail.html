@@ -58,10 +58,7 @@
               <h1 class="font-weight-normal  pt-1 pb-1">
                 {{ object.name }}
               </h1>
-              <p>{{untertitel}}</p>
-              {% if akademie %}
-              <p>Akademieinstitution</p>
-              {% endif %}
+              <p>{{untertitel|safe}}</p>
 
               <!--<div class="imgcontainer">
                 {% if image %}
@@ -72,7 +69,6 @@
               </div>-->
 
               <p class="profession-date-of-birth">
-                {% if object.kind %}<span>{{ object.kind.name }}</span> <br />{% endif %}
                 <span class="font-weight-normal">{% if object.start_date_written is not None %}
                      {{object.start_date_written }}{% endif %}
                   {% if object.end_date_written is not None %}

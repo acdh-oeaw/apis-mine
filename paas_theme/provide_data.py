@@ -927,6 +927,9 @@ def get_typ_of_institution(inst):
             return k
 
 
+#def enrich_institution_context(institution_object, context):
+
+
 def enrich_institution_context(institution_object, context):
     context["relatedinstitutions"] = get_child_institutions_from_parent(
         [institution_object.pk]
