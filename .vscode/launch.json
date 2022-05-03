@@ -22,7 +22,7 @@
             "program": "${workspaceFolder}/manage.py",
             "args": [
                 "runserver",
-                "--settings=apis.settings.dev"
+                "--settings=apis.settings.local_dev"
             ],
             "django": true
         },
@@ -55,7 +55,7 @@
 				"program": "${workspaceFolder}/manage.py",
 				"args": [
 					"shell_plus",
-					"--notebook",
+					//"--notebook",
 					"--settings=apis.settings.paas_remote"
 				],
 				"django": true
@@ -67,8 +67,8 @@
 				"program": "${workspaceFolder}/manage.py",
 				"args": [
 					"shell_plus",
-					"--notebook",
-					"--settings=apis.settings.dev"
+					//"--notebook",
+					"--settings=apis.settings.local_dev"
 				],
 				"django": true
 			},
