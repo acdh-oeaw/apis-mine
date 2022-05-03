@@ -46,7 +46,8 @@ class MitgliedschaftDict(typing.TypedDict):
 
 
 class MitgliedschaftInstitutionDict(typing.TypedDict):
-    mitgliedschaft: str
+    mitgliedschaft: object
+    person: Person
     start: datetime.date
     end: datetime.date
 
@@ -391,9 +392,10 @@ class PAASInstitution(Institution):
         res = []
         for memb in self.get_members(members=members, start=start, end=end):
             res.append({
-                "mitgliedschaft": str(memb.relation_type),
-                "start": memb.start,
-                "end": memb.end
+                "mitgliedschaft": memb.relation_type,
+                "person": memb.related_person,
+                "start": memb.start_date,
+                "end": memb.end_date
             })
         return res
 
@@ -465,9 +467,11 @@ class PAASInstitution(Institution):
 
         res = []
         q_dictA = {}
-        q_dictA["relation_type_id__in"] = list(chain.from_iterable([getattr(id_mapping, "INSTITUTION_HISTORY_IDS")[rel_ids] for rel_ids in relations]))
         q_dictB = {}
-        q_dictB["relation_type_id__in"] = list(set(chain.from_iterable([x for x in getattr(id_mapping, "INSTITUTION_HISTORY_IDS").values()])) - set(chain.from_iterable([getattr(id_mapping, "INSTITUTION_HISTORY_IDS")[rel_ids] for rel_ids in relations])))
+        q_dictA["relation_type_id__in"] = q_dictB["relation_type_id__in"] = list(chain.from_iterable([getattr(id_mapping, "INSTITUTION_HISTORY_IDS")[rel_ids] for rel_ids in relations]))
+        if len(relations) < 2:
+            q_dictA["relation_type_id__in"] = list(chain.from_iterable([getattr(id_mapping, "INSTITUTION_HISTORY_IDS")[rel_ids] for rel_ids in relations]))
+            q_dictB["relation_type_id__in"] = list(set(chain.from_iterable([x for x in getattr(id_mapping, "INSTITUTION_HISTORY_IDS").values()])) - set(chain.from_iterable([getattr(id_mapping, "INSTITUTION_HISTORY_IDS")[rel_ids] for rel_ids in relations])))
         if start is not None:
             if end is None or end == "":
                 end = datetime.datetime.today().strftime("%Y-%m-%d")
@@ -516,11 +520,14 @@ class PAASInstitution(Institution):
         res = sorted(res, key=lambda d: d['start']) 
         return res
     
-    def get_website_data(self):
+    def get_website_data(self, res=None):
         vor_nachf = self.get_history()
         lst_vor = []
         lst_nach = []
-        res = {"daten_institution": {}}
+        if res is None:
+            res = {"daten_institution": {}}
+        else:
+            res["daten_institution"] = {}
         for x in vor_nachf:
             if x["relation"] == "Institutionelle Vorläufer":
                 lst_vor.append(x)
@@ -534,7 +541,16 @@ class PAASInstitution(Institution):
             res["daten_institution"]["INSTITUTIONELLE VORLÄUFER"] = [f"<a href='{ii['institution_link']}'>{ii['institution_label']}</a></br>{ii['start_date_related_institution'].strftime('%Y') if ii['start_date_related_institution'] else ''} - {ii['end_date_related_institution'].strftime('%Y') if ii['end_date_related_institution'] else ''}" for ii in lst_vor[:-1]] + res["daten_institution"]["INSTITUTIONELLE VORLÄUFER"]
         if len(lst_nach) > 1:
             res["daten_institution"]["INSTITUTIONELLE NACHFOLGER"].extend([f"<a href='{ii['institution_link']}'>{ii['institution_label']}</a></br>{ii['start_date_related_institution'].strftime('%Y') if ii['start_date_related_institution'] else ''} - {ii['end_date_related_institution'].strftime('%Y') if ii['end_date_related_institution'] else ''}" for ii in lst_nach[1:]])
-        
+        if self.kind_id in getattr(id_mapping, "INSTITUTION_TYPE_AKADEMIE"):
+            obm = []
+            mitgld = []
+            for mem in self.get_memberships_dict():
+                for k, v in getattr(id_mapping, "INSTITUTION_TYPE_MEMBERSHIP").items():
+                    if mem["mitgliedschaft"].id in v:
+                        if k not in res["daten_institution"].keys():
+                            res["daten_institution"][k] = []
+                        res["daten_institution"][k].append(f"<a href='/person/{mem['person'].id}'>{mem['person']}<a/> {'(Stv.)' if 'stellvertreter' in str(mem['mitgliedschaft']).lower() else ''} {mem['start'].strftime('%Y') if mem['start'] else ''} - {mem['end'].strftime('%Y') if mem['end'] else ''}")
+
         return res
 
     class Meta:

@@ -77,7 +77,19 @@ RELATION_GEBURTSORT = [3090, 152, 64]
 
 GELEGEN_IN = [69]
 
-INSTITUTION_TYPE_AKADEMIE = [4309, 4302, 4301, 4236, 4235, 98, 85, 84, 83, 82, 81]
+INSTITUTION_TYPE_AKADEMIE = [
+    4309,   # Beirat
+    4302,   # Kuratorium
+    4301,   # Komitee
+    4236,   # Einrichtung
+    4235,   # Forschungsorientierte Einheit
+    98,     # Institution der Gesamtakademie
+    85,     # Klasse
+    84,     # Forschungsstelle
+    83,     # Institut
+    82,     # Kommission
+    81      # Akademie
+    ]
 
 INSTITUTION_MEMBERS_TYPES = {
     'president': [88, 162, 97, 96, 95, 94],
@@ -102,4 +114,22 @@ INSTITUTION_HISTORY_IDS = {
         4,      # zusammengelegt mit
         3       # umbenannt in
         ]
+}
+
+INSTITUTION_TYPE_MEMBERSHIP = {
+    "OBFRAUEN / OBMÄNNER": [
+        162,    # Stellvertreter Kommission
+        30,     # Obmann Kommission
+        97,     # Kuratorium Stellvertreter
+        96,     # Advisory Board Stellvertreter
+        95,     # Kuratorium Obmann
+        94,     # Advisory Board Obmann
+        30      # Kommission Obmann 
+        ],
+    "DIREKTORINEN / DIREKTOREN": [
+        88      # Direktor Institut
+    ],
+    "MITGLIEDER": [
+        26      # Kommissionsmitglied
+    ]
 }
