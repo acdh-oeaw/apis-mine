@@ -87,6 +87,19 @@ INSTITUTION_MEMBERS_TYPES = {
 INSTITUTION_STRUCTURE_IDS = [2, 99]
 
 INSTITUTION_HISTORY_IDS = {
-    "Vorläufer": [4205, 161, 7, 6, ],
-    "Nachfolger": [4214, 4204, 4203, 4202, 160, 5, 4, 3]
+    "Institutionelle Vorläufer": [
+        4205, 
+        161,    # preceeding
+        7,      # ist Nachfolger von
+        6       # umbenannt von
+        ],
+    "Institutionelle Nachfolger": [
+        4214,   # gründet neu
+        4204,   # übertragen an
+        4202,   # umgewandelt in
+        160,    # succeeding
+        5,      # ist Vorgänger von
+        4,      # zusammengelegt mit
+        3       # umbenannt in
+        ]
 }

@@ -1,3 +1,4 @@
+from itertools import chain
 from django.db import models
 from collections.abc import Sequence
 import typing
@@ -436,18 +437,18 @@ class PAASInstitution(Institution):
             })
         return res
 
-    def _get_relation_label_history(self, relation, relations_query: typing.List[typing.Literal["Vorläufer", "Nachfolger"]] = ["Vorläufer", "Nachfolger"]):
+    def _get_relation_label_history(self, relation, relations_query: typing.List[typing.Literal["Institutionelle Vorläufer", "Institutionelle Nachfolger"]] = ["Institutionelle Vorläufer", "Institutionelle Nachfolger"]):
         if relation.related_institutionA == self: # normal direction
-            if relation.relation_type_id in getattr(id_mapping, "INSTITUTION_HISTORY_IDS")["Vorläufer"] and "Vorläufer" in relations_query:
+            if relation.relation_type_id in getattr(id_mapping, "INSTITUTION_HISTORY_IDS")["Institutionelle Vorläufer"] and "Institutionelle Vorläufer" in relations_query:
                 label_relation = "Institutionelle Vorläufer"
-            elif relation.relation_type_id in getattr(id_mapping, "INSTITUTION_HISTORY_IDS")["Nachfolger"] and "Nachfolger" in relations_query:
+            elif relation.relation_type_id in getattr(id_mapping, "INSTITUTION_HISTORY_IDS")["Institutionelle Nachfolger"] and "Institutionelle Nachfolger" in relations_query:
                 label_relation = "Institutionelle Nachfolger"
             else:
                 label_relation = None
         else:
-            if relation.relation_type_id in getattr(id_mapping, "INSTITUTION_HISTORY_IDS")["Vorläufer"] and "Nachfolger" in relations_query:
+            if relation.relation_type_id in getattr(id_mapping, "INSTITUTION_HISTORY_IDS")["Institutionelle Vorläufer"] and "Institutionelle Nachfolger" in relations_query:
                 label_relation = "Institutionelle Nachfolger"
-            elif relation.relation_type_id in getattr(id_mapping, "INSTITUTION_HISTORY_IDS")["Nachfolger"] and "Vorläufer" in relations_query:
+            elif relation.relation_type_id in getattr(id_mapping, "INSTITUTION_HISTORY_IDS")["Institutionelle Nachfolger"] and "Institutionelle Vorläufer" in relations_query:
                 label_relation = "Institutionelle Vorläufer"
             else:
                 label_relation = None
@@ -456,14 +457,15 @@ class PAASInstitution(Institution):
 
     def get_history(
         self,
-        relations: typing.List[typing.Literal['Vorläufer', 'Nachfolger']] = ['Vorläufer', 'Nachfolger'],
+        relations: typing.List[typing.Literal['Institutionelle Vorläufer', 'Institutionelle Nachfolger']] = ['Institutionelle Vorläufer', 'Institutionelle Nachfolger'],
         start: typing.Optional[str] = None,
         end: typing.Optional[str] = None,
+        full_history: bool = True,
         **kwargs) -> typing.List[InstitutionInstitutionDict]:
 
         res = []
         q_dict = {}
-        q_dict["relation_type_id__in"] = getattr(id_mapping, "INSTITUTION_HISTORY_IDS")["Vorläufer"] + getattr(id_mapping, "INSTITUTION_HISTORY_IDS")["Nachfolger"]
+        q_dict["relation_type_id__in"] = list(chain.from_iterable([getattr(id_mapping, "INSTITUTION_HISTORY_IDS")[rel_ids] for rel_ids in relations]))
         if start is not None:
             if end is None or end == "":
                 end = datetime.datetime.today().strftime("%Y-%m-%d")
@@ -477,10 +479,14 @@ class PAASInstitution(Institution):
                 continue
             res.append({
                 "relation": label_relation,
-                "institution": str(instinst.related_institutionB) if instinst.related_institutionA == self else str(instinst.related_institutionA),
+                "relation_label": str(instinst.relation_type) if instinst.related_institutionA == self else str(instinst.relation_type.name_reverse),
+                "institution": instinst.related_institutionB if instinst.related_institutionA == self else instinst.related_institutionA,
+                "institution_label": str(instinst.related_institutionB) if instinst.related_institutionA == self else str(instinst.related_institutionA),
                 "institution_link": f"/institution/{instinst.related_institutionB_id if instinst.related_institutionA == self else instinst.related_institutionA_id}",
                 "start": instinst.start_date,
-                "end": instinst.end_date
+                "end": instinst.end_date,
+                "start_date_related_institution": instinst.related_institutionB.start_date if instinst.related_institutionA == self else instinst.related_institutionA.start_date,
+                "end_date_related_institution": instinst.related_institutionB.end_date if instinst.related_institutionA == self else instinst.related_institutionA.end_date
             })
         for instinst in self.related_institutionB.filter(**q_dict):
             label_relation = self._get_relation_label_history(instinst, relations)
@@ -488,11 +494,41 @@ class PAASInstitution(Institution):
                 continue
             res.append({
                 "relation": label_relation,
-                "institution": str(instinst.related_institutionB) if instinst.related_institutionA == self else str(instinst.related_institutionA),
+                "relation_label": str(instinst.relation_type) if instinst.related_institutionA == self else str(instinst.relation_type.name_reverse),
+                "institution": instinst.related_institutionB if instinst.related_institutionA == self else instinst.related_institutionA,
+                "institution_label": str(instinst.related_institutionB) if instinst.related_institutionA == self else str(instinst.related_institutionA),
                 "institution_link": f"/institution/{instinst.related_institutionB_id if instinst.related_institutionA == self else instinst.related_institutionA_id}",
                 "start": instinst.start_date,
-                "end": instinst.end_date
+                "end": instinst.end_date,
+                "start_date_related_institution": instinst.related_institutionB.start_date if instinst.related_institutionA == self else instinst.related_institutionA.start_date,
+                "end_date_related_institution": instinst.related_institutionB.end_date if instinst.related_institutionA == self else instinst.related_institutionA.end_date
             })
+        if full_history:
+            for instA in res:
+                res_2 = PAASInstitution.objects.get(pk=instA["institution"].pk).get_history(relations=[instA["relation"]])
+                res.extend(res_2)
+        res = sorted(res, key=lambda d: d['start']) 
+        return res
+    
+    def get_website_data(self):
+        vor_nachf = self.get_history()
+        lst_vor = []
+        lst_nach = []
+        res = {"daten_institution": {}}
+        for x in vor_nachf:
+            if x["relation"] == "Institutionelle Vorläufer":
+                lst_vor.append(x)
+            else:
+                lst_nach.append(x)
+        if len(lst_vor) > 0:
+            res["daten_institution"]["INSTITUTIONELLE VORLÄUFER"] = [f"{lst_vor[-1]['relation_label']} <a href='{lst_vor[-1]['institution_link']}'>{lst_vor[-1]['institution_label']}</a></br>{lst_vor[-1]['start_date_related_institution'].strftime('%Y') if lst_vor[-1]['start_date_related_institution'] else ''} - {lst_vor[-1]['end_date_related_institution'].strftime('%Y') if lst_vor[-1]['end_date_related_institution'] else ''}"]
+        if len(lst_nach) > 0:
+            res["daten_institution"]["INSTITUTIONELLE NACHFOLGER"] = [f"{lst_nach[0]['relation_label']} <a href='{lst_nach[0]['institution_link']}'>{lst_nach[0]['institution_label']}</a></br>{lst_nach[0]['start_date_related_institution'].strftime('%Y') if lst_nach[0]['start_date_related_institution'] else ''} - {lst_nach[0]['end_date_related_institution'].strftime('%Y') if lst_nach[0]['end_date_related_institution'] else ''}"]
+        if len(lst_vor) > 1:
+            res["daten_institution"]["INSTITUTIONELLE VORLÄUFER"] = [f"<a href='{ii['institution_link']}'>{ii['institution_label']}</a></br>{ii['start_date_related_institution'].strftime('%Y') if ii['start_date_related_institution'] else ''} - {ii['end_date_related_institution'].strftime('%Y') if ii['end_date_related_institution'] else ''}" for ii in lst_vor[:-1]] + res["daten_institution"]["INSTITUTIONELLE VORLÄUFER"]
+        if len(lst_nach) > 1:
+            res["daten_institution"]["INSTITUTIONELLE NACHFOLGER"].extend([f"<a href='{ii['institution_link']}'>{ii['institution_label']}</a></br>{ii['start_date_related_institution'].strftime('%Y') if ii['start_date_related_institution'] else ''} - {ii['end_date_related_institution'].strftime('%Y') if ii['end_date_related_institution'] else ''}" for ii in lst_nach[1:]])
+        
         return res
 
     class Meta:
