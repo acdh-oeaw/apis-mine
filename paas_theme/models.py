@@ -464,16 +464,20 @@ class PAASInstitution(Institution):
         **kwargs) -> typing.List[InstitutionInstitutionDict]:
 
         res = []
-        q_dict = {}
-        q_dict["relation_type_id__in"] = list(chain.from_iterable([getattr(id_mapping, "INSTITUTION_HISTORY_IDS")[rel_ids] for rel_ids in relations]))
+        q_dictA = {}
+        q_dictA["relation_type_id__in"] = list(chain.from_iterable([getattr(id_mapping, "INSTITUTION_HISTORY_IDS")[rel_ids] for rel_ids in relations]))
+        q_dictB = {}
+        q_dictB["relation_type_id__in"] = list(set(chain.from_iterable([x for x in getattr(id_mapping, "INSTITUTION_HISTORY_IDS").values()])) - set(chain.from_iterable([getattr(id_mapping, "INSTITUTION_HISTORY_IDS")[rel_ids] for rel_ids in relations])))
         if start is not None:
             if end is None or end == "":
                 end = datetime.datetime.today().strftime("%Y-%m-%d")
             if start > end:
                 raise ValueError(f"End date needs to be before start date: {start} > {end}")
-            q_dict["start_date__lte"] = convert_date(end)
-            q_dict["end_date__gte"] = convert_date(start)
-        for instinst in self.related_institutionA.filter(**q_dict):
+            q_dictA["start_date__lte"] = convert_date(end)
+            q_dictA["end_date__gte"] = convert_date(start)
+            q_dictB["start_date__lte"] = convert_date(end)
+            q_dictB["end_date__gte"] = convert_date(start)
+        for instinst in self.related_institutionA.filter(**q_dictB):
             label_relation = self._get_relation_label_history(instinst, relations)
             if label_relation is None:
                 continue
@@ -488,7 +492,7 @@ class PAASInstitution(Institution):
                 "start_date_related_institution": instinst.related_institutionB.start_date if instinst.related_institutionA == self else instinst.related_institutionA.start_date,
                 "end_date_related_institution": instinst.related_institutionB.end_date if instinst.related_institutionA == self else instinst.related_institutionA.end_date
             })
-        for instinst in self.related_institutionB.filter(**q_dict):
+        for instinst in self.related_institutionB.filter(**q_dictA):
             label_relation = self._get_relation_label_history(instinst, relations)
             if label_relation is None:
                 continue
@@ -506,7 +510,9 @@ class PAASInstitution(Institution):
         if full_history:
             for instA in res:
                 res_2 = PAASInstitution.objects.get(pk=instA["institution"].pk).get_history(relations=[instA["relation"]])
-                res.extend(res_2)
+                for res_3 in res_2:
+                    if res_3 not in res:
+                        res.append(res_3)
         res = sorted(res, key=lambda d: d['start']) 
         return res
     
