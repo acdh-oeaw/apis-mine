@@ -6,6 +6,7 @@ KLASSEN_IDS = [
 ]
 
 GESAMTAKADEMIE_UND_KLASSEN = KLASSEN_IDS + [
+    1,
     500,
     59131,
     501
@@ -96,7 +97,11 @@ INSTITUTION_MEMBERS_TYPES = {
     'members': [26, 164]
 }
 
-INSTITUTION_STRUCTURE_IDS = [2, 99]
+INSTITUTION_STRUCTURE_IDS = [
+    2, 
+    99,
+    4203        # gliedert ein
+    ]
 
 INSTITUTION_HISTORY_IDS = {
     "Institutionelle Vorläufer": [

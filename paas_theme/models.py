@@ -1,4 +1,5 @@
 from itertools import chain
+from platform import release
 from django.db import models
 from collections.abc import Sequence
 import typing
@@ -421,22 +422,27 @@ class PAASInstitution(Institution):
                 raise ValueError(f"End date needs to be before start date: {start} > {end}")
             q_dict["start_date__lte"] = convert_date(end)
             q_dict["end_date__gte"] = convert_date(start)
-        for instinst in self.related_institutionA.filter(**q_dict):
+        for instinst in self.related_institutionA.filter(**q_dict).exclude(related_institutionA_id__in=getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN")):
             res.append({
-                "relation": instinst.relation_type.label if instinst.related_institutionA == self else instinst.relation_type.label_reverse,
-                "institution": str(instinst.related_institutionB) if instinst.related_institutionA == self else str(instinst.related_institutionA),
+                "relation": instinst.relation_type,
+                "relation_label": instinst.relation_type.label if instinst.related_institutionA == self else instinst.relation_type.label_reverse,
+                "institution": instinst.related_institutionB if instinst.related_institutionA == self else instinst.related_institutionA,
+                "institution_label": str(instinst.related_institutionB) if instinst.related_institutionA == self else str(instinst.related_institutionA),
                 "institution_link": f"/institution/{instinst.related_institutionB_id if instinst.related_institutionA == self else instinst.related_institutionA_id}",
                 "start": instinst.start_date,
                 "end": instinst.end_date
             })
-        for instinst in self.related_institutionB.filter(**q_dict):
+        for instinst in self.related_institutionB.filter(**q_dict).exclude(related_institutionB_id__in=getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN")):
             res.append({
-                "relation": instinst.relation_type.label if instinst.related_institutionA == self else instinst.relation_type.label_reverse,
-                "institution": str(instinst.related_institutionB) if instinst.related_institutionA == self else str(instinst.related_institutionA),
+                "relation": instinst.relation_type,
+                "relation_label": instinst.relation_type.label if instinst.related_institutionA == self else instinst.relation_type.label_reverse,
+                "institution": instinst.related_institutionB if instinst.related_institutionA == self else instinst.related_institutionA, 
+                "institution_label": str(instinst.related_institutionB) if instinst.related_institutionA == self else str(instinst.related_institutionA),
                 "institution_link": f"/institution/{instinst.related_institutionB_id if instinst.related_institutionA == self else instinst.related_institutionA_id}",
                 "start": instinst.start_date,
                 "end": instinst.end_date
-            })
+            }) 
+        res = sorted(res, key=lambda d: d['start']) 
         return res
 
     def _get_relation_label_history(self, relation, relations_query: typing.List[typing.Literal["Institutionelle Vorläufer", "Institutionelle Nachfolger"]] = ["Institutionelle Vorläufer", "Institutionelle Nachfolger"]):
@@ -550,7 +556,22 @@ class PAASInstitution(Institution):
                         if k not in res["daten_institution"].keys():
                             res["daten_institution"][k] = []
                         res["daten_institution"][k].append(f"<a href='/person/{mem['person'].id}'>{mem['person']}<a/> {'(Stv.)' if 'stellvertreter' in str(mem['mitgliedschaft']).lower() else ''} {mem['start'].strftime('%Y') if mem['start'] else ''} - {mem['end'].strftime('%Y') if mem['end'] else ''}")
-
+        res["struktur"] = []
+        for struc in self.get_structure():
+            res["struktur"].append(
+                f"{struc['relation_label']} <a href='{struc['institution_link']}'>{struc['institution_label']}</a> {struc['start'].strftime('%Y') if struc['start'] else ''}"
+            )
+        related_inst = list(self.related_institutionB.filter(related_institutionB_id__in=[1,2,3], relation_type_id__in=[2, 99]).order_by('start_date')) + list(self.related_institutionA.filter(related_institutionB_id__in=[1,2,3], relation_type_id__in=[2, 99]).order_by('start_date'))
+        if len(related_inst) == 1:
+            related_inst = related_inst[0].related_institutionB
+            res["untertitel"] = f"{self.kind.name}{' der ' + str(related_inst) if related_inst else ''}"
+        elif len(related_inst) > 1:
+            lst_untertitel = []
+            for rel_inst_2 in related_inst:
+                lst_untertitel.append(f"{self.kind.name}{' der ' + str(rel_inst_2.related_institutionB) if rel_inst_2.related_institutionB else ''} {rel_inst_2.start_date.strftime('%Y') if rel_inst_2.start_date else ''} - {rel_inst_2.end_date.strftime('%Y') if rel_inst_2.end_date else ''}")
+            res["untertitel"] = "<br/>".join(lst_untertitel)
+        else:
+            res["untertitel"] = self.kind.name
         return res
 
     class Meta:
