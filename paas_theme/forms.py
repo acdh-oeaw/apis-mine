@@ -17,6 +17,14 @@ from paas_theme.models import PAASMembership
 from .provide_data import classes, get_child_classes
 
 
+def get_map_haystack_form(form):
+    array = [MultipleChoiceField, MultiSolrChildsField, MultiSolrField]
+    res = []
+    for field, class_name in form.fields.items():
+        if class_name.__class__ in array:
+            res.append(field)
+    return res 
+
 class MultiSolrField(forms.MultipleChoiceField):
     def to_python(self, value):
         """Normalize data to a list of strings."""
@@ -747,7 +755,7 @@ class InstitutionFacetedSearchFormNew(FacetedSearchForm):
         widget=autocomplete.Select2Multiple(
             url="paas_theme:paas_institution_uni_habil_autocomplete",
         ),
-    )
+     )
     fach_habilitation = MultiSolrField(
         required=False,
         label="Habilitationsfach",
@@ -762,6 +770,17 @@ class InstitutionFacetedSearchFormNew(FacetedSearchForm):
 
     def search(self):
         super().search()
+        if "related_institution" in self.data.keys():
+            kwargs = {"load_all": True, "searchqueryset": SearchQuerySet()}
+            map_haystack_form_fields = get_map_haystack_form(PersonFacetedSearchFormNew())
+            q_dict_inter = dict()
+            for k, v in self.data.items():
+                if k.startswith("p_"):
+                    if k[2:] in map_haystack_form_fields:
+                        v = [v]
+                    q_dict_inter[k[2:]] = v
+            p_objects = PersonFacetedSearchFormNew(q_dict_inter, **kwargs).search()
+            print("break")
         sqs = self.searchqueryset.filter(django_ct="apis_entities.institution")
         if self.cleaned_data["q"] != "":
             sqs = sqs.filter(content=AutoQuery(self.cleaned_data["q"]))
