@@ -11,8 +11,6 @@ from apis_core.apis_vocabularies.models import PersonInstitutionRelation, Person
 import datetime
 import re
 
-from zmq import proxy
-
 # from .provide_data import classes
 from paas_theme import id_mapping
 
