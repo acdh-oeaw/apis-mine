@@ -131,7 +131,7 @@ INSTITUTION_TYPE_MEMBERSHIP = {
         94,     # Advisory Board Obmann
         30      # Kommission Obmann 
         ],
-    "DIREKTORINEN / DIREKTOREN": [
+    "DIREKTORINNEN / DIREKTOREN": [
         88      # Direktor Institut
     ],
     "MITGLIEDER": [
