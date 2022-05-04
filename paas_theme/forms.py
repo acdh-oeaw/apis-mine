@@ -216,7 +216,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     )
     place_of_death = MultiSolrField(
         required=False,
-        label="Sterbesort",
+        label="Sterbeort",
         widget=Select2Multiple(
             url="paas_theme:paas_place_of_death_autocomplete",
             attrs =  {
