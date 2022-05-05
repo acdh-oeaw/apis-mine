@@ -36,6 +36,11 @@ def convert_date(date):
     else:
         return date
 
+class PrizeRecipientDict(typing.TypedDict):
+    preistraeger: Person
+    abgelehnt: bool
+    date: datetime.date
+
 
 class MitgliedschaftDict(typing.TypedDict):
     mitgliedschaft: str
@@ -446,6 +451,16 @@ class PAASInstitution(Institution):
             pass
         return res
 
+    def get_prize_recipients(
+        self,
+        start: typing.Optional[str] = None,
+        end: typing.Optional[str] = None,
+        **kwargs
+    ) -> typing.Optional[typing.List[PrizeRecipientDict]]:
+        return [{"preistraeger": x.related_person, "date": x.start_date, "abgelehnt": True if x.relation_type_id in getattr(id_mapping, "RELATION_PREISTRAEGER_ABGELEHNT") else False} for x in self.personinstitution_set.filter(relation_type_id__in=getattr(id_mapping, "RELATION_PREISTRAEGER")+getattr(id_mapping, "RELATION_PREISTRAEGER_ABGELEHNT"))]
+
+
+
     def _get_relation_label_history(self, relation, relations_query: typing.List[typing.Literal["Institutionelle Vorläufer", "Institutionelle Nachfolger"]] = ["Institutionelle Vorläufer", "Institutionelle Nachfolger"]):
         if relation.related_institutionA == self: # normal direction
             if relation.relation_type_id in getattr(id_mapping, "INSTITUTION_HISTORY_IDS")["Institutionelle Vorläufer"] and "Institutionelle Vorläufer" in relations_query:
@@ -572,7 +587,13 @@ class PAASInstitution(Institution):
                 lst_untertitel.append(f"{self.kind.name}{' der ' + str(rel_inst_2.related_institutionB) if rel_inst_2.related_institutionB else ''} {rel_inst_2.start_date.strftime('%Y') if rel_inst_2.start_date else ''} - {rel_inst_2.end_date.strftime('%Y') if rel_inst_2.end_date else ''}")
             res["untertitel"] = "<br/>".join(lst_untertitel)
         else:
-            res["untertitel"] = self.kind.name
+            res["untertitel"] = "" if self.kind is None else self.kind.name
+        if self.kind_id in getattr(id_mapping, "INSTITUTION_TYPE_PREISE"):
+            res["daten_institution"]["PREISTRÄGERINNEN / PREISTRÄGER"] = []
+            for preis in self.get_prize_recipients():
+                res["daten_institution"]["PREISTRÄGERINNEN / PREISTRÄGER"].append(
+                    f"<a href='/person/{preis['preistraeger'].id}'>{str(preis['preistraeger'])}</a>{' '+preis['date'].strftime('%Y') if preis['date'] is not None else ''}{' lehnt Preis ab' if preis['abgelehnt'] else ''}"
+                )    
         return res
 
     class Meta:
