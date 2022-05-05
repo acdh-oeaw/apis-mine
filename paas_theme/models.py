@@ -439,8 +439,11 @@ class PAASInstitution(Institution):
                 "institution_link": f"/institution/{instinst.related_institutionB_id if instinst.related_institutionA == self else instinst.related_institutionA_id}",
                 "start": instinst.start_date,
                 "end": instinst.end_date
-            }) 
-        res = sorted(res, key=lambda d: d['start']) 
+            })
+        try: 
+            res = sorted(res, key=lambda d: d['start']) 
+        except:
+            pass
         return res
 
     def _get_relation_label_history(self, relation, relations_query: typing.List[typing.Literal["Institutionelle Vorläufer", "Institutionelle Nachfolger"]] = ["Institutionelle Vorläufer", "Institutionelle Nachfolger"]):
@@ -557,7 +560,7 @@ class PAASInstitution(Institution):
         res["struktur"] = []
         for struc in self.get_structure():
             res["struktur"].append(
-                f"{struc['relation_label']} <a href='{struc['institution_link']}'>{struc['institution_label']}</a> {struc['start'].strftime('%Y') if struc['start'] else ''}"
+                f"{struc['relation_label']} <a href='{struc['institution_link']}'>{struc['institution_label']}</a> {struc['start'].strftime('%Y') if struc['start'] else ''}{' - ' + struc['end'].strftime('%Y') if struc['end'] else ''}"
             )
         related_inst = list(self.related_institutionB.filter(related_institutionB_id__in=[1,2,3], relation_type_id__in=[2, 99]).order_by('start_date')) + list(self.related_institutionA.filter(related_institutionB_id__in=[1,2,3], relation_type_id__in=[2, 99]).order_by('start_date'))
         if len(related_inst) == 1:

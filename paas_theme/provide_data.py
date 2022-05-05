@@ -360,6 +360,20 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
             "relation_type_id__in": [64, 3090, 152, 153, 3054, 3091],
         },
     }
+    classes["linked_search_institution"] = {
+        "kommission": {
+            "label": "Kommissionen",
+            "qs": {
+                "related_institution__kind_id": getattr(id_mapping, "AKADEMIE_KOMMISSION_TYP_ID"),
+                "relation_type_id__in": [
+                    164,    # Kooptiertes Mitglied
+                    162,    # StellvertreterIn
+                    30,     # Obfrau/Obmann
+                    26      # Mitglied
+                ]
+        }
+        }
+    }
     classes["inst_typ"] = {
         "Kommission": [getattr(id_mapping, "AKADEMIE_KOMMISSION_TYP_ID")],
         "Institut": [83],

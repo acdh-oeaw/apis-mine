@@ -151,6 +151,12 @@ class PersonSearchView(UserPassesTestMixin, FacetedSearchView):
             else {"key": k, "label": k}
             for k, v in classes["netzwerk"].items()
         ]
+        context["related_institutions"] = [
+            {"key": k, "label": v["label"]}
+            if "label" in v.keys()
+            else {"key": k, "label": k}
+            for k, v in classes["linked_search_institution"].items()
+        ]
         context["selected_filters"] = []
         for k, v in context["form"].cleaned_data.items():
             if v:
