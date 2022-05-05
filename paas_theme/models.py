@@ -461,7 +461,7 @@ class PAASInstitution(Institution):
         end: typing.Optional[str] = None,
         **kwargs
     ) -> typing.Optional[typing.List[PrizeRecipientDict]]:
-        return [{"preistraeger": x.related_person, "date": x.start_date, "abgelehnt": True if x.relation_type_id in getattr(id_mapping, "RELATION_PREISTRAEGER_ABGELEHNT") else False} for x in self.personinstitution_set.filter(relation_type_id__in=getattr(id_mapping, "RELATION_PREISTRAEGER")+getattr(id_mapping, "RELATION_PREISTRAEGER_ABGELEHNT"))]
+        return [{"preistraeger": x.related_person, "date": x.start_date, "abgelehnt": True if x.relation_type_id in getattr(id_mapping, "RELATION_PREISTRAEGER_ABGELEHNT") else False} for x in self.personinstitution_set.filter(relation_type_id__in=getattr(id_mapping, "RELATION_PREISTRAEGER")+getattr(id_mapping, "RELATION_PREISTRAEGER_ABGELEHNT")).order_by('start_date')]
 
 
     def get_prize_stifter(
@@ -470,7 +470,7 @@ class PAASInstitution(Institution):
         end: typing.Optional[str] = None,
         **kwargs
     ) -> typing.Optional[typing.List[PrizeStifterDict]]:
-        return [{"stifter": x.related_person, "date": x.start_date} for x in self.personinstitution_set.filter(relation_type_id__in=getattr(id_mapping, "RELATION_PREIS_STIFTER"))]
+        return [{"stifter": x.related_person, "date": x.start_date} for x in self.personinstitution_set.filter(relation_type_id__in=getattr(id_mapping, "RELATION_PREIS_STIFTER")).order_by('start_date')]
 
 
     def _get_relation_label_history(self, relation, relations_query: typing.List[typing.Literal["Institutionelle Vorläufer", "Institutionelle Nachfolger"]] = ["Institutionelle Vorläufer", "Institutionelle Nachfolger"]):
