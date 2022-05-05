@@ -39,7 +39,22 @@
       <!--<h1 class="text-uppercase pt-1"><a href="{% remove_facets request.get_full_path %}" type="button"
           class="btn btn-link btn-sm btn-right">Filter zurücksetzen<span class="icon-remove"></span></a></h1>
      -->
+      <div class="dropdown show  mt-3 mb-2" style="float:right">
+      </div>
       <div class="dropdown show  mt-3 mb-2">
+        <div class="btn-group">
+        <a class="btn-primary btn-sm rounded-0 bg-oeaw dropdown-toggle {% if not table.rows%}disabled{% endif%}" href="#" role="button" id="dropdownMenuLinkInstitutions" data-toggle="dropdown" aria-haspopup="true" {% if not table.rows%}aria-disabled="true" disabled {% endif%} aria-expanded="false">
+          <small class="align-text-bottom">Verbindung zu Institutionen</small>
+        </a>
+        <div class="dropdown-menu rounded-0" aria-labelledby="dropdownMenuLinkInstitutions">
+          {% for related_institution in related_institutions %}
+          
+          
+          <a class="dropdown-item" target="_blank" rel="noopener noreferrer" href="/institutionen/search?{% for k, v in request.GET.items %}p_{{k}}={{v}}&{% endfor %}related_institution={{related_institution.key}}">{{related_institution.label}}</a>
+        {% endfor %}
+        </div>
+        </div>
+        <div class="btn-group">
         <a class="btn-primary btn-sm rounded-0 bg-oeaw dropdown-toggle {% if not table.rows%}disabled{% endif%}" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" {% if not table.rows%}aria-disabled="true" disabled {% endif%} aria-expanded="false">
           <small class="align-text-bottom">Netzwerke</small>
         </a>
@@ -49,6 +64,7 @@
           
           <a class="dropdown-item" target="_blank" rel="noopener noreferrer" href="/network?{{request.META.QUERY_STRING}}&network_type={{network.key}}">{{network.label}}</a>
         {% endfor %}
+        </div>
         </div>
       </div>
   </div>
