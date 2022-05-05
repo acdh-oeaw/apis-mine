@@ -39,7 +39,11 @@ def convert_date(date):
 class PrizeRecipientDict(typing.TypedDict):
     preistraeger: Person
     abgelehnt: bool
-    date: datetime.date
+    date: typing.Optional[datetime.date]
+
+class PrizeStifterDict(typing.TypedDict):
+    stifter: Person
+    date: typing.Optional[datetime.date]
 
 
 class MitgliedschaftDict(typing.TypedDict):
@@ -460,6 +464,14 @@ class PAASInstitution(Institution):
         return [{"preistraeger": x.related_person, "date": x.start_date, "abgelehnt": True if x.relation_type_id in getattr(id_mapping, "RELATION_PREISTRAEGER_ABGELEHNT") else False} for x in self.personinstitution_set.filter(relation_type_id__in=getattr(id_mapping, "RELATION_PREISTRAEGER")+getattr(id_mapping, "RELATION_PREISTRAEGER_ABGELEHNT"))]
 
 
+    def get_prize_stifter(
+        self,
+        start: typing.Optional[str] = None,
+        end: typing.Optional[str] = None,
+        **kwargs
+    ) -> typing.Optional[typing.List[PrizeStifterDict]]:
+        return [{"stifter": x.related_person, "date": x.start_date} for x in self.personinstitution_set.filter(relation_type_id__in=getattr(id_mapping, "RELATION_PREIS_STIFTER"))]
+
 
     def _get_relation_label_history(self, relation, relations_query: typing.List[typing.Literal["Institutionelle Vorläufer", "Institutionelle Nachfolger"]] = ["Institutionelle Vorläufer", "Institutionelle Nachfolger"]):
         if relation.related_institutionA == self: # normal direction
@@ -593,7 +605,14 @@ class PAASInstitution(Institution):
             for preis in self.get_prize_recipients():
                 res["daten_institution"]["PREISTRÄGERINNEN / PREISTRÄGER"].append(
                     f"<a href='/person/{preis['preistraeger'].id}'>{str(preis['preistraeger'])}</a>{' '+preis['date'].strftime('%Y') if preis['date'] is not None else ''}{' lehnt Preis ab' if preis['abgelehnt'] else ''}"
-                )    
+                )
+            stifter = self.get_prize_stifter()
+            if len(stifter) > 0:
+                res["daten_institution"]["STIFTERINNEN / STIFTER"] = []
+                for stifter_pers in stifter:
+                    res["daten_institution"]["STIFTERINNEN / STIFTER"].append(
+                        f"<a href='/person/{stifter_pers['stifter'].id}'>{str(stifter_pers['stifter'])}</a>{' '+stifter_pers['date'].strftime('%Y') if stifter_pers['date'] is not None else ''}"
+                    )    
         return res
 
     class Meta:
