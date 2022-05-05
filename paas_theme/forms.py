@@ -12,6 +12,8 @@ from haystack.query import SQ, AutoQuery, SearchQuerySet
 from haystack.inputs import Raw, Exact
 from apis_core.helper_functions.DateParser import parse_date
 from apis_core.apis_entities.fields import Select2Multiple, ListSelect2
+from apis_core.apis_relations.models import PersonInstitution
+from django.db.models import Q
 
 from paas_theme.models import PAASMembership
 from .provide_data import classes, get_child_classes
@@ -770,6 +772,7 @@ class InstitutionFacetedSearchFormNew(FacetedSearchForm):
 
     def search(self):
         super().search()
+        sqs = self.searchqueryset.filter(django_ct="apis_entities.institution")
         if "related_institution" in self.data.keys():
             kwargs = {"load_all": True, "searchqueryset": SearchQuerySet()}
             map_haystack_form_fields = get_map_haystack_form(PersonFacetedSearchFormNew())
@@ -780,8 +783,20 @@ class InstitutionFacetedSearchFormNew(FacetedSearchForm):
                         v = [v]
                     q_dict_inter[k[2:]] = v
             p_objects = PersonFacetedSearchFormNew(q_dict_inter, **kwargs).search()
-            print("break")
-        sqs = self.searchqueryset.filter(django_ct="apis_entities.institution")
+            qs_persinst = []
+            if isinstance(self.data["related_institution"], str):
+                rel_config = [self.data["related_institution"]]
+            else:
+                rel_config = self.data["related_institution"]
+            for relation_type in rel_config:
+                qs_persinst_2 = classes["linked_search_institution"][relation_type]["qs"]
+                qs_persinst_2["related_person_id__in"] = list(p_objects.values_list("pk", flat=True))
+                qs_persinst.append(Q(**qs_persinst_2))
+            if len(qs_persinst) > 1:
+                p_objects_2 = PersonInstitution.objects.filter(Q(qs_persinst, _connector=Q.OR))
+            else:
+                p_objects_2 = PersonInstitution.objects.filter(qs_persinst[0])
+            sqs = sqs.filter(django_id__in=list(set(p_objects_2.values_list("related_institution_id", flat=True))))
         if self.cleaned_data["q"] != "":
             sqs = sqs.filter(content=AutoQuery(self.cleaned_data["q"]))
         if self.cleaned_data["akademiefunktionen"]:
