@@ -113,6 +113,16 @@
     
     <field name="kind" type="text_en" indexed="true" stored="true" multiValued="false" />
     
+    <field name="kind_exact" type="string" indexed="true" stored="true" multiValued="false" />
+    
+    <field name="kind_id" type="long" indexed="true" stored="true" multiValued="false" />
+    
+    <field name="klasse" type="text_en" indexed="true" stored="true" multiValued="true" />
+    
+    <field name="klasse_exact" type="string" indexed="true" stored="true" multiValued="true" />
+    
+    <field name="klasse_id" type="text_en" indexed="true" stored="true" multiValued="true" />
+    
     <field name="name_auto" type="edge_ngram" indexed="true" stored="true" multiValued="false" />
     
     <field name="relation_types_person_id" type="text_en" indexed="true" stored="true" multiValued="true" />
@@ -242,8 +252,6 @@
     <field name="membership_id" type="long" indexed="true" stored="true" multiValued="false" />
     
     <field name="membership_type" type="text_en" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="klasse" type="text_en" indexed="true" stored="true" multiValued="false" />
     
     <field name="elected" type="boolean" indexed="true" stored="true" multiValued="false" />
     

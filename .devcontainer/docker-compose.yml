@@ -54,6 +54,9 @@ services:
     command:
       - solr-precreate
       - paas_solr
+      - /var/solr/paas_solr
+    depends_on:
+      - "app"
   
   tunnel:
     image: cagataygurturk/docker-ssh-tunnel:0.0.1

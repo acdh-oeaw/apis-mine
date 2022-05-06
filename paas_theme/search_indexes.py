@@ -11,7 +11,7 @@ from apis_core.apis_vocabularies.models import (
 from apis_core.apis_labels.models import Label
 from apis_core.apis_entities.models import Institution, Place
 from apis_core.apis_relations.models import PersonInstitution, PersonPerson, PersonEvent
-from paas_theme.models import PAASPerson
+from paas_theme.models import PAASInstitution, PAASPerson
 from .provide_data import (
     get_child_classes,
     get_child_institutions_from_parent,
@@ -21,6 +21,7 @@ from .provide_data import (
 from .provide_data import classes
 
 from . id_mapping import KLASSEN_IDS, NOBEL_PREISE
+from paas_theme import id_mapping
 
 coll_id = 16
 
@@ -122,7 +123,10 @@ class InstitutionIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
     name = indexes.CharField(model_attr="name")
     academy = indexes.BooleanField(default=False)
-    kind = indexes.CharField(model_attr="kind__label", null=True)
+    kind = indexes.CharField(model_attr="kind__name", null=True, faceted=True)
+    kind_id = indexes.IntegerField(model_attr="kind_id", null=True)
+    klasse = indexes.MultiValueField(null=True, faceted=True)
+    klasse_id = indexes.MultiValueField(null=True)
     start_date = indexes.DateField(model_attr="start_date", null=True)
     end_date = indexes.DateField(model_attr="end_date", null=True)
     name_auto = indexes.EdgeNgramField(model_attr="name")
@@ -132,7 +136,7 @@ class InstitutionIndex(indexes.SearchIndex, indexes.Indexable):
     # located_at = indexes.LocationField(null=True)
 
     def get_model(self):
-        return Institution
+        return PAASInstitution
 
     def prepare_relation_types_person_id(self, object):
         res = []
@@ -140,6 +144,12 @@ class InstitutionIndex(indexes.SearchIndex, indexes.Indexable):
             if pi.relation_type_id not in res:
                 res.append(pi.relation_type_id)
         return res
+
+    def prepare_klasse(self, object):
+        return list(object.get_class().values_list("name", flat=True))
+    
+    def prepare_klasse_id(self, object):
+        return list(object.get_class().values_list("pk", flat=True))
 
     def prepare_academy(self, object):
         return object.pk in classes["subs_akademie"]
@@ -157,7 +167,7 @@ class InstitutionIndex(indexes.SearchIndex, indexes.Indexable):
         return res
 
     def index_queryset(self, using=None):
-        return self.get_model().objects.all()
+        return self.get_model().objects.filter(kind_id__in=getattr(id_mapping, "INSTITUTION_TYPE_AKADEMIE"))
 
 
 class FunktionenAkademieIndex(indexes.SearchIndex, indexes.Indexable):

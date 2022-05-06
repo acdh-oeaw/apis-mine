@@ -195,13 +195,14 @@ class SearchView(SingleTableMixin, PersonSearchView, UserPassesTestMixin):
 
 class InstitutionSearchView(UserPassesTestMixin, FacetedSearchView):
     login_url = "/webpage/accounts/login/"
-    queryset = SearchQuerySet().models(Institution)
+    queryset = SearchQuerySet().models(PAASInstitution)
     form_class = InstitutionFacetedSearchFormNew
     facet_fields = [
         # "akademiemitgliedschaft",
         #"start_date",
         #"place_of_death",
         # "comissions",
+        "klasse",
         "kind",
         # "education",
         # "career",

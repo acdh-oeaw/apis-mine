@@ -55,7 +55,7 @@
 				"program": "${workspaceFolder}/manage.py",
 				"args": [
 					"shell_plus",
-					//"--notebook",
+					"--notebook",
 					"--settings=apis.settings.paas_remote"
 				],
 				"django": true

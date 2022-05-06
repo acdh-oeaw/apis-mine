@@ -269,8 +269,8 @@ class PAASMembershipsQuerySet(models.QuerySet):
         self,
         memberships: typing.Union[typing.List[str], typing.List[int], None] = None,
         institutions: typing.Union[typing.List[str], typing.List[int], None] = None,
-        start: typing.Optional[str] = None,
-        end: typing.Optional[str] = None,
+        start: typing.Union[str, None, typing.Literal[False]] = False,
+        end: typing.Union[str, None, typing.Literal[False]] = False,
         **kwargs
     ) -> "PAASMembershipsQuerySet":
         """Adds the possibility to filter for memberships
@@ -278,8 +278,8 @@ class PAASMembershipsQuerySet(models.QuerySet):
         Args:
             memberships (list of strings or ints, optional): filters either for substring in the membership label or uses ids when int. Defaults to None.
             institutions (list of strings or int, optional): filters for the institution (Klasse or Gesamtakademie) either by substring or id. Defaults to None.
-            start (str, optional): start date. Needs to be in YYYY-MM-DD format. Defaults to None.
-            end (str, optional): end date. Needs to be in YYYY-MM-DD format. Defaults to None.
+            start (str, optional): start date. Needs to be in YYYY-MM-DD format. Defaults to False. Use None to explicitly filter for not set dates
+            end (str, optional): end date. Needs to be in YYYY-MM-DD format. Defaults to False. Use None to explicitly filter for not set dates
 
         Returns:
             PAASMembership: Subclass of apis_core.apis_relations.models.PersonInstitution
@@ -312,13 +312,18 @@ class PAASMembershipsQuerySet(models.QuerySet):
                 q_dict["related_institution_id__in"] = getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN") 
         else:
             q_dict["related_institution_id__in"] = getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN") 
-        if start is not None:
-            if end is None or end == "":
-                end = datetime.datetime.today().strftime("%Y-%m-%d")
-            if start > end:
-                raise ValueError(f"End date needs to be before start date: {start} > {end}")
-            q_dict["start_date__lte"] = convert_date(end)
+        if start and end:
+            if start is not None and end is not None:
+                if start > end:
+                    raise ValueError(f"End date needs to be before start date: {start} > {end}")
+        if start and start is not None:
             q_dict["end_date__gte"] = convert_date(start)
+        elif start:
+            q_dict["start_date__isnull"] = True
+        if end and end is not None:
+            q_dict["start_date__lte"] = convert_date(end)
+        elif end is None:
+            q_dict["end_date__isnull"] = True
         return self.filter(**q_dict)
 
 
@@ -351,7 +356,7 @@ class PAASInstitution(Institution):
 
     def get_class(self):
         try:
-            return self.related_institutionB.get(relation_type_id=2, related_institutionB_id__in=[1, 2, 3])
+            return self.related_institutionB.filter(relation_type_id=2, related_institutionB_id__in=[1, 2, 3])
         except:
             return None
 
