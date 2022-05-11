@@ -105,6 +105,44 @@ $(document).ready(function() {
     window.location.href = "/search?q=" + $("#fulltextsearch").val();
   }
 
+  /*** range slider ***/
+  const qs = new URLSearchParams(window.location.search)
+  const el = document.querySelectorAll('.range-slider')
+  const [min, max] = [1700, 2022]
+  
+  el.forEach(element => { 
+  const [startKey, endKey] = [element.dataset.startForm, element.dataset.endForm]
+  console.log(startKey, endKey)
+  console.log(element.dataset)
+  const s = noUiSlider.create(element, {
+    start: [
+      qs.get(startKey) || min,
+      qs.get(endKey) || max
+    ],
+    connect: true,
+    format: {
+      to: (num) => num.toFixed(0),
+      from: (string) => parseInt(string)
+    },
+    tooltips: true,
+    range: { min, max },
+    pips: {
+      mode: 'values',
+      values: [min, max],
+      density: '100%'
+    }
+  })
+  s.on('change', ([start, end]) => {
+    qs.set(startKey, start);
+    qs.set(endKey, end);
+    const ds = {...s.target.dataset};
+    $(`#search_form input[name=${ds.startForm}]`)[0].value = start;
+    $(`#search_form input[name=${ds.endForm}]`)[0].value = end;
+    
+    //window.location.search = qs.toString()
+  })
+});
+
 
 </script>
 {% endblock scripts2 %}
