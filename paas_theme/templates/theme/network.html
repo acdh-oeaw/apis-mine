@@ -259,8 +259,7 @@
                         {
                             className: "position-relative row justify-content-between bg-mine border-mine pt-2"
                         },
-                        [
-                            h(FilterControls, {
+                        [    h(FilterControls, {
                                 graph: graph,
                                 centerAt: false,
                                 children: props => [
@@ -306,8 +305,10 @@
                                         },
                                         )
                                     ),
-
                                     createPortal(h(Visualization, {
+                                        children: props => [
+                                            h(ExportButton, props)
+                                        ],
                                         ref: graphRef,
                                         graph: graph,
                                         style: {
