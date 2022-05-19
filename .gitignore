@@ -2,3 +2,4 @@ apis_core
 *.pyc
 staticfiles/
 data/
+git_replace_patterns.txt
