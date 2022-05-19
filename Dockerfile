@@ -7,5 +7,5 @@ COPY . /app/
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
      && apt-get -y install --no-install-recommends gdal-bin graphviz
 USER app_user
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
-ENV PATH "/home/app_user/.poetry/bin:$PATH"
+RUN curl -sSL https://install.python-poetry.org | python3 -
+ENV PATH "/home/app_user/.local/bin:$PATH"
