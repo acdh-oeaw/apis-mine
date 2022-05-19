@@ -1,7 +1,6 @@
 import dj_database_url
 
 from .base import *
-import sys
 
 
 # SECURITY WARNING: don't run with debug turned on in production!

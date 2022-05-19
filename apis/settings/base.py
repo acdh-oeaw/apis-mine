@@ -19,7 +19,9 @@ BASE_DIR = os.path.dirname(
 )
 
 
-SECRET_KEY = os.environ.get("APIS_SECRET_KEY", "TO_CHANGE")
+SECRET_KEY = (
+    os.environ.get("APIS_SECRET_KEY", "TO_CHANGE")
+)
 
 SHARED_URL = "https://shared.acdh.oeaw.ac.at/"
 
@@ -27,11 +29,25 @@ ACDH_IMPRINT_URL = (
     "https://shared.acdh.oeaw.ac.at/acdh-common-assets/api/imprint.php?serviceID="
 )
 
-CSP_DEFAULT_SRC = ("'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com', 'cdn.jsdelivr.net', 'fonts.googleapis.com', 
-                    'ajax.googleapis.com', 'cdn.rawgit.com', "*.acdh.oeaw.ac.at", "unpkg.com", "fonts.gstatic.com", 
-                    "cdn.datatables.net", "code.highcharts.com", "*.acdh-dev.oeaw.ac.at", "*.acdh.oeaw.ac.at",
-                    "openstreetmap.org", "*.openstreetmap.org")
-CSP_FRAME_SRC = ('sennierer.github.io',)
+CSP_DEFAULT_SRC = (
+    "'self'",
+    "'unsafe-inline'",
+    "cdnjs.cloudflare.com",
+    "cdn.jsdelivr.net",
+    "fonts.googleapis.com",
+    "ajax.googleapis.com",
+    "cdn.rawgit.com",
+    "*.acdh.oeaw.ac.at",
+    "unpkg.com",
+    "fonts.gstatic.com",
+    "cdn.datatables.net",
+    "code.highcharts.com",
+    "*.acdh-dev.oeaw.ac.at",
+    "*.acdh.oeaw.ac.at",
+    "openstreetmap.org",
+    "*.openstreetmap.org",
+)
+CSP_FRAME_SRC = ("sennierer.github.io",)
 
 PROJECT_NAME = "apis"
 PROJECT_SHARED = "https://shared.acdh.oeaw.ac.at/apis/"
@@ -49,10 +65,6 @@ PROJECT_DEFAULT_MD = {
     "matomo_id": "",
     "matomo_url": "",
     "imprint": "/imprint",
-    "social_media": [
-        ("fab fa-twitter", "https://twitter.com/ACDH_OeAW"),
-        ("fab fa-youtube", "https://www.youtube.com/channel/UCgaEMaMbPkULYRI5u6gvG-w"),
-    ],
     "social_media": [
         ("fab fa-twitter fa-2x", "https://twitter.com/ACDH_OeAW"),
         (
@@ -128,7 +140,7 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_FILTER_BACKENDS": (
         "django_filters.rest_framework.DjangoFilterBackend",
-        #"drf_spectacular.contrib.django_filters.DjangoFilterBackend",
+        # "drf_spectacular.contrib.django_filters.DjangoFilterBackend",
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
@@ -289,9 +301,13 @@ APIS_RELATIONS = {
             "related_person__first_name",
             "related_place__name",
         ],
-       # "include": ["related_place"], use include statement to set a list of filters
+        # "include": ["related_place"], use include statement to set a list of filters
         "list_filters": [("relation_type",), ("related_person",), ("related_place",)],
-        "exclude": ["related_person__first_name", "related_place__lng", "related_place__lat"]
+        "exclude": [
+            "related_person__first_name",
+            "related_place__lng",
+            "related_place__lat",
+        ],
     },
     "PersonInstitution": {
         "labels": ["related_person", "related_institution", "relation_type"],
@@ -305,8 +321,8 @@ APIS_RELATIONS = {
             ("relation_type",),
             ("related_person",),
             ("related_institution",),
-            ],
-        "exclude": ["related_person__first_name"]
+        ],
+        "exclude": ["related_person__first_name"],
     },
     "PersonEvent": {
         "labels": ["related_person", "related_event", "relation_type"],
@@ -317,7 +333,7 @@ APIS_RELATIONS = {
             "related_event__name",
         ],
         "list_filters": [("relation_type",), ("related_person",), ("related_event",)],
-        "exclude": ["related_person__first_name"]
+        "exclude": ["related_person__first_name"],
     },
     "PersonWork": {
         "labels": ["related_person", "related_work", "relation_type"],
@@ -328,7 +344,7 @@ APIS_RELATIONS = {
             "related_work__name",
         ],
         "list_filters": [("relation_type",), ("related_person",), ("related_work",)],
-        "exclude": ["related_person__first_name"]
+        "exclude": ["related_person__first_name"],
     },
     "PersonPerson": {
         "labels": ["related_personA", "related_personB", "relation_type"],
@@ -344,7 +360,7 @@ APIS_RELATIONS = {
             ("related_personA",),
             ("related_personB",),
         ],
-        "exclude": ["related_person__first_name"]
+        "exclude": ["related_person__first_name"],
     },
     "InstitutionPlace": {
         "labels": ["related_institution", "related_place", "relation_type"],
@@ -358,7 +374,7 @@ APIS_RELATIONS = {
             ("related_institution",),
             ("related_place",),
         ],
-        "exclude": ["related_place__lat", "related_place__lng"]
+        "exclude": ["related_place__lat", "related_place__lng"],
     },
     "InstitutionWork": {
         "labels": ["related_institution", "related_work", "relation_type"],
@@ -403,13 +419,13 @@ APIS_RELATIONS = {
         "labels": ["related_work", "related_place", "relation_type"],
         "search": ["relation_type__name", "related_place__name", "related_work__name"],
         "list_filters": [("relation_type",), ("related_place",), ("related_work",)],
-        "exclude": ["related_place__lat", "related_place__lng"]
+        "exclude": ["related_place__lat", "related_place__lng"],
     },
     "PlaceEvent": {
         "labels": ["related_event", "related_place", "relation_type"],
         "search": ["relation_type__name", "related_place__name", "related_event__name"],
         "list_filters": [("relation_type",), ("related_place",), ("related_event",)],
-        "exclude": ["related_place__lat", "related_place__lng"]
+        "exclude": ["related_place__lat", "related_place__lng"],
     },
     "PlacePlace": {
         "labels": ["related_placeA", "related_placeB", "relation_type"],
@@ -419,7 +435,7 @@ APIS_RELATIONS = {
             "related_placeB__name",
         ],
         "list_filters": [("relation_type",), ("related_placeA",), ("related_placeB",)],
-        "exclude": ["related_place__lat", "related_place__lng"]
+        "exclude": ["related_place__lat", "related_place__lng"],
     },
     "EventWork": {
         "labels": ["related_event", "related_work", "relation_type"],
