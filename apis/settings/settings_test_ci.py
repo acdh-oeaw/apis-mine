@@ -15,7 +15,6 @@ SECRET_KEY = 'd3j@454545()(/)@zlck/6dsaf*#sdfsaf*#sadflj/6dsfk-11$)d6ixcvjsdfsdf
 DEBUG = True
 DEV_VERSION = False
 
-INSTALLED_APPS += ['gm2m', 'apis_highlighter']
 
 DATABASES = {}
 

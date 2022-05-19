@@ -1,0 +1,57 @@
+name: Django Tests CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.8]
+        poetry-version: [1.1.13]
+        os: [ubuntu-latest]
+    env:
+      MYSQL_DATABASE: apisdb
+      MYSQL_USER: mariadb
+      MYSQL_PASSWORD: mariadb
+      MYSQL_ROOT_PASSWORD: mariadb
+      DJANGO_SETTINGS_MODULE: apis.settings.settings_test_ci
+    services:
+      db:
+        image: mariadb:latest
+        env:
+          MYSQL_DATABASE: apisdb
+          MYSQL_USER: mariadb
+          MYSQL_PASSWORD: mariadb
+          MYSQL_ROOT_PASSWORD: mariadb
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3 
+    steps:
+      - uses: actions/checkout@v3
+      # this fixes local act bug of python setup
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: setup poetry
+        uses: abatilo/actions-poetry@v2.0.0
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: install dependencies
+        run: |
+          poetry config virtualenvs.create false
+          poetry lock
+          poetry install
+      - name: Run Tests
+        env:
+          DATABASE_URL: mysql://${{ env.MYSQL_USER }}:${{ env.MYSQL_PASSWORD }}@127.0.0.1:${{ job.services.db.ports[3306] }}/${{ env.MYSQL_DATABASE }}
+        run: |
+          echo ${DATABASE_URL}
+          python manage.py migrate
+          python manage.py test
