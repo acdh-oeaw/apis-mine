@@ -64,4 +64,4 @@ jobs:
     steps:
     - name: Rancher Deploy Action
       run: |
-      curl -i -X POST "https://rancher.acdh-dev.oeaw.ac.at/v3/project/$RANCHER_PROJECT_ID/workloads/deployment:$RANCHER_NAMESPACE:production?action=redeploy" -H "Authorization: Bearer $RANCHER_BEARER_TOKEN"
+      curl -i -X POST "https://rancher.acdh-dev.oeaw.ac.at/v3/project/'$RANCHER_PROJECT_ID'/workloads/deployment:'$RANCHER_NAMESPACE':production?action=redeploy" -H "Authorization: Bearer '$RANCHER_BEARER_TOKEN'"
