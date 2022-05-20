@@ -44,7 +44,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: |
-            ghcr.io/acdh-oeaw/apis-mine:latest
-            ${{ steps.meta.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
