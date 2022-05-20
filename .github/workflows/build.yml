@@ -1,10 +1,15 @@
 name: Build Image
 
+
 on:
-  workflow_run:
-    workflows: ["Django Tests CI"]
-    types:
-      - completed
+  push:
+    branches: [main]
+
+# on:
+#   workflow_run:
+#     workflows: ["Django Tests CI"]
+#     types:
+#       - completed
 
 jobs:
   docker:
@@ -25,6 +30,7 @@ jobs:
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable={{is_default_branch}}
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2
