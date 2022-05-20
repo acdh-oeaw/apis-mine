@@ -9,3 +9,5 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 USER app_user
 RUN curl -sSL https://install.python-poetry.org | python3 -
 ENV PATH "/home/app_user/.local/bin:$PATH"
+EXPOSE 5000
+ENTRYPOINT ["bash", "start.sh"]

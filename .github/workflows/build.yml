@@ -12,7 +12,7 @@ on:
 #       - completed
 
 jobs:
-  docker:
+  build_and_push_to_registry:
     runs-on: ubuntu-latest
     steps:
       -
@@ -53,3 +53,11 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+  deploy_to_rancher:
+    needs: build_and_push_to_registry
+    name: Deploy to rancher
+    runs-on: ubuntu-latest
+    steps:
+    - name: Rancher Deploy Action
+      run: |
+      curl -i -X POST "https://rancher.acdh-dev.oeaw.ac.at/v3/project/${{ secrets.RANCHER_PROJECT_ID }}/workloads/deployment:${{ secrets.RANCHER_NAMESPACE }}:production?action=redeploy" -H "Authorization: Bearer ${{ secrets.RANCHER_BEARER_TOKEN }}"
