@@ -57,11 +57,7 @@ jobs:
     needs: build_and_push_to_registry
     name: Deploy to rancher
     runs-on: ubuntu-latest
-    env:
-      RANCHER_PROJECT_ID: ${{ secrets.RANCHER_PROJECT_ID }}
-      RANCHER_NAMESPACE: ${{ secrets.RANCHER_NAMESPACE }}
-      RANCHER_BEARER_TOKEN: ${{ secrets.RANCHER_BEARER_TOKEN }}
     steps:
     - name: Rancher Deploy Action
       run: |
-      curl -i -X POST "https://rancher.acdh-dev.oeaw.ac.at/v3/project/'$RANCHER_PROJECT_ID'/workloads/deployment:'$RANCHER_NAMESPACE':production?action=redeploy" -H "Authorization: Bearer '$RANCHER_BEARER_TOKEN'"
+        curl -i -X POST "https://rancher.acdh-dev.oeaw.ac.at/v3/project/${{ secrets.RANCHER_PROJECT_ID }}/workloads/deployment:${{ secrets.RANCHER_NAMESPACE }}:production?action=redeploy" -H "Authorization: Bearer ${{ secrets.RANCHER_BEARER_TOKEN }}"
