@@ -34,14 +34,18 @@ from paas_theme import id_mapping
 
 from .helper_functions import abbreviate, get_mitgliedschaft_from_relation
 
-MITGLIEDER = Person.objects.filter(collection__name=getattr(id_mapping, "MITGLIED_AUSWERTUNG_COL_NAME"))
-MITGLIDER_NS = Person.objects.filter(collection__name=getattr(id_mapping, "MITGLIED_AUSWERTUNG_NS_COL_NAME"))
+MITGLIEDER = Person.objects.filter(
+    collection__name=getattr(id_mapping, "MITGLIED_AUSWERTUNG_COL_NAME")
+)
+MITGLIDER_NS = Person.objects.filter(
+    collection__name=getattr(id_mapping, "MITGLIED_AUSWERTUNG_NS_COL_NAME")
+)
 NATIONALSOZIALISTEN = Person.objects.filter(
     collection__name=getattr(id_mapping, "NATIONALSOZIALISTEN_COL_NAME")
 )
-KOMMISSIONEN = Institution.objects.filter(kind__id=getattr(id_mapping, "AKADEMIE_KOMMISSION_TYP_ID")).exclude(
-    name="GEMEINSAME KOMMISSIONEN"
-)
+KOMMISSIONEN = Institution.objects.filter(
+    kind__id=getattr(id_mapping, "AKADEMIE_KOMMISSION_TYP_ID")
+).exclude(name="GEMEINSAME KOMMISSIONEN")
 
 try:
     FEATURED_COLLECTION_NAME = settings.FEATURED_COLLECTION_NAME
@@ -157,7 +161,8 @@ def get_date_range(
 
 def get_gewaehlt(pers, year):
     rel = pers.personinstitution_set.filter(
-        related_institution_id__in=getattr(id_mapping, "KLASSEN_IDS"), start_date_written__contains=year
+        related_institution_id__in=getattr(id_mapping, "KLASSEN_IDS"),
+        start_date_written__contains=year,
     ).order_by("start_date")
     if rel.count() == 0:
         return "nicht gewählt", None
@@ -180,7 +185,9 @@ def get_gewaehlt(pers, year):
 
 
 def get_academy_awards(
-    award_type_id=137, rel_id=[139, 2], subs_akademie=getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN")
+    award_type_id=137,
+    rel_id=[139, 2],
+    subs_akademie=getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN"),
 ):
     res = []
     awards = Institution.objects.filter(kind_id=award_type_id).values_list(
@@ -222,7 +229,9 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
             return res
 
     berufslaufbahn_ids = get_child_classes([1851, 1385], PersonInstitutionRelation)
-    subs_akademie = get_child_institutions_from_parent(getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN"))
+    subs_akademie = get_child_institutions_from_parent(
+        getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN")
+    )
     promotion_inst_ids, promotion_inst_labels = get_child_classes(
         [1386], PersonInstitutionRelation, labels=True
     )
@@ -312,7 +321,8 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
         ),
     }
     classes["akademiepreise"] = get_academy_awards(
-        subs_akademie=classes["subs_akademie"] + getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN")
+        subs_akademie=classes["subs_akademie"]
+        + getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN")
     )
     classes["preisaufgaben"] = get_academy_preisaufgaben(
         subs_akademie=classes["subs_akademie"]
@@ -343,7 +353,9 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
     classes["netzwerk"] = {
         "Kommissionen": {
             "relation": "PersonInstitution",
-            "related_institution__kind_id": getattr(id_mapping, "AKADEMIE_KOMMISSION_TYP_ID"),
+            "related_institution__kind_id": getattr(
+                id_mapping, "AKADEMIE_KOMMISSION_TYP_ID"
+            ),
             "relation_type_id__in": get_child_classes(
                 [26, 162], PersonInstitutionRelation, labels=False
             ),
@@ -364,14 +376,16 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
         "kommission": {
             "label": "Kommissionen",
             "qs": {
-                "related_institution__kind_id": getattr(id_mapping, "AKADEMIE_KOMMISSION_TYP_ID"),
+                "related_institution__kind_id": getattr(
+                    id_mapping, "AKADEMIE_KOMMISSION_TYP_ID"
+                ),
                 "relation_type_id__in": [
-                    164,    # Kooptiertes Mitglied
-                    162,    # StellvertreterIn
-                    30,     # Obfrau/Obmann
-                    26      # Mitglied
-                ]
-        }
+                    164,  # Kooptiertes Mitglied
+                    162,  # StellvertreterIn
+                    30,  # Obfrau/Obmann
+                    26,  # Mitglied
+                ],
+            },
         }
     }
     classes["inst_typ"] = {
@@ -492,10 +506,17 @@ def get_wahlvorschlag(pers, mitgliedschaften):
 
 def create_text_berufslaufbahn(rel):
     lst_rels = rel.relation_type.label.split(">>")
+
     if rel.relation_type_id in classes["berufslaufbahn_map"]["Professor/in"]:
-        return f"{lst_rels[1]} für {lst_rels[2]}"
+        try:
+            return f"{lst_rels[1]} für {lst_rels[2]}"
+        except IndexError:
+            return lst_rels[1]
     elif rel.relation_type_id in classes["habilitation"]:
-        return f"Habilitation in {lst_rels[1]}"
+        try:
+            return f"Habilitation in {lst_rels[1]}"
+        except IndexError:
+            return "Habilitation"
     elif rel.relation_type_id == 3088:
         return "Ehrendoktorat von"
     else:
@@ -639,7 +660,8 @@ def enrich_person_context(person_object, context):
         context["image"] = False
     preise = []
     for nobel in person_object.personinstitution_set.filter(
-        relation_type_id=138, related_institution_id__in=getattr(id_mapping, "NOBEL_PREISE")
+        relation_type_id=138,
+        related_institution_id__in=getattr(id_mapping, "NOBEL_PREISE"),
     ):
         preise.append(
             f"{nobel.related_institution.name}, {get_date_range(nobel, classes['time_ranges_ids'])[1:-1]}"
@@ -869,7 +891,9 @@ def enrich_person_context(person_object, context):
             + [
                 f'Zum Sekretär der {abbreviate(rel.related_institution)} {rel.relation_type.name} am {rel.start_date_written}{", tätig bis "+rel.end_date_written if rel.end_date_written is not None else ""}'
                 for rel in person_object.personinstitution_set.filter(
-                    related_institution_id__in=getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN"),
+                    related_institution_id__in=getattr(
+                        id_mapping, "GESAMTAKADEMIE_UND_KLASSEN"
+                    ),
                     relation_type_id__in=classes["akad_funktionen"]["sekretärin"][0],
                 )
             ],
@@ -941,14 +965,16 @@ def get_typ_of_institution(inst):
             return k
 
 
-#def enrich_institution_context(institution_object, context):
+# def enrich_institution_context(institution_object, context):
 
 
 def enrich_institution_context(institution_object, context):
     context["relatedinstitutions"] = get_child_institutions_from_parent(
         [institution_object.pk]
     )
-    if institution_object.pk in classes["subs_akademie"] + getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN"):
+    if institution_object.pk in classes["subs_akademie"] + getattr(
+        id_mapping, "GESAMTAKADEMIE_UND_KLASSEN"
+    ):
         context["akademie"] = True
     else:
         context["akademie"] = False
