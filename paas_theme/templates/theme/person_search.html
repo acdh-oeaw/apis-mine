@@ -6,6 +6,7 @@
 {% block content %}
 {% load static %}
 {% load render_table from django_tables2 %}
+{{jazz}}
 <div class="container-fluid">
   <div class="row mx-0 pt-1 bg-mine border-mine">
     <div class="col-md-8">
@@ -99,13 +100,13 @@
               <!--<div id="lebensdaten" class="collapse show" aria-labelledby="heading_lebensdaten">-->
               <div class="card-body pt-5 pl-4 pr-4">
                 <div class="slider-container pt-3">
-                  <div data-start-form="start_date_form" data-end-form="end_date_form" class="range-slider" data-range-start="1847" data-range-end="2022"></div>
+                  <div data-start-form="start_date_form" data-end-form="end_date_form" class="range-slider" data-range-start="{{form_membership_start_date}}" data-range-end="{{form_membership_end_date}}"></div>
                 </div>
                 <label style="padding-top: 12px">Mitgliedschaft in Zeitraum</label>
               </div>
               <div class="card-body pt-5 pl-4 pr-4">
                 <div class="slider-container pt-3">
-                  <div data-start-form="start_date_life_form" data-end-form="end_date_life_form" class="range-slider" data-range-start="1700" data-range-end="2022"></div>
+                  <div data-start-form="start_date_life_form" data-end-form="end_date_life_form" class="range-slider" data-range-start="{{form_birth_start_date}}" data-range-end="{{form_birth_end_date}}"></div>
                 </div>
                 <label style="padding-top: 12px">Leben in Zeitraum</label>
               </div>
@@ -233,9 +234,12 @@
     }
   })
   s.on('change', ([start, end]) => {
+  
     qs.set(startKey, start)
     qs.set(endKey, end)
+    //console.log(">>", qs)
     window.location.search = qs.toString()
+
   })
 });
 
