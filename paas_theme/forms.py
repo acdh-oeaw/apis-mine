@@ -25,7 +25,8 @@ def get_map_haystack_form(form):
     for field, class_name in form.fields.items():
         if class_name.__class__ in array:
             res.append(field)
-    return res 
+    return res
+
 
 class MultiSolrField(forms.MultipleChoiceField):
     def to_python(self, value):
@@ -77,7 +78,13 @@ class PersonFilterFormHelperNew(FormHelper):
         self.form_method = "GET"
         self.helper.form_tag = False
         # self.template = "forms/template_person_form.html"
-        self.add_input(Submit("", "Kombinierte Auswertung starten", css_class="rounded-0 mt-3 text-uppercase w-100 text-left"))
+        self.add_input(
+            Submit(
+                "",
+                "Kombinierte Auswertung starten",
+                css_class="rounded-0 mt-3 text-uppercase w-100 text-left",
+            )
+        )
         self.layout = Layout(
             Fieldset("", "q", css_class="bg-mine", css_id="basic_search_fields"),
             Div(
@@ -203,7 +210,12 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     gender = forms.ChoiceField(
         widget=forms.Select(attrs={"class": "select2-main no-search rounded-0"}),
         required=False,
-        choices=(("", "-"), ("männlich", "Männlich"), ("weiblich", "Weiblich"), ("unbekannt", "Unbekannt")),
+        choices=(
+            ("", "-"),
+            ("männlich", "Männlich"),
+            ("weiblich", "Weiblich"),
+            ("unbekannt", "Unbekannt"),
+        ),
         label="",
     )
     wahl_gender = forms.ChoiceField(
@@ -219,9 +231,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         label="Geburtsort",
         widget=Select2Multiple(
             url="paas_theme:paas_place_of_birth_autocomplete",
-            attrs =  {
-                "data-theme":"bootstrap4"
-                }
+            attrs={"data-theme": "bootstrap4"},
         ),
     )
     place_of_death = MultiSolrField(
@@ -229,9 +239,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         label="Sterbeort",
         widget=Select2Multiple(
             url="paas_theme:paas_place_of_death_autocomplete",
-            attrs =  {
-                "data-theme":"bootstrap4"
-                }
+            attrs={"data-theme": "bootstrap4"},
         ),
     )
     profession = MultiSolrField(
@@ -239,9 +247,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         label="Beruf",
         widget=Select2Multiple(
             url="paas_theme:paas_person_beruf_autocomplete",
-            attrs =  {
-                "data-theme":"bootstrap4"
-                }
+            attrs={"data-theme": "bootstrap4"},
         ),
     )
     nobelpreis = forms.BooleanField(required=False, label="Nobelpreis")
@@ -251,19 +257,16 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         label="Position",
         widget=Select2Multiple(
             url="paas_theme:paas_position_autocomplete",
-            attrs =  {
-                "data-theme":"bootstrap4"
-                }
+            attrs={"data-theme": "bootstrap4"},
         ),
     )
     beruf_institution = MultiSolrField(
         required=False,
         label="Institution",
         widget=Select2Multiple(
-            url="paas_theme:paas_institution_autocomplete", forward=["beruf_position"],
-            attrs =  {
-                "data-theme":"bootstrap4"
-                }
+            url="paas_theme:paas_institution_autocomplete",
+            forward=["beruf_position"],
+            attrs={"data-theme": "bootstrap4"},
         ),
     )
     mgld_nsdap = forms.BooleanField(required=False, label="Mitglied der NSDAP")
@@ -276,7 +279,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             ("kM A", "korrespondierendes Mitglied im Ausland"),
             ("wM", "Wirkliches Mitglied"),
             ("em", "Ehrenmitglied"),
-            ("Junge Kurie/Junge Akademie", "Junge Kurie/Junge Akademie")
+            ("Junge Kurie/Junge Akademie", "Junge Kurie/Junge Akademie"),
         ],
     )
     mtgld_klasse = forms.MultipleChoiceField(
@@ -299,10 +302,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         label="Land",
         widget=autocomplete.Select2Multiple(
             url="paas_theme:paas_place_wiss_austausch_autocomplete",
-            attrs =  {
-                "data-theme":"bootstrap4"
-                }
-            
+            attrs={"data-theme": "bootstrap4"},
         ),
     )
     schule = MultiSolrField(
@@ -310,9 +310,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         label="Schule",
         widget=autocomplete.Select2Multiple(
             url="paas_theme:paas_institution_schule_autocomplete",
-            attrs =  {
-                "data-theme":"bootstrap4"
-                }
+            attrs={"data-theme": "bootstrap4"},
         ),
     )
     uni = MultiSolrField(
@@ -320,9 +318,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         label="Universität",
         widget=autocomplete.Select2Multiple(
             url="paas_theme:paas_institution_uni_autocomplete",
-            attrs =  {
-                "data-theme":"bootstrap4"
-                }
+            attrs={"data-theme": "bootstrap4"},
         ),
     )
     uni_habil = MultiSolrField(
@@ -330,9 +326,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         label="Universität Habilitation",
         widget=autocomplete.Select2Multiple(
             url="paas_theme:paas_institution_uni_habil_autocomplete",
-            attrs =  {
-                "data-theme":"bootstrap4"
-                }
+            attrs={"data-theme": "bootstrap4"},
         ),
     )
     fach_habilitation = MultiSolrField(
@@ -340,9 +334,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         label="Habilitationsfach",
         widget=autocomplete.Select2Multiple(
             url="paas_theme:paas_institution_habil_fach_autocomplete",
-            attrs =  {
-                "data-theme":"bootstrap4"
-                }
+            attrs={"data-theme": "bootstrap4"},
         ),
     )
 
@@ -390,20 +382,27 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             for funk in self.cleaned_data["pres_funktionen"]:
                 pres_funk_dict.add(SQ(**{funk: True}), SQ.OR)
             sqs = sqs.filter(pres_funk_dict)
-        if ((
+        if (
             self.cleaned_data["mtgld_mitgliedschaft"]
-            or self.cleaned_data["mtgld_klasse"]) and not self.cleaned_data["start_date_form"]
-        ):
+            or self.cleaned_data["mtgld_klasse"]
+        ) and not self.cleaned_data["start_date_form"]:
             mtgld_dic = SQ()
             for mitgliedschaft in self.cleaned_data["mtgld_mitgliedschaft"]:
-                mtgld_dic.add(SQ(akademiemitgliedschaft_exact=Exact(mitgliedschaft)), SQ.OR)
+                mtgld_dic.add(
+                    SQ(akademiemitgliedschaft_exact=Exact(mitgliedschaft)), SQ.OR
+                )
             kls_dict = SQ()
             for klasse in self.cleaned_data["mtgld_klasse"]:
                 kls_dict.add(SQ(klasse_person=klasse), SQ.OR)
             sqs = sqs.filter(mtgld_dic & kls_dict)
-        elif ((self.cleaned_data["mtgld_mitgliedschaft"]
-            or self.cleaned_data["mtgld_klasse"]) and self.cleaned_data["start_date_form"]):
-            ids_person = PAASMembership.objects.get_memberships(start=self.cleaned_data["start_date_form"], end=self.cleaned_data["end_date_form"], institutions=self.cleaned_data["mtgld_klasse"], memberships=self.cleaned_data["mtgld_mitgliedschaft"]).get_person_ids()
+        # TODO: This looks unnecessary requirement for self.cleaned_data["mtgld_mitgliedschaft"] or self.cleaned_data["mtgld_klasse"]
+        elif self.cleaned_data["start_date_form"]:
+            ids_person = PAASMembership.objects.get_memberships(
+                start=self.cleaned_data["start_date_form"],
+                end=self.cleaned_data["end_date_form"],
+                institutions=self.cleaned_data.get("mtgld_klasse", None),
+                memberships=self.cleaned_data.get("mtgld_mitgliedschaft", None),
+            ).get_person_ids()
             sqs = sqs.filter(django_id__in=ids_person)
         if self.cleaned_data["ewk"]:
             sqs = sqs.filter(ewk=self.cleaned_data["ewk"])
@@ -565,7 +564,13 @@ class InstitutionFilterFormHelperNew(FormHelper):
         self.form_method = "GET"
         self.helper.form_tag = False
         # self.template = "forms/template_person_form.html"
-        self.add_input(Submit("", "Kombinierte Auswertung starten", css_class="rounded-0 mt-3 text-uppercase  w-100 text-left"))
+        self.add_input(
+            Submit(
+                "",
+                "Kombinierte Auswertung starten",
+                css_class="rounded-0 mt-3 text-uppercase  w-100 text-left",
+            )
+        )
         self.layout = Layout(
             Fieldset("", "q", css_class="bg-mine", css_id="basic_search_fields"),
             Div(
@@ -686,19 +691,16 @@ class InstitutionFacetedSearchFormNew(FacetedSearchForm):
         label="Position",
         widget=autocomplete.Select2Multiple(
             url="paas_theme:paas_position_autocomplete",
-            attrs =  {
-                "data-theme":"bootstrap4"
-                }
+            attrs={"data-theme": "bootstrap4"},
         ),
     )
     beruf_institution = MultiSolrField(
         required=False,
         label="Institution",
         widget=autocomplete.Select2Multiple(
-            url="paas_theme:paas_institution_autocomplete", forward=["beruf_position"],
-            attrs =  {
-                "data-theme":"bootstrap4"
-                }
+            url="paas_theme:paas_institution_autocomplete",
+            forward=["beruf_position"],
+            attrs={"data-theme": "bootstrap4"},
         ),
     )
     mgld_nsdap = forms.BooleanField(required=False, label="Mitglied der NSDAP")
@@ -757,7 +759,7 @@ class InstitutionFacetedSearchFormNew(FacetedSearchForm):
         widget=autocomplete.Select2Multiple(
             url="paas_theme:paas_institution_uni_habil_autocomplete",
         ),
-     )
+    )
     fach_habilitation = MultiSolrField(
         required=False,
         label="Habilitationsfach",
@@ -775,7 +777,9 @@ class InstitutionFacetedSearchFormNew(FacetedSearchForm):
         sqs = self.searchqueryset.filter(django_ct="apis_entities.institution")
         if "related_institution" in self.data.keys():
             kwargs = {"load_all": True, "searchqueryset": SearchQuerySet()}
-            map_haystack_form_fields = get_map_haystack_form(PersonFacetedSearchFormNew())
+            map_haystack_form_fields = get_map_haystack_form(
+                PersonFacetedSearchFormNew()
+            )
             q_dict_inter = dict()
             for k, v in self.data.items():
                 if k.startswith("p_"):
@@ -789,14 +793,24 @@ class InstitutionFacetedSearchFormNew(FacetedSearchForm):
             else:
                 rel_config = self.data["related_institution"]
             for relation_type in rel_config:
-                qs_persinst_2 = classes["linked_search_institution"][relation_type]["qs"]
-                qs_persinst_2["related_person_id__in"] = list(p_objects.values_list("pk", flat=True))
+                qs_persinst_2 = classes["linked_search_institution"][relation_type][
+                    "qs"
+                ]
+                qs_persinst_2["related_person_id__in"] = list(
+                    p_objects.values_list("pk", flat=True)
+                )
                 qs_persinst.append(Q(**qs_persinst_2))
             if len(qs_persinst) > 1:
-                p_objects_2 = PersonInstitution.objects.filter(Q(qs_persinst, _connector=Q.OR))
+                p_objects_2 = PersonInstitution.objects.filter(
+                    Q(qs_persinst, _connector=Q.OR)
+                )
             else:
                 p_objects_2 = PersonInstitution.objects.filter(qs_persinst[0])
-            sqs = sqs.filter(django_id__in=list(set(p_objects_2.values_list("related_institution_id", flat=True))))
+            sqs = sqs.filter(
+                django_id__in=list(
+                    set(p_objects_2.values_list("related_institution_id", flat=True))
+                )
+            )
         if self.cleaned_data["q"] != "":
             sqs = sqs.filter(content=AutoQuery(self.cleaned_data["q"]))
         if self.cleaned_data["akademiefunktionen"]:
