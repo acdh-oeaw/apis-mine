@@ -753,7 +753,9 @@ class PAASInstitution(Institution):
                 for res_3 in res_2:
                     if res_3 not in res:
                         res.append(res_3)
-        res = sorted(res, key=lambda d: d["start"])
+        res = sorted(
+            res, key=lambda d: d.get("start") or d.get("start_date_related_institution")
+        )
         return res
 
     def get_website_data(self, res=None):
