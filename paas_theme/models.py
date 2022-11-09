@@ -303,9 +303,11 @@ class PAASMembershipsQuerySet(models.QuerySet):
         Returns:
             PAASMembership: Subclass of apis_core.apis_relations.models.PersonInstitution
         """
-        q_dict = dict()
-        if memberships is None:
-            q_dict["relation_type_id__in"] = getattr(id_mapping, "MITGLIEDSCHAFT")
+        q_obj = models.Q()
+        if not memberships:
+            q_obj &= models.Q(
+                relation_type_id__in=getattr(id_mapping, "MITGLIEDSCHAFT")
+            )
         else:
             if isinstance(memberships[0], str):
                 ids = []
@@ -316,9 +318,9 @@ class PAASMembershipsQuerySet(models.QuerySet):
                         if t1.lower() in pi.label.lower():
                             ids.append(pi.pk)
                             break
-                q_dict["relation_type_id__in"] = ids
+                q_obj &= models.Q(relation_type_id__in=ids)
             elif isinstance(memberships[0], int):
-                q_dict["relation_type_id__in"] = memberships
+                q_obj &= models.Q(relation_type_id__in=memberships)
         if institutions is not None:
             if len(institutions) > 0:
                 ids = []
@@ -330,25 +332,30 @@ class PAASMembershipsQuerySet(models.QuerySet):
                             if inst2.lower() in inst.name.lower():
                                 ids.append(inst.id)
                                 break
-                    q_dict["related_institution_id__in"] = institutions
+                    q_obj &= models.Q(related_institution_id__in=ids)
             else:
-                q_dict["related_institution_id__in"] = getattr(
-                    id_mapping, "GESAMTAKADEMIE_UND_KLASSEN"
+                q_obj &= models.Q(
+                    related_institution_id__in=getattr(
+                        id_mapping, "GESAMTAKADEMIE_UND_KLASSEN"
+                    )
                 )
         else:
-            q_dict["related_institution_id__in"] = getattr(
-                id_mapping, "GESAMTAKADEMIE_UND_KLASSEN"
+            q_obj &= models.Q(
+                related_institution_id__in=getattr(
+                    id_mapping, "GESAMTAKADEMIE_UND_KLASSEN"
+                )
             )
         if start is not None:
-            if end is None or end == "":
-                end = datetime.datetime.today().strftime("%Y-%m-%d")
-            if start > end:
+            if end and start > end:
                 raise ValueError(
                     f"End date needs to be before start date: {start} > {end}"
                 )
-            q_dict["start_date__lte"] = convert_date(end)
-            q_dict["end_date__gte"] = convert_date(start)
-        return self.filter(**q_dict)
+            q_obj &= models.Q(end_date__isnull=True) | models.Q(
+                end_date__gte=convert_date(start)
+            )
+            if end:
+                q_obj &= models.Q(start_date__lte=convert_date(end))
+        return self.filter(q_obj)
 
 
 class PAASMembership(PersonInstitution):
