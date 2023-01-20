@@ -117,10 +117,6 @@
     
     <field name="relation_types_person_id" type="text_en" indexed="true" stored="true" multiValued="true" />
     
-    <field name="institution_art" type="long" indexed="true" stored="true" multiValued="false" />
-    
-    <field name="institution_klasse" type="long" indexed="true" stored="true" multiValued="false" />
-    
     <field name="academy_member" type="boolean" indexed="true" stored="true" multiValued="false" />
     
     <field name="birth_date" type="date" indexed="true" stored="true" multiValued="false" />

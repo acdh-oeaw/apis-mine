@@ -20,7 +20,7 @@ from .provide_data import (
 )
 from .provide_data import classes
 
-from . id_mapping import KLASSEN_IDS, NOBEL_PREISE
+from .id_mapping import KLASSEN_IDS, NOBEL_PREISE
 
 coll_id = 16
 
@@ -130,6 +130,30 @@ class InstitutionIndex(indexes.SearchIndex, indexes.Indexable):
     # located_in = indexes.CharField(null=True)
     # located_in_id = indexes.IntegerField(null=True)
     # located_at = indexes.LocationField(null=True)
+
+    institution_art = indexes.IntegerField()
+    institution_klasse = indexes.IntegerField()
+
+    def prepare_institution_art(self, object):
+        if object.kind:
+            return object.kind.id
+        return 0
+
+    def prepare_institution_klasse(self, object):
+        klasse_inst = object.related_institutionB.filter(
+            relation_type__pk=2, related_institutionB__pk__in=[1, 2, 3, 500, 501, 59131]
+        ).first()
+        if klasse_inst:
+            klasse = klasse_inst.related_institutionB.pk
+            # 2 =  Philosophisch-Historische Klasse
+            # 3 = Mathematisch-Naturwissenschaftliche Klasse
+            if klasse in [2, 3]:
+                return klasse
+            else:
+                # 1 = Andere
+                return 1
+        # 0 = Nothing, not searchable by klasse
+        return 0
 
     def get_model(self):
         return Institution

@@ -1,4 +1,7 @@
-from apis_core.apis_vocabularies.models import PersonInstitutionRelation
+from apis_core.apis_vocabularies.models import (
+    PersonInstitutionRelation,
+    InstitutionType,
+)
 from crispy_forms.bootstrap import Accordion, AccordionGroup
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout, Fieldset, Div
@@ -14,6 +17,7 @@ from apis_core.helper_functions.DateParser import parse_date
 from apis_core.apis_entities.fields import Select2Multiple, ListSelect2
 from apis_core.apis_relations.models import PersonInstitution
 from django.db.models import Q
+
 
 from paas_theme.models import PAASMembership
 from .provide_data import classes, get_child_classes
@@ -576,11 +580,12 @@ class InstitutionFilterFormHelperNew(FormHelper):
             Div(
                 Div(
                     Accordion(
-                        AccordionGroup(
-                            "Akademieinstitutionen",
-                            "mtgld_mitgliedschaft",
-                            "mtgld_klasse",
-                            css_id="akademieinstitutionen",
+                        Fieldset(
+                            "",
+                            "institution_art",
+                            "institution_klasse",
+                            css_id="mitgliedschaft",
+                            css_class="show card-body card filter-wrapper",
                         ),
                     ),
                     css_class="col-md-6 pt-30 pr-0 pr-md-custom pl-0",
@@ -616,6 +621,31 @@ class InstitutionFacetedSearchFormNew(FacetedSearchForm):
     death_date = forms.DateField(required=False)
     birth_date = forms.DateField(required=False)
     name = forms.CharField(required=False)
+
+    institution_art = forms.MultipleChoiceField(
+        required=False,
+        label="Art",
+        widget=forms.CheckboxSelectMultiple(),
+        choices=[
+            (i.pk, i.name)
+            for i in InstitutionType.objects.filter(parent_class_id=81).exclude(
+                pk__in=[85, 4236]
+            )
+        ]
+        + [(i.pk, i.name) for i in InstitutionType.objects.filter(pk=137)],
+    )
+
+    institution_klasse = forms.MultipleChoiceField(
+        required=False,
+        label="Klasse",
+        widget=forms.CheckboxSelectMultiple(),
+        choices=[
+            (2, "Philosophisch-Historische Klasse"),
+            (3, "Mathematisch-Naturwissenschaftliche Klasse"),
+            (1, "Andere"),
+        ],
+    )
+
     akademiemitgliedschaft = forms.CharField(required=False)
     akademiefunktionen = forms.MultipleChoiceField(
         widget=forms.SelectMultiple(attrs={"class": "select2-main"}),
@@ -774,7 +804,13 @@ class InstitutionFacetedSearchFormNew(FacetedSearchForm):
 
     def search(self):
         super().search()
-        sqs = self.searchqueryset.filter(django_ct="apis_entities.institution")
+        sqs = self.searchqueryset.filter(
+            django_ct="apis_entities.institution",
+        )
+        if "institution_art" in self.data.keys():
+            sqs = sqs.filter(institution_art=self.data["institution_art"])
+        if "institution_klasse" in self.data.keys():
+            sqs = sqs.filter(institution_klasse=self.data["institution_klasse"])
         if "related_institution" in self.data.keys():
             kwargs = {"load_all": True, "searchqueryset": SearchQuerySet()}
             map_haystack_form_fields = get_map_haystack_form(
