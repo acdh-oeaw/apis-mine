@@ -171,8 +171,14 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     )
     start_date_form = forms.CharField(required=False)
     end_date_form = forms.CharField(required=False)
+    start_date_form_exclusive = forms.BooleanField(
+        required=False, label="Membership start not before"
+    )
+    end_date_form_exclusive = forms.BooleanField(required=False)
     start_date_life_form = forms.CharField(required=False)
     end_date_life_form = forms.CharField(required=False)
+    start_date_life_form_exclusive = forms.CharField(required=False)
+    end_date_life_form_exclusive = forms.CharField(required=False)
     death_date = forms.DateField(required=False)
     birth_date = forms.DateField(required=False)
     name = forms.CharField(required=False)
@@ -347,7 +353,9 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         return val
 
     def search(self):
+        # print("PERSON FACETED SEARCH FORM NEW")
         super().search()
+
         pers_ids = []
         sqs = self.searchqueryset.filter(
             django_ct="paas_theme.paasperson", academy_member=True
@@ -406,6 +414,8 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
                 end=self.cleaned_data["end_date_form"],
                 institutions=self.cleaned_data.get("mtgld_klasse", None),
                 memberships=self.cleaned_data.get("mtgld_mitgliedschaft", None),
+                start_exclusive=self.cleaned_data.get("start_date_form_exclusive"),
+                end_exclusive=self.cleaned_data.get("end_date_form_exclusive"),
             ).get_person_ids()
             sqs = sqs.filter(django_id__in=ids_person)
         if self.cleaned_data["ewk"]:
@@ -467,10 +477,23 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             sqs = sqs.filter(
                 death_date__gte=parse_date(self.cleaned_data["start_date_life_form"])[0]
             )
+            if self.cleaned_data.get("start_date_life_form_exclusive"):
+                sqs = sqs.filter(
+                    birth_date__gte=parse_date(
+                        self.cleaned_data["start_date_life_form"]
+                    )[0]
+                )
         if self.cleaned_data["end_date_life_form"]:
             sqs = sqs.filter(
                 birth_date__lte=parse_date(self.cleaned_data["end_date_life_form"])[0]
             )
+
+            if self.cleaned_data.get("end_date_life_form_exclusive"):
+                sqs = sqs.filter(
+                    death_date__lte=parse_date(self.cleaned_data["end_date_life_form"])[
+                        0
+                    ]
+                )
         return sqs
 
     def __init__(self, *args, **kwargs):
@@ -642,7 +665,7 @@ class InstitutionFacetedSearchFormNew(FacetedSearchForm):
         choices=[
             (2, "Philosophisch-Historische Klasse"),
             (3, "Mathematisch-Naturwissenschaftliche Klasse"),
-            (1, "Andere"),
+            (1, "Gesamtakademie"),
         ],
     )
 
