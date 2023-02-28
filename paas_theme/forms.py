@@ -94,18 +94,37 @@ class PersonFilterFormHelperNew(FormHelper):
             Div(
                 Div(
                     Accordion(
-                        Hidden('start_date_form', ''),
-                        Hidden('end_date_form', ''),
-                        Hidden('start_date_life_form', ''),
-                        Hidden('end_date_life_form', ''),
-                        Div(Fieldset(
-                            "",
-                            "mtgld_mitgliedschaft",
-                            "mtgld_klasse",
-                            css_id="mitgliedschaft",
-                            css_class="show card-body card filter-wrapper pb-1",
-                        ), HTML('<div class="px-3 pb-3 pt-1"><label class="font-weight-bold pb-5">Mitgliedschaft im Zeitraum</label><div class="slider-container pt-3"><div data-start-form="start_date_form" data-end-form="end_date_form" class="range-slider"></div></div></div>'),
-                        css_class="bg-white"),
+                        Hidden("start_date_form", ""),
+                        Hidden("end_date_form", ""),
+                        Hidden("start_date_form_exclusive", ""),
+                        Hidden("end_date_form_exclusive", ""),
+                        Hidden("start_date_life_form", ""),
+                        Hidden("end_date_life_form", ""),
+                        Div(
+                            Fieldset(
+                                "",
+                                "mtgld_mitgliedschaft",
+                                "mtgld_klasse",
+                                css_id="mitgliedschaft",
+                                css_class="show card-body card filter-wrapper pb-1",
+                            ),
+                            HTML(  # Mitgliedschaft slider
+                                """ <div class="px-3 pb-3 pt-1">
+                                        <label id="mitgleidschaft-slider-label" class="font-weight-bold pb-5">Mitgliedschaft im Zeitraum</label>
+                                            <div class="slider-container pt-3">
+                                                <div data-start-form="start_date_form" data-end-form="end_date_form" class="range-slider" data-range-start="{{form_membership_start_date}}" data-range-end="{{form_membership_end_date}}">
+                                            </div>
+                                            <div class="mt-3 d-flex align-items-center">
+                                        <input class="form-control form-control-sm w-25 mr-2" type="text" id="start_date_input" value="{{form_membership_start_date}}"/><input type="checkbox" class="mt-1 ml-1" id="start_date_exclusive_checkbox"/><span class="ml-1">⟼</span>
+                                        
+                                        <div class="w-50"></div><span class="mr-1">⟻</span><input type="checkbox" class="mt-1 mr-2"  id="end_date_exclusive_checkbox" class="mr-2"/>
+                                        <input class="form-control form-control-sm w-25" type="text" id="end_date_input" value="{{form_membership_end_date}}"/>
+                  </div>
+                                        </div>
+                                    </div>"""
+                            ),
+                            css_class="bg-white",
+                        ),
                     ),
                     css_class="col-md-6 pt-30 pr-0 pr-md-custom pl-0 align-items-md-stretch d-flex",
                 ),
@@ -123,7 +142,15 @@ class PersonFilterFormHelperNew(FormHelper):
                         ),
                         AccordionGroup(
                             "Lebenslauf",
-                            HTML('<div class="pb-3 pt-1"><label class="pb-5">Leben im Zeitraum</label><div class="slider-container pt-3"><div data-start-form="start_date_life_form" data-end-form="end_date_life_form" class="range-slider"></div></div></div>'),
+                            HTML(  # DEBUG: TURNED OFF RANGE SLIDER
+                                """<div class="pb-3 pt-1">
+                                        <label class="pb-5">Leben im Zeitraum</label>
+                                        <div class="slider-container pt-3">
+                                            <div data-start-form="start_date_life_form" data-end-form="end_date_life_form" class="range-sliderOFF">
+                                            </div>
+                                        </div>
+                                    </div>"""
+                            ),
                             "place_of_birth",
                             "place_of_death",
                             "schule",
