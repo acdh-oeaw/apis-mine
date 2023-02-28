@@ -929,6 +929,19 @@ def enrich_person_context(person_object, context):
             "Mitglied in einer nationalsozialistischen Vereinigung"
         ]
 
+    speeches = person_object.personwork_set.filter(relation_type_id=4317).all()
+
+    if speeches:
+
+        list_speeches_html = [
+            f'<li><a href="/work/{speech.related_work.pk}">"{speech.related_work.name}"</a> (<a href="/event/{speech.related_work.eventwork_set.first().related_event.pk}">{speech.related_work.eventwork_set.first().related_event.name}</a>, {speech.start_date})</li>'
+            for speech in speeches.order_by("start_date")
+        ]
+
+        context["daten_akademie"]["Rede"] = [
+            f'<ul class="list-unstyled pl-3">{"".join(list_speeches_html)}</ul>'
+        ]
+
     # Membership...
     if (
         person_object.personinstitution_set.filter(relation_type_id__in=[26]).count()
