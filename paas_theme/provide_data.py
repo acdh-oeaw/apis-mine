@@ -934,11 +934,11 @@ def enrich_person_context(person_object, context):
     if speeches:
 
         list_speeches_html = [
-            f'<li><a href="/work/{speech.related_work.pk}">"{speech.related_work.name}"</a> (<a href="/event/{speech.related_work.eventwork_set.first().related_event.pk}">{speech.related_work.eventwork_set.first().related_event.name}</a>, {speech.start_date})</li>'
+            f'<li><a href="/work/{speech.related_work.pk}">"{speech.related_work.name}"</a> (<a href="/event/{speech.related_work.eventwork_set.first().related_event.pk}">{speech.related_work.eventwork_set.first().related_event.name}</a>, {speech.start_date.strftime("%d.%m.%Y")})</li>'
             for speech in speeches.order_by("start_date")
         ]
 
-        context["daten_akademie"]["Rede"] = [
+        context["daten_akademie"]["Rede in einer feierlichen Sitzung"] = [
             f'<ul class="list-unstyled pl-3">{"".join(list_speeches_html)}</ul>'
         ]
 
