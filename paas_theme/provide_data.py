@@ -942,32 +942,6 @@ def enrich_person_context(person_object, context):
             f'<ul class="list-unstyled pl-3">{"".join(list_speeches_html)}</ul>'
         ]
 
-    # Membership...
-    if (
-        person_object.personinstitution_set.filter(relation_type_id__in=[26]).count()
-        > 0
-    ):
-
-        lst_kom = dict()
-
-        for rel in person_object.personinstitution_set.filter(
-            relation_type_id__in=[26]
-        ).order_by("start_date"):
-            if rel.related_institution not in lst_kom.keys():
-                lst_kom[rel.related_institution] = [
-                    get_date_range(rel, classes["time_ranges_ids"])[1:-1]
-                ]
-            else:
-                lst_kom[rel.related_institution].append(
-                    get_date_range(rel, classes["time_ranges_ids"])[1:-1]
-                )
-        lst_kom = [
-            f'<li><a href="/institution/{inst.pk}">{inst.name}</a> ({", ".join(dates)})</li>'
-            for inst, dates in lst_kom.items()
-        ]
-        context["daten_akademie"]["Funktionen in der Akademie"].append(
-            f'Mitglied der folgenden Kommission{"en" if len(lst_kom) > 1 else ""}: <ul class="list-unstyled pl-3">{"".join(lst_kom)}</ul>'
-        )
     # Obmannship...
     if (
         person_object.personinstitution_set.filter(relation_type_id__in=[30]).count()
@@ -993,6 +967,32 @@ def enrich_person_context(person_object, context):
         ]
         context["daten_akademie"]["Funktionen in der Akademie"].append(
             f'Obmann/Obfrau der folgenden Kommission{"en" if len(lst_kom) > 1 else ""}: <ul class="list-unstyled pl-3">{"".join(lst_kom)}</ul>'
+        )
+    # Membership...
+    if (
+        person_object.personinstitution_set.filter(relation_type_id__in=[26]).count()
+        > 0
+    ):
+
+        lst_kom = dict()
+
+        for rel in person_object.personinstitution_set.filter(
+            relation_type_id__in=[26]
+        ).order_by("start_date"):
+            if rel.related_institution not in lst_kom.keys():
+                lst_kom[rel.related_institution] = [
+                    get_date_range(rel, classes["time_ranges_ids"])[1:-1]
+                ]
+            else:
+                lst_kom[rel.related_institution].append(
+                    get_date_range(rel, classes["time_ranges_ids"])[1:-1]
+                )
+        lst_kom = [
+            f'<li><a href="/institution/{inst.pk}">{inst.name}</a> ({", ".join(dates)})</li>'
+            for inst, dates in lst_kom.items()
+        ]
+        context["daten_akademie"]["Funktionen in der Akademie"].append(
+            f'Mitglied der folgenden Kommission{"en" if len(lst_kom) > 1 else ""}: <ul class="list-unstyled pl-3">{"".join(lst_kom)}</ul>'
         )
 
     if (
