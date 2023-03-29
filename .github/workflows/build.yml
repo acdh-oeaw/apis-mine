@@ -5,11 +5,6 @@ on:
   push:
     branches: [main]
 
-# on:
-#   workflow_run:
-#     workflows: ["Django Tests CI"]
-#     types:
-#       - completed
 
 jobs:
   setup_workflow_env:
