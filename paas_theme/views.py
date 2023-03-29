@@ -1,3 +1,4 @@
+import datetime
 import random
 from typing import Any, Dict
 
@@ -12,7 +13,7 @@ from apis_core.apis_entities.models import Institution
 from apis_core.apis_relations.models import PersonPlace
 from apis_core.apis_entities.views import set_session_variables
 from browsing.browsing_utils import GenericListView
-from paas_theme.models import PAASInstitution
+from paas_theme.models import PAASInstitution, PAASMembership, PAASPerson
 from webpage.views import get_imprint_url
 from .filters import PersonListFilter
 from .forms import (
@@ -22,8 +23,19 @@ from .forms import (
     InstitutionFacetedSearchForm,
     InstitutionFacetedSearchFormNew,
 )
-from .tables import PersonTable, SearchResultTable, InstitutionTable, InstitutionsSearchResultTable
-from .provide_data import oebl_persons, institutions, enrich_person_context, enrich_institution_context, classes
+from .tables import (
+    PersonTable,
+    SearchResultTable,
+    InstitutionTable,
+    InstitutionsSearchResultTable,
+)
+from .provide_data import (
+    oebl_persons,
+    institutions,
+    enrich_person_context,
+    enrich_institution_context,
+    classes,
+)
 
 from apis_core.helper_functions.utils import access_for_all
 
@@ -70,10 +82,15 @@ class IndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["heading"] = "Mitglieder der Österreichischen Akademie der Wissenschaften"
-        context["intro_text"] = "Die Österreichische Akademie der Wissenschaften besteht aus zwei Klassen, der mathematisch-naturwissenschaftlichen und der philosophisch-historischen Klasse. Die Gelehrtengesellschaft ergänzt sich selbst durch die Wahl neuer Mitglieder."
+        context[
+            "heading"
+        ] = "Mitglieder der Österreichischen Akademie der Wissenschaften"
+        context[
+            "intro_text"
+        ] = "Die Österreichische Akademie der Wissenschaften besteht aus zwei Klassen, der mathematisch-naturwissenschaftlichen und der philosophisch-historischen Klasse. Die Gelehrtengesellschaft ergänzt sich selbst durch die Wahl neuer Mitglieder."
         context["search_form"] = PersonFacetedSearchFormNew()
         return context
+
 
 class IndexInstitutionsView(TemplateView):
     model = Institution
@@ -81,10 +98,15 @@ class IndexInstitutionsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["heading"] = "Institutionen der Österreichischen Akademie der Wissenschaften"
-        context["intro_text"] = "Die Österreichische Akademie der Wissenschaften organisiert ihre Forschungstätigkeit in Kommissionen und Instituten. Hier können Sie nach historischen und gegenwärtigen Forschungseinrichtungen suchen und kombinierte Auswertungen durchführen."
+        context[
+            "heading"
+        ] = "Institutionen der Österreichischen Akademie der Wissenschaften"
+        context[
+            "intro_text"
+        ] = "Die Österreichische Akademie der Wissenschaften organisiert ihre Forschungstätigkeit in Kommissionen und Instituten. Hier können Sie nach historischen und gegenwärtigen Forschungseinrichtungen suchen und kombinierte Auswertungen durchführen."
         context["search_form"] = InstitutionFacetedSearchFormNew()
-        return context        
+        return context
+
 
 class StoriesIndexPage(UserPassesTestMixin, TemplateView):
     template_name = "theme/stories.html"
@@ -145,6 +167,23 @@ class PersonSearchView(UserPassesTestMixin, FacetedSearchView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        context["form_membership_end_date"] = datetime.date.today().year
+        context["form_membership_start_date"] = (
+            PAASMembership.objects.get_memberships()
+            .order_by("start_date")
+            .first()
+            .start_date.year
+        )
+        context["form_birth_end_date"] = datetime.date.today().year
+        context["form_birth_start_date"] = (
+            PAASPerson.objects.members()
+            .filter(start_date__isnull=False)
+            .order_by("start_date")
+            .first()
+            .start_date.year
+        )
+
         context["network_buttons"] = [
             {"key": k, "label": v["label"]}
             if "label" in v.keys()
@@ -193,20 +232,20 @@ class SearchView(SingleTableMixin, PersonSearchView, UserPassesTestMixin):
     def get_table_data(self):
         return self.queryset
 
+
 class InstitutionSearchView(UserPassesTestMixin, FacetedSearchView):
     login_url = "/webpage/accounts/login/"
     queryset = SearchQuerySet().models(Institution)
     form_class = InstitutionFacetedSearchFormNew
     facet_fields = [
         # "akademiemitgliedschaft",
-        #"start_date",
-        #"place_of_death",
+        # "start_date",
+        # "place_of_death",
         # "comissions",
         "kind",
         # "education",
         # "career",
     ]
-    
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -225,7 +264,9 @@ class InstitutionSearchView(UserPassesTestMixin, FacetedSearchView):
         return access
 
 
-class SearchViewInstitutions(SingleTableMixin, InstitutionSearchView, UserPassesTestMixin):
+class SearchViewInstitutions(
+    SingleTableMixin, InstitutionSearchView, UserPassesTestMixin
+):
     table_class = InstitutionsSearchResultTable
     template_name = "theme/institution_search.html"
 
@@ -281,11 +322,12 @@ class PersonDetailView(UserPassesTestMixin, DetailView):
         except AttributeError:
             context["next"] = None
         enriched_context = enrich_person_context(self.object, context)
-        
-        if self.request.GET.get('subview') == 'minimal':
+
+        if self.request.GET.get("subview") == "minimal":
             self.template_name = "theme/person_detail_popover.html"
 
         return enriched_context
+
 
 class InstitutionDetailView(UserPassesTestMixin, DetailView):
     model = Institution
@@ -319,9 +361,9 @@ class InstitutionDetailView(UserPassesTestMixin, DetailView):
             context["next"] = institutions.filter(id__gt=self.object.id).first()
         except AttributeError:
             context["next"] = None
-        #enriched_context = enrich_institution_context(self.object, context)
+        # enriched_context = enrich_institution_context(self.object, context)
         enriched_context = self.object.get_website_data(context)
-        if self.request.GET.get('subview') == 'minimal':
+        if self.request.GET.get("subview") == "minimal":
             self.template_name = "theme/institution_detail_popover.html"
 
         return enriched_context
