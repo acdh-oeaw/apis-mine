@@ -1,7 +1,10 @@
-from apis_core.apis_vocabularies.models import PersonInstitutionRelation
+from apis_core.apis_vocabularies.models import (
+    PersonInstitutionRelation,
+    InstitutionType,
+)
 from crispy_forms.bootstrap import Accordion, AccordionGroup
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit, Layout, Fieldset, Div
+from crispy_forms.layout import Submit, Layout, Fieldset, Div, HTML, Hidden
 from dal import autocomplete
 from django import forms
 from django.db.models.base import ModelBase
@@ -14,6 +17,7 @@ from apis_core.helper_functions.DateParser import parse_date
 from apis_core.apis_entities.fields import Select2Multiple, ListSelect2
 from apis_core.apis_relations.models import PersonInstitution
 from django.db.models import Q
+
 
 from paas_theme.models import PAASMembership
 from .provide_data import classes, get_child_classes
@@ -90,12 +94,36 @@ class PersonFilterFormHelperNew(FormHelper):
             Div(
                 Div(
                     Accordion(
-                        Fieldset(
-                            "",
-                            "mtgld_mitgliedschaft",
-                            "mtgld_klasse",
-                            css_id="mitgliedschaft",
-                            css_class="show card-body card filter-wrapper",
+                        Hidden("start_date_form", ""),
+                        Hidden("end_date_form", ""),
+                        Hidden("start_date_form_exclusive", ""),
+                        Hidden("end_date_form_exclusive", ""),
+                        Hidden("start_date_life_form", ""),
+                        Hidden("end_date_life_form", ""),
+                        Div(
+                            Fieldset(
+                                "",
+                                "mtgld_mitgliedschaft",
+                                "mtgld_klasse",
+                                css_id="mitgliedschaft",
+                                css_class="show card-body card filter-wrapper pb-1",
+                            ),
+                            HTML(  # Mitgliedschaft slider
+                                """ <div class="px-3 pb-3 pt-1">
+                                        <label id="mitgleidschaft-slider-label" class="font-weight-bold pb-5">Mitgliedschaft im Zeitraum</label>
+                                            <div class="slider-container pt-3">
+                                                <div data-start-form="start_date_form" data-end-form="end_date_form" class="range-slider" data-range-start="{{form_membership_start_date}}" data-range-end="{{form_membership_end_date}}">
+                                            </div>
+                                            <div class="mt-3 d-flex align-items-center">
+                                        <input class="form-control form-control-sm w-25 mr-2" type="text" id="start_date_input" value="{{form_membership_start_date}}"/><input type="checkbox" class="mt-1 ml-1" id="start_date_exclusive_checkbox"/><span class="ml-1">⟼</span>
+                                        
+                                        <div class="w-50"></div><span class="mr-1">⟻</span><input type="checkbox" class="mt-1 mr-2"  id="end_date_exclusive_checkbox" class="mr-2"/>
+                                        <input class="form-control form-control-sm w-25" type="text" id="end_date_input" value="{{form_membership_end_date}}"/>
+                  </div>
+                                        </div>
+                                    </div>"""
+                            ),
+                            css_class="bg-white",
                         ),
                     ),
                     css_class="col-md-6 pt-30 pr-0 pr-md-custom pl-0 align-items-md-stretch d-flex",
@@ -114,6 +142,15 @@ class PersonFilterFormHelperNew(FormHelper):
                         ),
                         AccordionGroup(
                             "Lebenslauf",
+                            HTML(  # DEBUG: TURNED OFF RANGE SLIDER
+                                """<div class="pb-3 pt-1">
+                                        <label class="pb-5">Leben im Zeitraum</label>
+                                        <div class="slider-container pt-3">
+                                            <div data-start-form="start_date_life_form" data-end-form="end_date_life_form" class="range-sliderOFF">
+                                            </div>
+                                        </div>
+                                    </div>"""
+                            ),
                             "place_of_birth",
                             "place_of_death",
                             "schule",
@@ -167,8 +204,14 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     )
     start_date_form = forms.CharField(required=False)
     end_date_form = forms.CharField(required=False)
+    start_date_form_exclusive = forms.BooleanField(
+        required=False, label="Membership start not before"
+    )
+    end_date_form_exclusive = forms.BooleanField(required=False)
     start_date_life_form = forms.CharField(required=False)
     end_date_life_form = forms.CharField(required=False)
+    start_date_life_form_exclusive = forms.CharField(required=False)
+    end_date_life_form_exclusive = forms.CharField(required=False)
     death_date = forms.DateField(required=False)
     birth_date = forms.DateField(required=False)
     name = forms.CharField(required=False)
@@ -343,7 +386,9 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         return val
 
     def search(self):
+        # print("PERSON FACETED SEARCH FORM NEW")
         super().search()
+
         pers_ids = []
         sqs = self.searchqueryset.filter(
             django_ct="paas_theme.paasperson", academy_member=True
@@ -402,6 +447,8 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
                 end=self.cleaned_data["end_date_form"],
                 institutions=self.cleaned_data.get("mtgld_klasse", None),
                 memberships=self.cleaned_data.get("mtgld_mitgliedschaft", None),
+                start_exclusive=self.cleaned_data.get("start_date_form_exclusive"),
+                end_exclusive=self.cleaned_data.get("end_date_form_exclusive"),
             ).get_person_ids()
             sqs = sqs.filter(django_id__in=ids_person)
         if self.cleaned_data["ewk"]:
@@ -463,10 +510,23 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             sqs = sqs.filter(
                 death_date__gte=parse_date(self.cleaned_data["start_date_life_form"])[0]
             )
+            if self.cleaned_data.get("start_date_life_form_exclusive"):
+                sqs = sqs.filter(
+                    birth_date__gte=parse_date(
+                        self.cleaned_data["start_date_life_form"]
+                    )[0]
+                )
         if self.cleaned_data["end_date_life_form"]:
             sqs = sqs.filter(
                 birth_date__lte=parse_date(self.cleaned_data["end_date_life_form"])[0]
             )
+
+            if self.cleaned_data.get("end_date_life_form_exclusive"):
+                sqs = sqs.filter(
+                    death_date__lte=parse_date(self.cleaned_data["end_date_life_form"])[
+                        0
+                    ]
+                )
         return sqs
 
     def __init__(self, *args, **kwargs):
@@ -576,11 +636,12 @@ class InstitutionFilterFormHelperNew(FormHelper):
             Div(
                 Div(
                     Accordion(
-                        AccordionGroup(
-                            "Akademieinstitutionen",
-                            "mtgld_mitgliedschaft",
-                            "mtgld_klasse",
-                            css_id="akademieinstitutionen",
+                        Fieldset(
+                            "",
+                            "institution_art",
+                            "institution_klasse",
+                            css_id="mitgliedschaft",
+                            css_class="show card-body card filter-wrapper",
                         ),
                     ),
                     css_class="col-md-6 pt-30 pr-0 pr-md-custom pl-0",
@@ -616,6 +677,31 @@ class InstitutionFacetedSearchFormNew(FacetedSearchForm):
     death_date = forms.DateField(required=False)
     birth_date = forms.DateField(required=False)
     name = forms.CharField(required=False)
+
+    institution_art = forms.MultipleChoiceField(
+        required=False,
+        label="Art",
+        widget=forms.CheckboxSelectMultiple(),
+        choices=[
+            (i.pk, i.name)
+            for i in InstitutionType.objects.filter(parent_class_id=81).exclude(
+                pk__in=[85, 4236]
+            )
+        ]
+        + [(i.pk, i.name) for i in InstitutionType.objects.filter(pk=137)],
+    )
+
+    institution_klasse = forms.MultipleChoiceField(
+        required=False,
+        label="Klasse",
+        widget=forms.CheckboxSelectMultiple(),
+        choices=[
+            (2, "Philosophisch-Historische Klasse"),
+            (3, "Mathematisch-Naturwissenschaftliche Klasse"),
+            (1, "Gesamtakademie"),
+        ],
+    )
+
     akademiemitgliedschaft = forms.CharField(required=False)
     akademiefunktionen = forms.MultipleChoiceField(
         widget=forms.SelectMultiple(attrs={"class": "select2-main"}),
@@ -774,7 +860,13 @@ class InstitutionFacetedSearchFormNew(FacetedSearchForm):
 
     def search(self):
         super().search()
-        sqs = self.searchqueryset.filter(django_ct="apis_entities.institution")
+        sqs = self.searchqueryset.filter(
+            django_ct="apis_entities.institution",
+        )
+        if "institution_art" in self.data.keys():
+            sqs = sqs.filter(institution_art=self.data["institution_art"])
+        if "institution_klasse" in self.data.keys():
+            sqs = sqs.filter(institution_klasse=self.data["institution_klasse"])
         if "related_institution" in self.data.keys():
             kwargs = {"load_all": True, "searchqueryset": SearchQuerySet()}
             map_haystack_form_fields = get_map_haystack_form(

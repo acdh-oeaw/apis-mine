@@ -89,6 +89,13 @@ class IndexView(TemplateView):
             "intro_text"
         ] = "Die Österreichische Akademie der Wissenschaften besteht aus zwei Klassen, der mathematisch-naturwissenschaftlichen und der philosophisch-historischen Klasse. Die Gelehrtengesellschaft ergänzt sich selbst durch die Wahl neuer Mitglieder."
         context["search_form"] = PersonFacetedSearchFormNew()
+        context["form_membership_end_date"] = datetime.date.today().year
+        context["form_membership_start_date"] = (
+            PAASMembership.objects.get_memberships()
+            .order_by("start_date")
+            .first()
+            .start_date.year
+        )
         return context
 
 

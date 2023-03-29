@@ -11,10 +11,9 @@
   <div class="wrapper  pb-0" id="wrapper-hero-content">
     <div class="container pl-5 pr-5 hero-light" id="wrapper-hero-inner" tabindex="-1">
 
-
       <div class="row m-0 bg-mine border-mine p-1">
 
-        <h1 class="w-50 text-uppercase font-weight-bold">{{heading}}</h1>
+        <h1 class="w-50  font-weight-bold">{{heading}}</h1>
         <div class="w-75 mx-auto">
         <p class="font-weight-normal">{{intro_text}}</p>
       </div>
@@ -105,6 +104,248 @@ $(document).ready(function() {
   function doFullTextSearch() {
     window.location.href = "/search?q=" + $("#fulltextsearch").val();
   }
+
+  /*** range slider ***/
+  const qs = new URLSearchParams(window.location.search)
+  const rangeSliders = document.querySelectorAll('.range-slider')
+  const [min, max] = [1700, 2022]
+
+  function validateDateInput(datestring) {
+    const reg = /^\d{1,4}$/
+    const valid = reg.test(datestring) || datestring === ""
+    return valid;
+  }
+
+  
+  const mitgliedschaftSliderLabel = document.querySelector("#mitgleidschaft-slider-label");
+  const mitgliedschaftForm = document.getElementById("mitgliedschaft");
+  const mitgliedschaftFormInputs = mitgliedschaftForm.querySelectorAll("input")
+  console.log(mitgliedschaftFormInputs)
+
+  function buildMitgliedschaftLabel() {
+    const membershipLabels = Array.from(mitgliedschaftFormInputs).filter(i => i.checked && i.id.startsWith("id_mtgld_mitgliedschaft")).map(i => i.nextElementSibling.textContent.trim());
+        const classLabels = Array.from(mitgliedschaftFormInputs).filter(i => i.checked && i.id.startsWith("id_mtgld_klasse")).map(i => i.nextElementSibling.textContent.trim());
+        
+        if (membershipLabels.length > 0 ||  classLabels.length > 0) {
+          let text = "";
+         
+            text += "Mitgliedschaft "
+         
+          text += `${membershipLabels.map(l => `<i style="color: #0047bb">${l}</i>`).join(" / ")}`
+          
+          if (membershipLabels.length > 0 && classLabels.length > 0) {
+            text += " und "
+          }
+          text += `${classLabels.map(l => `<i style="color: #0047bb">${l}</i>`).join(" / ")}`
+          
+          mitgliedschaftSliderLabel.innerHTML = text + " in Zeitraum";
+        }
+        else {
+          mitgliedschaftSliderLabel.textContent = `Mitgliedschaft in Zeitraum`
+        }
+  }
+
+  buildMitgliedschaftLabel();
+
+
+  mitgliedschaftFormInputs.forEach(input => {
+  
+    input.addEventListener("input", (e) => {
+        const membershipLabels = Array.from(mitgliedschaftFormInputs).filter(i => i.checked && i.id.startsWith("id_mtgld_mitgliedschaft")).map(i => i.nextElementSibling.textContent.trim());
+        const classLabels = Array.from(mitgliedschaftFormInputs).filter(i => i.checked && i.id.startsWith("id_mtgld_klasse")).map(i => i.nextElementSibling.textContent.trim());
+        
+        if (membershipLabels.length > 0 ||  classLabels.length > 0) {
+          let text = "";
+         
+            text += "Mitgliedschaft "
+         
+          text += `${membershipLabels.map(l => `<i style="color: #0047bb">${l}</i>`).join(" / ")}`
+          
+          if (membershipLabels.length > 0 && classLabels.length > 0) {
+            text += " und "
+          }
+          text += `${classLabels.map(l => `<i style="color: #0047bb">${l}</i>`).join(" / ")}`
+          
+          mitgliedschaftSliderLabel.innerHTML = text + " in Zeitraum";
+        }
+        else {
+          mitgliedschaftSliderLabel.textContent = `Mitgliedschaft in Zeitraum`
+        }
+    });
+  });
+  
+  rangeSliders.forEach(element => { 
+  const [startKey, endKey] = [element.dataset.startForm, element.dataset.endForm];
+  const [min, max] = [parseInt(element.dataset.rangeStart), parseInt(element.dataset.rangeEnd)];  
+
+
+  const start_date_input = document.querySelector("#"+startKey.replace("form", "input"));
+  const end_date_input = document.querySelector("#"+endKey.replace("form", "input"));
+  
+
+  const start_date_exclusive_checkbox = document.querySelector("#"+startKey.replace("form", "exclusive_checkbox"));
+
+  const end_date_exclusive_checkbox = document.querySelector("#"+endKey.replace("form", "exclusive_checkbox"));
+
+ 
+  const s = noUiSlider.create(element, {
+    start: [
+       min,
+       max
+    ],
+    connect: true,
+    format: {
+      to: (num) => num.toFixed(0),
+      from: (string) => parseInt(string)
+    },
+    tooltips: true,
+    range: { min, max },
+    pips: {
+      mode: 'values',
+      values: [min, max],
+      density: '100%'
+    }
+  });
+
+  const lowerHandle = element.querySelector(".noUi-handle-lower").querySelector(".noUi-tooltip");
+  const upperHandle = element.querySelector(".noUi-handle-upper").querySelector(".noUi-tooltip");
+
+  if (start_date_exclusive_checkbox.checked) {
+      lowerHandle.style.backgroundColor = "#c80000";
+      lowerHandle.textContent =  lowerHandle.textContent + " ⟼";
+      $(`#search_form input[name=${startKey + "_exclusive"}]`)[0].value = true;   
+  }
+  if (end_date_exclusive_checkbox.checked) {
+      upperHandle.style.backgroundColor = "#c80000";
+      upperHandle.textContent = "⟻ " + upperHandle.textContent;
+      $(`#search_form input[name=${endKey + "_exclusive"}]`)[0].value = true;
+  }
+
+  start_date_exclusive_checkbox.addEventListener("input", (e) => {
+    if (e.target.checked) {
+      lowerHandle.style.backgroundColor = "#c80000";
+      lowerHandle.textContent =  lowerHandle.textContent + " ⟼";
+      $(`#search_form input[name=${startKey + "_exclusive"}]`)[0].value = true;
+     
+    }
+    else {
+      lowerHandle.style.backgroundColor = "#0047bb";
+      lowerHandle.textContent = lowerHandle.textContent.replace(" ⟼", "")
+      $(`#search_form input[name=${startKey + "_exclusive"}]`)[0].value = null;
+    }
+  })
+
+  end_date_exclusive_checkbox.addEventListener("input", (e) => {
+    if (e.target.checked) {
+      upperHandle.style.backgroundColor = "#c80000";
+      upperHandle.textContent = "⟻ " + upperHandle.textContent;
+      $(`#search_form input[name=${endKey + "_exclusive"}]`)[0].value = true;
+    }
+    else {
+      upperHandle.style.backgroundColor = "#0047bb";
+      upperHandle.textContent = upperHandle.textContent.replace("⟻ ", "");
+      $(`#search_form input[name=${endKey + "_exclusive"}]`)[0].value = null;
+    }
+  })
+
+  let previousStartString = "";
+  let previousEndString = "";
+
+  start_date_input.addEventListener("input", (e) => {
+    if (!validateDateInput(e.target.value)) {
+      e.target.value = previousStartString;
+      return
+    }
+    previousStartString = e.target.value;
+
+    e.target.classList.remove("is-invalid");
+    if (e.target.value.length === 4 && e.target.value > end_date_input.value) {
+      e.target.classList.add("is-invalid");
+      return
+    }
+    else if (e.target.value.length === 4) {
+      if (e.target.value*1 < min) {
+        e.target.value = min;
+      }
+      s.set([e.target.value*1, null])
+      if (start_date_exclusive_checkbox.checked) {
+        lowerHandle.style.backgroundColor = "#c80000";
+        lowerHandle.textContent =  lowerHandle.textContent + " ⟼";
+      }
+      else {
+        lowerHandle.style.backgroundColor = "#0047bb";
+        lowerHandle.textContent = lowerHandle.textContent.replace(" ⟼", "")
+      }
+      if (e.target.value*1 === min) {
+        //qs.delete(startKey)
+      }
+     //window.location.search = qs.toString()
+    }
+
+  });
+
+  end_date_input.addEventListener("input", (e) => {
+    if (!validateDateInput(e.target.value)) {
+      e.target.value = previousEndString;
+      return
+    }
+    previousEndString = e.target.value;
+
+
+    e.target.classList.remove("is-invalid");
+    if (e.target.value.length === 4 && e.target.value < start_date_input.value) {
+      e.target.classList.add("is-invalid")
+      return
+    }
+    if (e.target.value.length === 4) {
+      if (e.target.value*1 > max) {
+        e.target.value = max
+      }
+     s.set([null, e.target.value*1])
+      if (end_date_exclusive_checkbox.checked) {
+        upperHandle.style.backgroundColor = "#c80000";
+        upperHandle.textContent =  "⟻ " + upperHandle.textContent;
+      }
+      else {
+        upperHandle.style.backgroundColor = "#0047bb";
+        upperHandle.textContent = upperHandle.textContent.replace("⟻ ", "")
+      }
+     if (e.target.value*1 === max) {
+      //qs.delete(endKey)
+     }
+     //window.location.search = qs.toString()
+    }
+  })
+
+
+  s.on('change', ([start, end]) => {
+    if (start_date_exclusive_checkbox.checked) {
+      lowerHandle.style.backgroundColor = "#c80000";
+      lowerHandle.textContent = lowerHandle.textContent.replace(" ⟼", "")
+      lowerHandle.textContent =  lowerHandle.textContent + " ⟼";
+    }
+    else {
+      lowerHandle.style.backgroundColor = "#0047bb";
+      lowerHandle.textContent = lowerHandle.textContent.replace(" ⟼", "")
+    }
+
+    if (end_date_exclusive_checkbox.checked) {
+      upperHandle.style.backgroundColor = "#c80000";
+      upperHandle.textContent = upperHandle.textContent.replace("⟻ ", "")
+      upperHandle.textContent = "⟻ " + upperHandle.textContent
+    }
+    else {
+      upperHandle.style.backgroundColor = "#0047bb";
+      upperHandle.textContent = upperHandle.textContent.replace("⟻ ", "")
+    }
+    start_date_input.value = start;
+    end_date_input.value = end;
+    const ds = {...s.target.dataset};
+    $(`#search_form input[name=${ds.startForm}]`)[0].value = start;
+    $(`#search_form input[name=${ds.endForm}]`)[0].value = end;
+    
+  })
+});
 
 
 </script>
