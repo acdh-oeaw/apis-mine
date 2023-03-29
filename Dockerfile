@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3
 RUN addgroup --system app && adduser --system --group app
 WORKDIR /app/
 # https://docs.python.org/3/using/cmdline.html#envvar-PYTHONDONTWRITEBYTECODE
