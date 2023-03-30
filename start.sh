@@ -5,4 +5,4 @@ export LANG=C.UTF-8
 python manage.py migrate --settings=apis.settings.dev
 #ls /var/solr_new/paas_solr
 #python manage.py build_solr_schema --configure-directory /var/solr_new/paas_solr/conf --reload-core default
-gunicorn apis.wsgi
+gunicorn apis.wsgi -b 0.0.0.0:5000 --timeout 120 --workers=3 --threads=3 --worker-connections=1000
