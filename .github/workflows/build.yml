@@ -20,7 +20,7 @@ jobs:
 # This together with the branch name is also used as the namespace to deploy to
       APP_ROOT: "/"
       SERVICE_ID: "20563"
-      PUBLIC_URL: https://apis-mine.acdh-dev.oeaw.ac.at
+      PUBLIC_URL: https://mine.acdh-ch-dev.oeaw.ac.at
       POSTGRES_ENABLED: "false"
     steps:
       - run: "/bin/true"      
