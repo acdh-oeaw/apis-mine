@@ -31,7 +31,7 @@ APIS_SKOSMOS = {
 ALLOWED_HOSTS = re.sub(
     r"https?://",
     "",
-    os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1,paas.acdh-dev.oeaw.ac.at,paas.acdh.oeaw.ac.at"),
+    os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1,paas.acdh-dev.oeaw.ac.at,paas.acdh.oeaw.ac.at,apis-mine-main.acdh-cluster-2.arz.oeaw.ac.at,mine.acdh-ch-dev.oeaw.ac.at,mine.acdh.oeaw.ac.at"),
 ).split(",")
 # You need to allow '10.0.0.0/8' for service health checks.
 ALLOWED_CIDR_NETS = ["10.0.0.0/8", "127.0.0.0/8"]
