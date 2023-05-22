@@ -61,11 +61,21 @@ class SearchResultTable(tables.Table):
         attrs={"td": {"class": "no-wrap"}},
     )
 
-    birth_place = tables.Column(accessor="place_of_birth", verbose_name="geboren in")
+    mitgliedschaft = tables.Column(
+        accessor="akademiemitgliedschaft",
+        verbose_name="Mitgieldschaft",
+        attrs={"td": {"class": "no-wrap"}},
+    )
+
+    # birth_place = tables.Column(accessor="place_of_birth", verbose_name="geboren in")
 
     # death_place = tables.Column(accessor="place_of_death", verbose_name="gestorben in")
 
     def render_profession(self, value):
+        separator = ", "
+        return separator.join(value)
+
+    def render_mitgliedschaft(self, value):
         separator = ", "
         return separator.join(value)
 
@@ -75,7 +85,8 @@ class SearchResultTable(tables.Table):
             "name",
             "birth_date",
             "death_date",
-            "birth_place",
+            # "birth_place",
+            "mitgliedschaft",
             "profession",
         )
         attrs = {"class": "table table-hover custom-table bg-mine", "thead": {}}
