@@ -290,6 +290,8 @@ class PAASMembershipsQuerySet(models.QuerySet):
         institutions: typing.Union[typing.List[str], typing.List[int], None] = None,
         start: typing.Optional[str] = None,
         end: typing.Optional[str] = None,
+        start_exclusive=False,
+        end_exclusive=False,
         **kwargs,
     ) -> "PAASMembershipsQuerySet":
         """Adds the possibility to filter for memberships
@@ -355,6 +357,12 @@ class PAASMembershipsQuerySet(models.QuerySet):
             )
             if end:
                 q_obj &= models.Q(start_date__lte=convert_date(end))
+
+                if end_exclusive:
+                    q_obj = models.Q(end_date__lte=convert_date(end))
+
+            if start_exclusive:
+                q_obj &= models.Q(start_date__gte=convert_date(start))
         return self.filter(q_obj)
 
 
@@ -829,6 +837,7 @@ class PAASInstitution(Institution):
         else:
             res["untertitel"] = "" if self.kind is None else self.kind.name
         if self.kind_id in getattr(id_mapping, "INSTITUTION_TYPE_PREISE"):
+            res["desc"] = self.notes
             res["daten_institution"]["PREISTRÄGERINNEN / PREISTRÄGER"] = []
             for preis in self.get_prize_recipients():
                 res["daten_institution"]["PREISTRÄGERINNEN / PREISTRÄGER"].append(

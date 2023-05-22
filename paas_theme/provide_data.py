@@ -992,7 +992,7 @@ def enrich_person_context(person_object, context):
             for inst, dates in lst_kom.items()
         ]
         context["daten_akademie"]["Funktionen in der Akademie"].append(
-            f'Mitglied der folgenden Kommission{"en" if len(lst_kom) > 1 else ""}: <ul class="list-unstyled pl-3">{"".join(lst_kom)}</ul>'
+            f'{"Mitglied der folgenden Kommissionen/Kuratorien" if len(lst_kom) > 1 else "Mitglied der folgenden Kommission/des folgenden Kuratoriums"} : <ul class="list-unstyled pl-3">{"".join(lst_kom)}</ul>'
         )
 
     if (
