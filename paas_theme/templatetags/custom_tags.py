@@ -48,7 +48,7 @@ def normalize_facet(facet, kind, url=None):
         "akademiemitgliedschaft": "Mitgliedschaft",
         "gender": "Geschlecht",
         "q": "Suche",
-        "kind": "Typ"
+        "kind": "Typ",
     }
     fac = facet.split(":")
     fac[0] = fac[0].replace("_exact", "")
@@ -147,6 +147,7 @@ def remove_facets(url):
 
 @register.simple_tag
 def filter_facetfields(fields, fieldname):
+    print(fields)
     return fields[fieldname]
 
 
