@@ -588,11 +588,12 @@ def enrich_person_context(person_object, context):
         )
     normdaten_gnd = person_object.uri_set.filter(uri__contains="d-nb.info")
     if normdaten_gnd.count() == 1:
+        gnd_identifier = normdaten_gnd[0].uri.split("/")[-1]
         context["normdaten"].append(
             {
                 "kind": "GND",
-                "uri": normdaten_gnd[0].uri,
-                "identifier": normdaten_gnd[0].uri.split("/")[-1],
+                "uri": f"https://portal.dnb.de/opac/simpleSearch?reset=true&cqlMode=true&query=auRef%3D{gnd_identifier}&selectedCategory=any",
+                "identifier": gnd_identifier,
             }
         )
     normdaten_wikidata = person_object.uri_set.filter(uri__contains="wikidata")
