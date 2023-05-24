@@ -347,22 +347,27 @@ class PAASMembershipsQuerySet(models.QuerySet):
                     id_mapping, "GESAMTAKADEMIE_UND_KLASSEN"
                 )
             )
-        if start is not None:
-            if end and start > end:
-                raise ValueError(
-                    f"End date needs to be before start date: {start} > {end}"
-                )
+
+        if start and end and start > end:
+            raise ValueError(
+                f"End date needs to be before start date: {start} > {end}"
+            )
+
+        if start:
+
             q_obj &= models.Q(end_date__isnull=True) | models.Q(
                 end_date__gte=convert_date(start)
             )
-            if end:
-                q_obj &= models.Q(start_date__lte=convert_date(end))
 
-                if end_exclusive:
-                    q_obj = models.Q(end_date__lte=convert_date(end))
+        if start and start_exclusive:
+            q_obj &= models.Q(start_date__gte=convert_date(start))
+            
+        if end:
+            q_obj &= models.Q(start_date__lte=convert_date(end))
 
-            if start_exclusive:
-                q_obj &= models.Q(start_date__gte=convert_date(start))
+        if end and end_exclusive:
+            q_obj = models.Q(end_date__lte=convert_date(end))
+
         return self.filter(q_obj)
 
 

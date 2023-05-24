@@ -441,7 +441,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
                 kls_dict.add(SQ(klasse_person=klasse), SQ.OR)
             sqs = sqs.filter(mtgld_dic & kls_dict)
         # TODO: This looks unnecessary requirement for self.cleaned_data["mtgld_mitgliedschaft"] or self.cleaned_data["mtgld_klasse"]
-        elif self.cleaned_data["start_date_form"]:
+        else:
             ids_person = PAASMembership.objects.get_memberships(
                 start=self.cleaned_data["start_date_form"],
                 end=self.cleaned_data["end_date_form"],
