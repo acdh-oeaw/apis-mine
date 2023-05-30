@@ -17,14 +17,29 @@ urlpatterns = [
     url(r"^contact/$", views.ContactView.as_view(), name="contact"),
     url(r"^expert-search/$", views.PersonListView.as_view(), name="expert-search"),
     url(r"search/$", views.SearchView.as_view(), name="search"),
-    url(r"^institutionen/$", views.IndexInstitutionsView.as_view(), name="institutions"),
-    url(r"^institutionen/search/?$", views.SearchViewInstitutions.as_view(), name="institutionssearch"),
+    url(
+        r"^institutionen/$", views.IndexInstitutionsView.as_view(), name="institutions"
+    ),
+    url(
+        r"^institutionen/search/?$",
+        views.SearchViewInstitutions.as_view(),
+        name="institutionssearch",
+    ),
     url(r"^network/?$", views.network_viz),
-    url(r"^stories/ns-zeit/$", story_views.NationalSozialismusStory.as_view(), name="ns_zeit"),
+    url(
+        r"^stories/ns-zeit/$",
+        story_views.NationalSozialismusStory.as_view(),
+        name="ns_zeit",
+    ),
     url(r"^stories/test/$", views.TestView.as_view(), name="test_view"),
     url(r"^stories/$", views.StoriesIndexPage.as_view(), name="stories_index"),
     url(r"^api/network/$", api_views.NetVizTheme.as_view()),
     url(r"^api/egonetwork/$", api_views.EgoNetwork.as_view()),
+    url(
+        r"^paas/autocompletes/person/$",
+        autocompletes.PaasPersonAutocomplete.as_view(),
+        name="paas_person_autocomplete",
+    ),
     url(
         r"^paas/autocompletes/institution/$",
         autocompletes.PaasInstitutionAutocomplete.as_view(),
@@ -119,5 +134,5 @@ urlpatterns = [
         r"^analyze/mitglieder/$",
         analyze_views.mitglieder,
         name="mitglieder",
-    )
+    ),
 ]

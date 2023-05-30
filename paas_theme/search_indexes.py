@@ -127,12 +127,16 @@ class InstitutionIndex(indexes.SearchIndex, indexes.Indexable):
     end_date = indexes.DateField(model_attr="end_date", null=True)
     name_auto = indexes.EdgeNgramField(model_attr="name")
     relation_types_person_id = indexes.MultiValueField(null=True)
+    mitglieder_id = indexes.MultiValueField(null=True)
     # located_in = indexes.CharField(null=True)
     # located_in_id = indexes.IntegerField(null=True)
     # located_at = indexes.LocationField(null=True)
 
     institution_art = indexes.IntegerField()
     institution_klasse = indexes.IntegerField()
+
+    def prepare_mitglieder_id(self, object):
+        return [p.related_person_id for p in object.personinstitution_set.all()]
 
     def prepare_kind(self, object):
         if object.kind:

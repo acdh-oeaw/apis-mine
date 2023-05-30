@@ -19,6 +19,27 @@ def get_date_label(item):
     return date
 
 
+class PaasPersonAutocomplete(autocomplete.Select2QuerySetView):
+    f = {"django_ct": "paas_theme.paasperson"}
+
+    def get_result_value(self, result):
+        return f"{result.pk}|{result.name}"
+
+    def get_result_label(self, item):
+        lbl = item.name
+        date = get_date_label(item)
+        if date:
+            lbl += f" {date}"
+        return lbl
+
+    def get_queryset(self):
+        query_object = SQ(**self.f)
+        if self.q:
+            query_object &= SQ(name=self.q)
+
+        return SearchQuerySet().filter(query_object)
+
+
 class PaasInstitutionAutocomplete(autocomplete.Select2QuerySetView):
     f = {"django_ct": "apis_entities.institution", "academy": False}
 
