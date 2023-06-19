@@ -22,7 +22,7 @@
             "program": "${workspaceFolder}/manage.py",
             "args": [
                 "runserver",
-                "--settings=apis.settings.local_dev"
+                "--settings=apis.settings.dev"
             ],
             "django": true
         },
@@ -49,28 +49,28 @@
             "django": true
         },
         {
-				"name": "Paas remote Jupyter",
-				"type": "python",
-				"request": "launch",
-				"program": "${workspaceFolder}/manage.py",
-				"args": [
-					"shell_plus",
-					//"--notebook",
-					"--settings=apis.settings.paas_remote"
-				],
-				"django": true
-			},
+            "name": "Paas remote Jupyter",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "shell_plus",
+                //"--notebook",
+                "--settings=apis.settings.paas_remote"
+            ],
+            "django": true
+        },
         {
-				"name": "Paas local Jupyter",
-				"type": "python",
-				"request": "launch",
-				"program": "${workspaceFolder}/manage.py",
-				"args": [
-					"shell_plus",
-					//"--notebook",
-					"--settings=apis.settings.local_dev"
-				],
-				"django": true
-			},
+            "name": "Paas local Jupyter",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "shell_plus",
+                //"--notebook",
+                "--settings=apis.settings.local_dev"
+            ],
+            "django": true
+        },
     ]
 }
