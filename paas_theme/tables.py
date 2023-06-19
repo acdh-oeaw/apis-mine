@@ -121,10 +121,6 @@ class InstitutionsSearchResultTable(tables.Table):
         attrs={"td": {"class": "no-wrap"}},
     )
 
-    def render_profession(self, value):
-        separator = ", "
-        return separator.join(value)
-
     class Meta:
         model = Institution
         fields = (

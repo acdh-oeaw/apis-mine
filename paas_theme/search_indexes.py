@@ -122,7 +122,7 @@ class InstitutionIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
     name = indexes.CharField(model_attr="name")
     academy = indexes.BooleanField(default=False)
-    kind = indexes.CharField(model_attr="kind__label", null=True)
+    kind = indexes.CharField(model_attr="kind__label", null=True, faceted=True)
     start_date = indexes.DateField(model_attr="start_date", null=True)
     end_date = indexes.DateField(model_attr="end_date", null=True)
     name_auto = indexes.EdgeNgramField(model_attr="name")
@@ -133,6 +133,11 @@ class InstitutionIndex(indexes.SearchIndex, indexes.Indexable):
 
     institution_art = indexes.IntegerField()
     institution_klasse = indexes.IntegerField()
+
+    def prepare_kind(self, object):
+        if object.kind:
+            return object.kind.name
+        return 0
 
     def prepare_institution_art(self, object):
         if object.kind:
@@ -180,8 +185,10 @@ class InstitutionIndex(indexes.SearchIndex, indexes.Indexable):
         ]
         return res
 
+    # TODO: filter on institutions that are part of academy
     def index_queryset(self, using=None):
-        return self.get_model().objects.all()
+        qs = self.get_model().objects.filter(kind__parent_class__id=81)
+        return qs
 
 
 class FunktionenAkademieIndex(indexes.SearchIndex, indexes.Indexable):
