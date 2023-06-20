@@ -441,7 +441,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
                 kls_dict.add(SQ(klasse_person=klasse), SQ.OR)
             sqs = sqs.filter(mtgld_dic & kls_dict)
         # TODO: This looks unnecessary requirement for self.cleaned_data["mtgld_mitgliedschaft"] or self.cleaned_data["mtgld_klasse"]
-        elif self.cleaned_data["start_date_form"]:
+        else:
             ids_person = PAASMembership.objects.get_memberships(
                 start=self.cleaned_data["start_date_form"],
                 end=self.cleaned_data["end_date_form"],
@@ -669,7 +669,7 @@ class InstitutionFilterFormHelperNew(FormHelper):
                     Accordion(
                         AccordionGroup(
                             "Akademiemitglieder in Akademieinstitutionen",
-                            "akademiefunktionen",
+                            "mitglieder",
                             css_id="in_der_akademie",
                         ),
                     ),
@@ -719,6 +719,14 @@ class InstitutionFacetedSearchFormNew(FacetedSearchForm):
             (3, "Mathematisch-Naturwissenschaftliche Klasse"),
             (1, "Gesamtakademie"),
         ],
+    )
+
+    mitglieder = MultiSolrField(
+        required=False,
+        label="Mitglieder",
+        widget=autocomplete.Select2Multiple(
+            url="paas_theme:paas_person_autocomplete",
+        ),
     )
 
     akademiemitgliedschaft = forms.CharField(required=False)
@@ -882,6 +890,13 @@ class InstitutionFacetedSearchFormNew(FacetedSearchForm):
         sqs = self.searchqueryset.filter(
             django_ct="apis_entities.institution",
         )
+        if "mitglieder" in self.data.keys():
+            sq = SQ()
+            for m in self.data._getlist("mitglieder"):
+                sq &= SQ(mitglieder_id=m.split("|")[0])
+
+            sqs = sqs.filter(sq)
+
         if "institution_art" in self.data.keys():
             sqs = sqs.filter(institution_art=self.data["institution_art"])
         if "institution_klasse" in self.data.keys():
