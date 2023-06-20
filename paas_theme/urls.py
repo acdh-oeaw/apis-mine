@@ -25,6 +25,11 @@ urlpatterns = [
     path(r"api/network/", api_views.NetVizTheme.as_view()),
     path(r"api/egonetwork/", api_views.EgoNetwork.as_view()),
     path(
+        "paas/autocompletes/person/",
+        autocompletes.PaasPersonAutocomplete.as_view(),
+        name="paas_person_autocomplete",
+    ),
+    path(
         r"paas/autocompletes/institution/",
         autocompletes.PaasInstitutionAutocomplete.as_view(),
         name="paas_institution_autocomplete",
