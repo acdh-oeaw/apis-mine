@@ -26,7 +26,7 @@ RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python
     ln -s /opt/poetry/bin/poetry && \
     poetry config virtualenvs.create false
 
-RUN apt-get update && apt-get install -y memcached libmemcached-tools
+#RUN apt-get update && apt-get install -y memcached libmemcached-tools
 # 
 COPY ./pyproject.toml ./poetry.lock* /app/
 
