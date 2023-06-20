@@ -185,7 +185,7 @@ class InstitutionIndex(indexes.SearchIndex, indexes.Indexable):
         ]
         return res
 
-    # TODO: filter on institutions that are part of academy
+    # TODO: MAYBE remove GEMEINSAM KOMMISSION etc. (not id__in=[1,2,3])
     def index_queryset(self, using=None):
         qs = self.get_model().objects.filter(kind__parent_class__id=81)
         return qs

@@ -112,6 +112,14 @@ class IndexInstitutionsView(TemplateView):
             "intro_text"
         ] = "Die Österreichische Akademie der Wissenschaften organisiert ihre Forschungstätigkeit in Kommissionen und Instituten. Hier können Sie nach historischen und gegenwärtigen Forschungseinrichtungen suchen und kombinierte Auswertungen durchführen."
         context["search_form"] = InstitutionFacetedSearchFormNew()
+        context["form_institution_start_date"] = (
+            Institution.objects.filter(kind__parent_class__id=81)
+            .exclude(start_date__isnull=True)
+            .order_by("start_date")
+            .first()
+            .start_date.year
+        )
+        context["form_institution_end_date"] = datetime.date.today().year
         return context
 
 
@@ -237,7 +245,8 @@ class SearchView(SingleTableMixin, PersonSearchView, UserPassesTestMixin):
     template_name = "theme/person_search.html"
 
     def get_table_data(self):
-        return self.queryset
+        qs = self.queryset
+        return qs
 
 
 class InstitutionSearchView(UserPassesTestMixin, FacetedSearchView):
@@ -262,6 +271,14 @@ class InstitutionSearchView(UserPassesTestMixin, FacetedSearchView):
             else {"key": k, "label": k}
             for k, v in classes["netzwerk"].items()
         ]
+        context["form_institution_start_date"] = (
+            Institution.objects.filter(kind__parent_class__id=81)
+            .exclude(start_date__isnull=True)
+            .order_by("start_date")
+            .first()
+            .start_date.year
+        )
+        context["form_institution_end_date"] = datetime.date.today().year
         return context
 
     def test_func(self):

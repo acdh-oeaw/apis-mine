@@ -636,12 +636,31 @@ class InstitutionFilterFormHelperNew(FormHelper):
             Div(
                 Div(
                     Accordion(
+                        Hidden("start_date_form", ""),
+                        Hidden("end_date_form", ""),
+                        Hidden("start_date_form_exclusive", ""),
+                        Hidden("end_date_form_exclusive", ""),
                         Fieldset(
                             "",
                             "institution_art",
                             "institution_klasse",
                             css_id="mitgliedschaft",
                             css_class="show card-body card filter-wrapper",
+                        ),
+                        HTML(  # Mitgliedschaft slider
+                            """ <div class="px-3 pb-3 pt-1 mt-3">
+                                        <label id="bestehen-slider-label" class="font-weight-bold pb-5">Bestehen im Zeitraum</label>
+                                            <div class="slider-container pt-3">
+                                                <div data-start-form="start_date_form" data-end-form="end_date_form" class="range-slider" data-range-start="{{form_institution_start_date}}" data-range-end="{{form_institution_end_date}}">
+                                            </div>
+                                            <div class="mt-3 d-flex align-items-center">
+                                        <input class="form-control form-control-sm w-25 mr-2" type="text" id="start_date_input" value="{{form_institution_start_date}}"/><input type="checkbox" class="mt-1 ml-1" id="start_date_exclusive_checkbox"/><span class="ml-1">⟼</span>
+                                        
+                                        <div class="w-50"></div><span class="mr-1">⟻</span><input type="checkbox" class="mt-1 mr-2"  id="end_date_exclusive_checkbox" class="mr-2"/>
+                                        <input class="form-control form-control-sm w-25" type="text" id="end_date_input" value="{{form_institution_end_date}}"/>
+                  </div>
+                                        </div>
+                                    </div>"""
                         ),
                     ),
                     css_class="col-md-6 pt-30 pr-0 pr-md-custom pl-0",
@@ -1007,12 +1026,22 @@ class InstitutionFacetedSearchFormNew(FacetedSearchForm):
             return self.no_query_found()
         if self.cleaned_data["start_date_form"]:
             sqs = sqs.filter(
-                death_date__gte=parse_date(self.cleaned_data["start_date_form"])[0]
+                end_date__gte=parse_date(self.cleaned_data["start_date_form"])[0]
             )
+            if self.cleaned_data.get("start_date_form_exclusive"):
+                sqs = sqs.filter(
+                    start_date__gte=parse_date(self.cleaned_data["start_date_form"])[0]
+                )
+
         if self.cleaned_data["end_date_form"]:
             sqs = sqs.filter(
-                birth_date__lte=parse_date(self.cleaned_data["end_date_form"])[0]
+                start_date__lte=parse_date(self.cleaned_data["end_date_form"])[0]
             )
+
+            if self.cleaned_data.get("end_date_form_exclusive"):
+                sqs = sqs.filter(
+                    end_date__lte=parse_date(self.cleaned_data["end_date_form"])[0]
+                )
         return sqs
 
     def __init__(self, *args, **kwargs):
