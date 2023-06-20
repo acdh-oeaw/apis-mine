@@ -588,11 +588,12 @@ def enrich_person_context(person_object, context):
         )
     normdaten_gnd = person_object.uri_set.filter(uri__contains="d-nb.info")
     if normdaten_gnd.count() == 1:
+        gnd_identifier = normdaten_gnd[0].uri.split("/")[-1]
         context["normdaten"].append(
             {
                 "kind": "GND",
-                "uri": normdaten_gnd[0].uri,
-                "identifier": normdaten_gnd[0].uri.split("/")[-1],
+                "uri": f"https://portal.dnb.de/opac/simpleSearch?reset=true&cqlMode=true&query=auRef%3D{gnd_identifier}&selectedCategory=any",
+                "identifier": gnd_identifier,
             }
         )
     normdaten_wikidata = person_object.uri_set.filter(uri__contains="wikidata")
@@ -992,7 +993,28 @@ def enrich_person_context(person_object, context):
             for inst, dates in lst_kom.items()
         ]
         context["daten_akademie"]["Funktionen in der Akademie"].append(
-            f'{"Mitglied der folgenden Kommissionen/Kuratorien" if len(lst_kom) > 1 else "Mitglied der folgenden Kommission/des folgenden Kuratoriums"} : <ul class="list-unstyled pl-3">{"".join(lst_kom)}</ul>'
+            f'{"Mitglied der folgenden Kommissionen/Kuratorien" if len(lst_kom) > 1 else "Mitglied der folgenden Kommission/des folgenden Kuratoriums"}: <ul class="list-unstyled pl-3">{"".join(lst_kom)}</ul>'
+        )
+
+        del_kom = dict()
+
+        for rel in person_object.personinstitution_set.filter(
+            relation_type_id__in=[4201]
+        ).order_by("start_date"):
+            if rel.related_institution not in del_kom.keys():
+                del_kom[rel.related_institution] = [
+                    get_date_range(rel, classes["time_ranges_ids"])[1:-1]
+                ]
+            else:
+                del_kom[rel.related_institution].append(
+                    get_date_range(rel, classes["time_ranges_ids"])[1:-1]
+                )
+        del_kom = [
+            f'<li><a href="/institution/{inst.pk}">{inst.name}</a> ({", ".join(dates)})</li>'
+            for inst, dates in del_kom.items()
+        ]
+        context["daten_akademie"]["Funktionen in der Akademie"].append(
+            f'{"Delegierte/r an folgenden Institutionen" if len(del_kom) > 1 else "Delegierte/r an der folgenden Institution"}: <ul class="list-unstyled pl-3">{"".join(del_kom)}</ul>'
         )
 
     if (
