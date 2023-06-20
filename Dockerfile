@@ -1,6 +1,6 @@
 FROM python:3
 ARG USERNAME=app
-ARG USER_UID=8983
+ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
 # Create the user
