@@ -18,7 +18,7 @@ django-extensions = "^3.2.1"
 django-csp = "^3.7"
 #viecpro-vis = "^0.1.10"
 pyzotero = "^1.5.5"
-apis-core = { git = "https://github.com/acdh-oeaw/apis-core.git", branch = "feature/bump-python311-django4" }
+apis-core = { git = "https://github.com/acdh-oeaw/apis-core.git", branch = "hotfix/fix-python3.11_errors" }
 pysolr = "^3.9.0"
 django-haystack = "^3.2.1"
 django-sass-processor = "^1.2.2"
