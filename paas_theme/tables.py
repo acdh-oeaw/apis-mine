@@ -63,7 +63,7 @@ class SearchResultTable(tables.Table):
 
     mitgliedschaft = tables.Column(
         accessor="akademiemitgliedschaft",
-        verbose_name="Mitgieldschaft",
+        verbose_name="Mitgliedschaft",
         attrs={"td": {"class": "no-wrap"}},
     )
 
