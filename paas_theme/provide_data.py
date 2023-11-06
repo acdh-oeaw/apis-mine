@@ -919,6 +919,9 @@ def enrich_person_context(person_object, context):
                     relation_type_id__in=classes["akad_funktionen"]["präsidentin"][0],
                 )
             ],
+            "WissenschaftlerInnenaustausch": [
+                f"{rel.related_place.name} {get_date_range(rel, classes['time_ranges_ids'])}" for rel in person_object.personplace_set.filter(relation_type_id=3375).order_by("start_date")
+            ],
             "Mitgliedschaften in anderen Akademien": [
                 f'<a href="/institution/{rel.related_institution_id}">{rel.related_institution}</a>, {rel.relation_type.name} {get_date_range(rel, classes["time_ranges_ids"])}'
                 for rel in person_object.personinstitution_set.filter(
