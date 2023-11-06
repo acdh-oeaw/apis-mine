@@ -1021,9 +1021,10 @@ def enrich_person_context(person_object, context):
             f'<li><a href="/institution/{inst.pk}">{inst.name}</a> ({", ".join(dates)})</li>'
             for inst, dates in del_kom.items()
         ]
-        context["daten_akademie"]["Funktionen in der Akademie"].append(
+        if len(del_kom) > 0:
+            context["daten_akademie"]["Funktionen in der Akademie"].append(
             f'{"Delegierte/r an folgenden Institutionen" if len(del_kom) > 1 else "Delegierte/r an der folgenden Institution"}: <ul class="list-unstyled pl-3">{"".join(del_kom)}</ul>'
-        )
+            )
 
     if (
         "Mitglied in einer nationalsozialistischen Vereinigung"
