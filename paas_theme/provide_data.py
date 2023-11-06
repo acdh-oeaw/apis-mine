@@ -990,6 +990,27 @@ def enrich_person_context(person_object, context):
         context["daten_akademie"]["Funktionen in der Akademie"].append(
             f'Obmann/Obfrau der folgenden Kommission{"en" if len(lst_kom) > 1 else ""}: <ul class="list-unstyled pl-3">{"".join(lst_kom)}</ul>'
         )
+    lst_inst = dict()
+    for rel in person_object.personinstitution_set.filter(
+        relation_type_id__in=[3488, 3479, 3423, 1872, 88], related_institution__kind_id=83
+    ).order_by("start_date"):
+        if rel.related_institution not in lst_inst.keys():
+            lst_inst[rel.related_institution] = [
+                get_date_range(rel, classes["time_ranges_ids"])[1:-1]
+            ]
+        else:
+            lst_inst[rel.related_institution].append(
+                get_date_range(rel, classes["time_ranges_ids"])[1:-1]
+            )
+    lst_inst = [
+        f'<li><a href="/institution/{inst.pk}">{inst.name}</a> ({", ".join(dates)})</li>'
+        for inst, dates in lst_inst.items()
+    ]
+    if len(lst_inst) > 0:
+        context["daten_akademie"]["Funktionen in der Akademie"].append(
+        f'{"Direktor/in der folgenden Institute" if len(lst_inst) > 1 else "Direktor/in des folgenden Instituts"}: <ul class="list-unstyled pl-3">{"".join(lst_inst)}</ul>'
+        )
+    
     # Membership...
     if (
         person_object.personinstitution_set.filter(relation_type_id__in=[26]).count()
@@ -1013,9 +1034,10 @@ def enrich_person_context(person_object, context):
             f'<li><a href="/institution/{inst.pk}">{inst.name}</a> ({", ".join(dates)})</li>'
             for inst, dates in lst_kom.items()
         ]
-        context["daten_akademie"]["Funktionen in der Akademie"].append(
+        if len(lst_kom) > 0:
+            context["daten_akademie"]["Funktionen in der Akademie"].append(
             f'{"Mitglied der folgenden Kommissionen/Kuratorien" if len(lst_kom) > 1 else "Mitglied der folgenden Kommission/des folgenden Kuratoriums"}: <ul class="list-unstyled pl-3">{"".join(lst_kom)}</ul>'
-        )
+            )
 
         del_kom = dict()
 
