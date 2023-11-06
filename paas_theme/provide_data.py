@@ -656,6 +656,7 @@ def enrich_person_context(person_object, context):
                     .first()
                     .label
                 ),
+                "@wikicommons"
             )
     else:
         context["image"] = False
