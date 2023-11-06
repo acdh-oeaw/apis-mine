@@ -21,6 +21,14 @@ def abbreviate(value):
         return "NSV"
     elif value.name == "GESAMTAKADEMIE":
         return "Gesamtakademie"
+    elif value.name == "Wirkliches Mitglied (w. M.)":
+        return "wM"
+    elif value.name == "Korrespondierendes Mitglied im Ausland (k. M. A.)":
+        return "kMA"
+    elif value.name == "Korrespondierendes Mitglied im Inland (k. M. I.)":
+        return "kMI"
+    elif value.name == "Ehrenmitglied (E. M.)":
+        return "EM"
     else:
         return value
 

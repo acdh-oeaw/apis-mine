@@ -295,6 +295,7 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
         [19, 20, 21, 23, 24], PersonInstitutionRelation, labels=True
     )
     classes["mitgliedschaft sortiert"] = ["wM", "kM I", "kM A", "EM"]
+    classes["mitgliedschaft nicht gewählt"] = [3068, 3065, 3063, 1380]
     classes["ausschluss"] = [4170, 4171, 3458, 3464, 3474]
     classes["akad_funktionen"] = {
         "präsidentin": get_child_classes(
@@ -415,6 +416,7 @@ def get_wahlvorschlag(pers, mitgliedschaften):
     ruhend = getattr(id_mapping, "RUHEND_GESTELLT")
     reaktiviert = [3471, 3460, 3459]
     lst_gew = []
+    lst_wahl_dates = []
     for pp in (
         pers.related_personB.filter(relation_type_id__in=classes["vorschlag"][0])
         .exclude(start_date_written__isnull=True)
@@ -423,6 +425,7 @@ def get_wahlvorschlag(pers, mitgliedschaften):
         m = get_mitgliedschaft_from_relation(pp.relation_type)
         date, funk = get_gewaehlt(pers, pp.start_date_written)
         txt = f"{pp.start_date_written} zur Wahl zum {m} der {kls} vorgeschlagen von:"
+        lst_wahl_dates.append(pp.start_date_written)
         if (txt, pp.start_date) not in res.keys():
             res[(txt, pp.start_date)] = [
                 pp.related_personA if pp.related_personA != pers else pp.related_personB
@@ -469,6 +472,16 @@ def get_wahlvorschlag(pers, mitgliedschaften):
                 )
             )
             lst_fin.append((pp.start_date, "<hr/>"))
+    for pe in pers.personevent_set.filter(relation_type_id__in=classes["mitgliedschaft nicht gewählt"]):
+        if pe.start_date.strftime("%Y") in lst_wahl_dates:
+            continue
+        lst_fin.append(
+            (
+                pe.start_date,
+                f"{'am' if len(pe.start_date_written) > 4 else ''} {pe.start_date_written} nicht gewählt als {abbreviate(pe.relation_type)} der {kls}",
+            )
+        )
+        lst_fin.append((pe.start_date, "<hr/>"))
     for mit in mitgliedschaften:
         if (
             mit[0]
