@@ -874,14 +874,14 @@ def enrich_person_context(person_object, context):
                 for t in get_wahlvorschlag(person_object, mitgliedschaften)
             ],
             "Funktionen in der Akademie": [
-                f'Zum Präsidenten der Gesamtakademie gewählt am {rel.start_date_written}{", tätig bis "+rel.end_date_written if rel.end_date_written is not None else ""}'
+                f'Zum Präsidenten der Gesamtakademie {rel.relation_type.name} am {rel.start_date_written}{", tätig bis "+rel.end_date_written if rel.end_date_written is not None else ""}'
                 for rel in person_object.personinstitution_set.filter(
                     related_institution_id=500,
                     relation_type_id__in=classes["akad_funktionen"]["präsidentin"][0],
                 )
             ]
             + [
-                f'Zu{"m Vizepräsidenten" if person_object.gender == "male" else "r Vizepräsidentin"} der Gesamtakademie gewählt am {rel.start_date_written}{", tätig bis "+rel.end_date_written if rel.end_date_written is not None else ""}'
+                f'Zu{"m Vizepräsidenten" if person_object.gender == "male" else "r Vizepräsidentin"} der Gesamtakademie {rel.relation_type.name} am {rel.start_date_written}{", tätig bis "+rel.end_date_written if rel.end_date_written is not None else ""}'
                 for rel in person_object.personinstitution_set.filter(
                     related_institution_id=500,
                     relation_type_id__in=classes["akad_funktionen"]["vizepräsidentin"][
@@ -890,12 +890,19 @@ def enrich_person_context(person_object, context):
                 )
             ]
             + [
-                f'Zum Sekretär der {abbreviate(rel.related_institution)} {rel.relation_type.name} am {rel.start_date_written}{", tätig bis "+rel.end_date_written if rel.end_date_written is not None else ""}'
+                f'Zu{"m Sekretär" if person_object.gender == "male" else "r Sekretärin"} der {abbreviate(rel.related_institution)} {rel.relation_type.name} am {rel.start_date_written}{", tätig bis "+rel.end_date_written if rel.end_date_written is not None else ""}'
                 for rel in person_object.personinstitution_set.filter(
                     related_institution_id__in=getattr(
                         id_mapping, "GESAMTAKADEMIE_UND_KLASSEN"
                     ),
                     relation_type_id__in=classes["akad_funktionen"]["sekretärin"][0],
+                )
+            ]
+            + [
+                f'Zu{"m Präsident" if person_object.gender == "male" else "r Präsidentin"} der {abbreviate(rel.related_institution)} {rel.relation_type.name} am {rel.start_date_written}{", tätig bis "+rel.end_date_written if rel.end_date_written is not None else ""}'
+                for rel in person_object.personinstitution_set.filter(
+                    related_institution_id__in=[2,3],
+                    relation_type_id__in=classes["akad_funktionen"]["präsidentin"][0],
                 )
             ],
             "Mitgliedschaften in anderen Akademien": [
