@@ -494,7 +494,7 @@ def get_wahlvorschlag(pers, mitgliedschaften):
             lst_fin.append(
                 (
                     datetime.strptime(mit[0], "%Y").date(),
-                    f"{mit[0]} {mit[2]}",
+                    f"{mit[0]} {mit[2]}" if 'erloschen' not in mit[6] else f"{mit[0]} {mit[6]}",
                 )
             )
             lst_fin.append((datetime.strptime(mit[0], "%Y").date(), "<hr/>"))
@@ -766,8 +766,15 @@ def enrich_person_context(person_object, context):
     context["mitgliedschaften"] = []
     for mit in mitgliedschaften:
         if mit[5].relation_type_id in classes["ausschluss"]:
-            context["mitgliedschaften"].append(f"{mit[0]} {mit[3]}")
+            if mit[6].lower() == "mitgliedschaft erloschen":
+                context["mitgliedschaften"].append(f"{mit[0]} {mit[6]}")
+            else: 
+                context["mitgliedschaften"].append(f"{mit[0]} {mit[3]}")
         elif mit[6].lower() == "ruhend gestellt":
+            context["mitgliedschaften"].append(
+                f"{mit[0]} <span title='{mit[2]} in der {mit[4]}'>{mit[2]}</span> ({mit[6]})"
+            )
+        elif mit[6].lower() == "mitgliedschaft erloschen":
             context["mitgliedschaften"].append(
                 f"{mit[0]} <span title='{mit[2]} in der {mit[4]}'>{mit[2]}</span> ({mit[6]})"
             )
