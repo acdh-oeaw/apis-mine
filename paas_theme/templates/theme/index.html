@@ -279,6 +279,7 @@ $(document).ready(function() {
       if (e.target.value*1 === min) {
         //qs.delete(startKey)
       }
+      $('input[name="start_date_form"]').val(e.target.value);
      //window.location.search = qs.toString()
     }
 
@@ -313,6 +314,7 @@ $(document).ready(function() {
      if (e.target.value*1 === max) {
       //qs.delete(endKey)
      }
+      $('input[name="end_date_form"]').val(e.target.value);
      //window.location.search = qs.toString()
     }
   })
