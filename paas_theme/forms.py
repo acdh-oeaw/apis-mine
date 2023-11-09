@@ -282,7 +282,6 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     wahl_vorschlag_erfolgreich = forms.ChoiceField(
         widget=forms.RadioSelect(),
         required=False,
-        initial="beides",
         label="Vorschlag erfolgreich",
         choices=[
             ("beides", "sowohl erflogreich als auch nicht erfolgreich"),
