@@ -654,7 +654,7 @@ def enrich_person_context(person_object, context):
             fig_caption = fig_caption.first().label
         else:
             fig_caption = "OEAW"
-        context["image"] = (True, lst_images[0].split("/")[-1], fig_caption)
+        context["image"] = (True, lst_images[0].split("/")[-1].replace(".tif", ".png").replace(".jfif", ".png"), fig_caption)
     elif classes.get("image_wiki", False):
         if (
             person_object.label_set.filter(
