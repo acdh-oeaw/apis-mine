@@ -159,12 +159,12 @@ $(document).ready(function() {
          
             text += "Mitgliedschaft "
          
-          text += `${membershipLabels.map(l => `<i style="color: #0047bb">${l}</i>`).join(" / ")}`
+          text += `${membershipLabels.map(l => `<i style="color: #0047bb">${l}</i>`).join(" & ")}`
           
           if (membershipLabels.length > 0 && classLabels.length > 0) {
             text += " und "
           }
-          text += `${classLabels.map(l => `<i style="color: #0047bb">${l}</i>`).join(" / ")}`
+          text += `${classLabels.map(l => `<i style="color: #0047bb">${l}</i>`).join(" & ")}`
           
           mitgliedschaftSliderLabel.innerHTML = text + " in Zeitraum";
         }
