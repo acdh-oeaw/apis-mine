@@ -175,8 +175,10 @@ class PersonFilterFormHelperNew(FormHelper):
                         AccordionGroup(
                             "zur Wahl vorgeschlagen von",
                             "wahl_person",
-                            "wahl_beruf",
-                            "wahl_gender",
+                            "wahl_vorschlag_erfolgreich",
+                            # "wahl_person",
+                            # "wahl_beruf",
+                            # "wahl_gender",
                             css_id="wahlvorschlag",
                         ),
                         AccordionGroup(
@@ -261,14 +263,36 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         ),
         label="",
     )
-    wahl_gender = forms.ChoiceField(
-        widget=forms.Select(attrs={"class": "select2-main no-search rounded-0"}),
+    # wahl_gender = forms.ChoiceField(
+    #     widget=forms.Select(attrs={"class": "select2-main no-search rounded-0"}),
+    #     required=False,
+    #     choices=(("", "-"), ("male", "Männlich"), ("female", "Weiblich")),
+    #     label="Geschlecht",
+    # )
+    # wahl_beruf = forms.CharField(required=False, label="Beruf")
+    # wahl_person = forms.CharField(required=False, label="Name")
+    wahl_person = MultiSolrField(
         required=False,
-        choices=(("", "-"), ("male", "Männlich"), ("female", "Weiblich")),
-        label="Geschlecht",
+        label="Person",
+        widget=autocomplete.Select2Multiple(
+            url="paas_theme:paas_person_autocomplete",
+            attrs={"data-theme": "bootstrap4"},
+        ),
     )
-    wahl_beruf = forms.CharField(required=False, label="Beruf")
-    wahl_person = forms.CharField(required=False, label="Name")
+    wahl_vorschlag_erfolgreich = forms.ChoiceField(
+        widget=forms.RadioSelect(),
+        required=False,
+        initial="beides",
+        label="Vorschlag erfolgreich",
+        choices=[
+            ("beides", "sowohl erflogreich als auch nicht erfolgreich"),
+            (
+                "erfolgreich",
+                "nur erfolgreich",
+            ),
+            ("nicht erfolgreich", "nur nicht erfolgreich"),
+        ],
+    )
     place_of_birth = MultiSolrField(
         required=False,
         label="Geburtsort",
@@ -389,7 +413,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         # print("PERSON FACETED SEARCH FORM NEW")
         super().search()
 
-        pers_ids = []
+        pers_ids = None
         sqs = self.searchqueryset.filter(
             django_ct="paas_theme.paasperson", academy_member=True
         )
@@ -457,26 +481,41 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             sqs = sqs.filter(ewk=self.cleaned_data["ewk"])
         if self.cleaned_data["nobelpreis"]:
             sqs = sqs.filter(nobelpreis=self.cleaned_data["nobelpreis"])
-        if (
-            self.cleaned_data["wahl_beruf"]
-            or self.cleaned_data["wahl_person"]
-            or self.cleaned_data["wahl_gender"]
-        ):
-            dict_wahl = {"django_ct": "apis_relations.personperson"}
-            if self.cleaned_data["wahl_beruf"]:
-                dict_wahl["elected_by_profession"] = AutoQuery(
-                    self.cleaned_data["wahl_beruf"]
-                )
-            if self.cleaned_data["wahl_person"]:
-                dict_wahl["elected_by"] = AutoQuery(self.cleaned_data["wahl_person"])
-            if self.cleaned_data["wahl_gender"]:
-                dict_wahl["elected_by_gender"] = AutoQuery(
-                    self.cleaned_data["wahl_gender"]
-                )
+        if self.cleaned_data["wahl_person"]:
+            dict_wahl = {"django_ct": "apis_relations.personperson",
+                         "elected_by_id__in": [x[0] for x in self.cleaned_data["wahl_person"]]
+                         }
+            if self.cleaned_data["wahl_vorschlag_erfolgreich"] == 'erfolgreich':
+                dict_wahl["elected"] = True
+            elif self.cleaned_data["wahl_vorschlag_erfolgreich"] == 'nicht erfolgreich':
+                dict_wahl["elected"] = False
             sqs2 = SearchQuerySet().filter(**dict_wahl)
+            if pers_ids is None:
+                pers_ids = []
             for pers2 in sqs2:
-                if pers2.elected_by_id not in pers_ids:
-                    pers_ids.append(pers2.elected_by_id)
+                if pers2.elected_person_id not in pers_ids:
+                    pers_ids.append(pers2.elected_person_id)
+
+        # if (
+        #     self.cleaned_data["wahl_beruf"]
+        #     or self.cleaned_data["wahl_person"]
+        #     or self.cleaned_data["wahl_gender"]
+        # ):
+        #     dict_wahl = {"django_ct": "apis_relations.personperson"}
+        #     if self.cleaned_data["wahl_beruf"]:
+        #         dict_wahl["elected_by_profession"] = AutoQuery(
+        #             self.cleaned_data["wahl_beruf"]
+        #         )
+        #     if self.cleaned_data["wahl_person"]:
+        #         dict_wahl["elected_by"] = AutoQuery(self.cleaned_data["wahl_person"])
+        #     if self.cleaned_data["wahl_gender"]:
+        #         dict_wahl["elected_by_gender"] = AutoQuery(
+        #             self.cleaned_data["wahl_gender"]
+        #         )
+        #     sqs2 = SearchQuerySet().filter(**dict_wahl)
+        #     for pers2 in sqs2:
+        #         if pers2.elected_by_id not in pers_ids:
+        #             pers_ids.append(pers2.elected_by_id)
         if (
             self.cleaned_data["beruf_position"]
             or self.cleaned_data["beruf_institution"]
@@ -484,6 +523,8 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             q_dict3 = {
                 "django_ct": "apis_relations.personinstitution",
             }
+            if pers_ids is None:
+                pers_ids = []
             if len(self.cleaned_data["beruf_position"]) > 0:
                 q_dict3["relation_type_id__in"] = self.cleaned_data["beruf_position"]
             if len(self.cleaned_data["beruf_institution"]) > 0:
@@ -492,7 +533,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             for pers2 in sqs3:
                 if pers2.person_id not in pers_ids:
                     pers_ids.append(pers2.person_id)
-        if len(pers_ids) > 0:
+        if pers_ids is not None:
             sqs = sqs.filter(django_id__in=pers_ids)
 
         if len(self.selected_facets) == 0 and "selected_facets" in self.data.keys():
