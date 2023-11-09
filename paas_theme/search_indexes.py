@@ -273,16 +273,13 @@ class WahlIndex(indexes.SearchIndex, indexes.Indexable):
             return None
 
     def prepare_membership(self, obj):
-        if hasattr(self, "pi"):
-            pi = self.pi
-        else:
-            qdict = {
-                "related_person_id": obj.related_personA_id,
-                "related_institution_id__in": [2, 3, 500],
-            }
-            if obj.start_date_written is not None:
-                qdict["start_date_written__contains"] = obj.start_date_written
-            pi = PersonInstitution.objects.filter(**qdict)
+        qdict = {
+            "related_person_id": obj.related_personA_id,
+            "related_institution_id__in": [2, 3, 500],
+        }
+        if obj.start_date_written is not None:
+            qdict["start_date_written__contains"] = obj.start_date_written
+        pi = PersonInstitution.objects.filter(**qdict)
         if pi.count() == 1:
             if not hasattr(self, "pi"):
                 self.pi = pi
@@ -292,16 +289,13 @@ class WahlIndex(indexes.SearchIndex, indexes.Indexable):
             return None
 
     def prepare_klasse(self, obj):
-        if hasattr(self, "pi"):
-            pi = self.pi
-        else:
-            qdict = {
-                "related_person_id": obj.related_personA_id,
-                "related_institution_id__in": [2, 3, 500],
-            }
-            if obj.start_date_written is not None:
-                qdict["start_date_written__contains"] = obj.start_date_written
-            pi = PersonInstitution.objects.filter(**qdict)
+        qdict = {
+            "related_person_id": obj.related_personA_id,
+            "related_institution_id__in": [2, 3, 500],
+        }
+        if obj.start_date_written is not None:
+            qdict["start_date_written__contains"] = obj.start_date_written
+        pi = PersonInstitution.objects.filter(**qdict)
         if pi.count() == 1:
             if not hasattr(self, "pi"):
                 self.pi = pi
@@ -311,16 +305,13 @@ class WahlIndex(indexes.SearchIndex, indexes.Indexable):
             return None
 
     def prepare_elected(self, obj):
-        if hasattr(self, "pi"):
-            pi = self.pi
-        else:
-            qdict = {
-                "related_person_id": obj.related_personA_id,
-                "related_institution_id__in": [2, 3, 500],
-            }
-            if obj.start_date_written is not None:
-                qdict["start_date_written__contains"] = obj.start_date_written
-            pi = PersonInstitution.objects.filter(**qdict)
+        qdict = {
+            "related_person_id": obj.related_personA_id,
+            "related_institution_id__in": [2, 3, 500],
+        }
+        if obj.start_date_written is not None:
+            qdict["start_date_written__contains"] = obj.start_date_written
+        pi = PersonInstitution.objects.filter(**qdict)
         if pi.count() == 1:
             if not hasattr(self, "pi"):
                 self.pi = pi

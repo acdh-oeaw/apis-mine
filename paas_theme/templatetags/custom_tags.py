@@ -87,6 +87,8 @@ def normalize_filter(filter, kind, url=None):
         "end_date_birth_form": "Lebensspanne bis",
         "mtgld_mitgliedschaft": "Mitgliedschaft",
         "mtgld_klasse": "Klasse",
+        "wahl_person": "vorgeschlagen von",
+        "wahl_vorschlag_erfolgreich": "Vorschlag erfolgreich",
     }
     bool_fields_norm = {
         "funk_praesidentin": "Präsident/in",

@@ -35,8 +35,7 @@ class PaasPersonAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         query_object = SQ(**self.f)
         if self.q:
-            query_object &= SQ(name=self.q)
-
+            query_object &= SQ(name__contains=self.q)
         return SearchQuerySet().filter(query_object)
 
 
