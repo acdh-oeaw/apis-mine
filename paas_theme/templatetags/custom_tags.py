@@ -105,7 +105,14 @@ def normalize_filter(filter, kind, url=None):
     if kind == "simple":
         return f"{norm_kind[filter['field']]}"
     if kind == "name":
-        if filter["kind"] == "multi":
+        if filter["kind"] == "boolean" and filter["field"] == "mtgld_mitgliedschaft":
+            val = " UND ".join(
+                [
+                    bool_fields_norm[x] if x in bool_fields_norm.keys() else x
+                    for x in filter["value"]
+                ]
+            )
+        elif filter["kind"] == "multi":
             val = " ODER ".join([x[1] for x in filter["value"]])
         elif filter["kind"] == "boolean":
             val = " ODER ".join(

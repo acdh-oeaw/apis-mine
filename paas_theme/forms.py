@@ -325,8 +325,8 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             ("Junge Kurie/Junge Akademie", "Junge Kurie/Junge Akademie"),
         ],
     )
-    mtgld_klasse = forms.MultipleChoiceField(
-        widget=forms.CheckboxSelectMultiple(),
+    mtgld_klasse = forms.ChoiceField(
+        widget=forms.RadioSelect(),
         required=False,
         label="Klasse",
         choices=[
@@ -434,12 +434,14 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             mtgld_dic = SQ()
             for mitgliedschaft in self.cleaned_data["mtgld_mitgliedschaft"]:
                 mtgld_dic.add(
-                    SQ(akademiemitgliedschaft_exact=Exact(mitgliedschaft)), SQ.OR
+                    SQ(akademiemitgliedschaft_exact=Exact(mitgliedschaft)), SQ.AND
                 )
-            kls_dict = SQ()
-            for klasse in self.cleaned_data["mtgld_klasse"]:
-                kls_dict.add(SQ(klasse_person=klasse), SQ.OR)
-            sqs = sqs.filter(mtgld_dic & kls_dict)
+            if self.cleaned_data["mtgld_klasse"]:
+                mtgld_dic.add(
+                    SQ(klasse_person=Exact(self.cleaned_data["mtgld_klasse"])),
+                    SQ.AND,
+                )
+            sqs = sqs.filter(mtgld_dic)
         # TODO: This looks unnecessary requirement for self.cleaned_data["mtgld_mitgliedschaft"] or self.cleaned_data["mtgld_klasse"]
         else:
             ids_person = PAASMembership.objects.get_memberships(
