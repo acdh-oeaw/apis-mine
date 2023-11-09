@@ -321,7 +321,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             ("kM I", "korrespondierendes Mitglied im Inland"),
             ("kM A", "korrespondierendes Mitglied im Ausland"),
             ("wM", "Wirkliches Mitglied"),
-            ("em", "Ehrenmitglied"),
+            ("EM", "Ehrenmitglied"),
             ("Junge Kurie/Junge Akademie", "Junge Kurie/Junge Akademie"),
         ],
     )
