@@ -15,18 +15,24 @@ from paas_theme import id_mapping
 from .helper_functions import abbreviate, get_mitgliedschaft_from_relation
 
 
-def convert_date(date):
+def convert_date(date, boundary=None):
     """converts date string to correct format
 
     Args:
         date (str): date string
+        boundary (str, optional): if set to start or end, the function will return the start or end of the year. Defaults to None.
 
     Returns:
         str: returns date in format YYYY-MM-DD
     """
 
     if re.match(r"^[0-9]{4}$", date):
-        return f"{date}-06-30"
+        if boundary is None:
+            return f"{date}-06-30"
+        elif boundary == "start":
+            return f"{date}-01-01"
+        elif boundary == "end":
+            return f"{date}-12-31"
     elif re.match(r"[0-9]{2}\.[0-9]{2}\.[0-9]{4}", date):
         pdate = re.match(r"([0-9]{2})\.([0-9]{2})\.([0-9]{4})", date)
         return f"{pdate.group(3)}-{pdate.group(2)}-{pdate.group(1)}"
@@ -356,17 +362,17 @@ class PAASMembershipsQuerySet(models.QuerySet):
         if start:
 
             q_obj &= models.Q(end_date__isnull=True) | models.Q(
-                end_date__gte=convert_date(start)
+                end_date__gte=convert_date(start, boundary="start")
             )
 
         if start and start_exclusive:
-            q_obj &= models.Q(start_date__gte=convert_date(start))
+            q_obj &= models.Q(start_date__gte=convert_date(start, boundary="start"))
             
         if end:
-            q_obj &= models.Q(start_date__lte=convert_date(end))
+            q_obj &= models.Q(start_date__lte=convert_date(end, boundary="end"))
 
         if end and end_exclusive:
-            q_obj = models.Q(end_date__lte=convert_date(end))
+            q_obj = models.Q(end_date__lte=convert_date(end, boundary="end"))
 
         return self.filter(q_obj)
 
