@@ -354,17 +354,21 @@ class PAASMembershipsQuerySet(models.QuerySet):
                 )
             )
 
-        if start and end and start > end:
-            raise ValueError(
-                f"End date needs to be before start date: {start} > {end}"
+        if start and end:
+            if convert_date(start, boundary="start") > convert_date(end, boundary="end"):
+                raise ValueError(
+                    f"End date needs to be before start date: {start} > {end}"
+                )
+
+        if start and not end:
+
+            q_obj &= models.q(models.Q(end_date__isnull=True) | models.Q(
+                end_date__gte=convert_date(start, boundary="start"))
             )
-
-        if start:
-
-            q_obj &= models.Q(end_date__isnull=True) | models.Q(
+        elif start:
+            q_obj &= models.Q(
                 end_date__gte=convert_date(start, boundary="start")
             )
-
         if start and start_exclusive:
             q_obj &= models.Q(start_date__gte=convert_date(start, boundary="start"))
             
@@ -372,7 +376,7 @@ class PAASMembershipsQuerySet(models.QuerySet):
             q_obj &= models.Q(start_date__lte=convert_date(end, boundary="end"))
 
         if end and end_exclusive:
-            q_obj = models.Q(end_date__lte=convert_date(end, boundary="end"))
+            q_obj &= models.Q(end_date__lte=convert_date(end, boundary="end"))
 
         return self.filter(q_obj)
 
