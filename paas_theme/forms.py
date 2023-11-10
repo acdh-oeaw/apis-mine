@@ -353,6 +353,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         required=False,
         label="Klasse",
         choices=[
+            ("beide", "beide Klassen"),
             (
                 "math.-nat. Klasse",
                 "Mathematisch-Naturwissenschaftliche Klasse",
@@ -465,12 +466,14 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
                         SQ(akademiemitgliedschaft_exact=Exact(mitgliedschaft)), SQ.AND
                     )
             if self.cleaned_data["mtgld_klasse"]:
-                klasse = "MATHEMATISCH-NATURWISSENSCHAFTLICHE KLASSE" if self.cleaned_data["mtgld_klasse"] == "math.-nat. Klasse" else "PHILOSOPHISCH-HISTORISCHE KLASSE"
-                mtgld_dic.add(
-                    SQ(klasse_person=Exact(klasse)),
-                    SQ.AND,
-                )
-            sqs = sqs.filter(mtgld_dic)
+                if self.cleaned_data["mtgld_klasse"] != "beide":
+                    klasse = "MATHEMATISCH-NATURWISSENSCHAFTLICHE KLASSE" if self.cleaned_data["mtgld_klasse"] == "math.-nat. Klasse" else "PHILOSOPHISCH-HISTORISCHE KLASSE"
+                    mtgld_dic.add(
+                        SQ(klasse_person=Exact(klasse)),
+                        SQ.AND,
+                    )
+            if mtgld_dic:
+                sqs = sqs.filter(mtgld_dic)
         # TODO: This looks unnecessary requirement for self.cleaned_data["mtgld_mitgliedschaft"] or self.cleaned_data["mtgld_klasse"]
         elif self.cleaned_data["start_date_form"] or self.cleaned_data["end_date_form"]:
             ids_person = PAASMembership.objects.get_memberships(
