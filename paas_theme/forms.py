@@ -282,7 +282,6 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
     wahl_vorschlag_erfolgreich = forms.ChoiceField(
         widget=forms.RadioSelect(),
         required=False,
-        initial="beides",
         label="Vorschlag erfolgreich",
         choices=[
             ("beides", "sowohl erflogreich als auch nicht erfolgreich"),
@@ -454,7 +453,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         if (
             self.cleaned_data["mtgld_mitgliedschaft"]
             or self.cleaned_data["mtgld_klasse"]
-        ) and not self.cleaned_data["start_date_form"]:
+        ) and not (self.cleaned_data["start_date_form"] or self.cleaned_data["end_date_form"]):
             mtgld_dic = SQ()
             for mitgliedschaft in self.cleaned_data["mtgld_mitgliedschaft"]:
                 mtgld_dic.add(
