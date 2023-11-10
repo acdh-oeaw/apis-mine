@@ -284,7 +284,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         required=False,
         label="Vorschlag erfolgreich",
         choices=[
-            ("beides", "sowohl erflogreich als auch nicht erfolgreich"),
+            ("beides", "alle"),
             (
                 "erfolgreich",
                 "nur erfolgreich",
@@ -416,7 +416,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         sqs = self.searchqueryset.filter(
             django_ct="paas_theme.paasperson", academy_member=True
         )
-        if self.cleaned_data["q"] != "":
+        if self.cleaned_data["q"]:
             sqs = sqs.filter(content=AutoQuery(self.cleaned_data["q"]))
         if self.cleaned_data["akademiefunktionen"]:
             funk_dict = SQ()
@@ -472,7 +472,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
                 )
             sqs = sqs.filter(mtgld_dic)
         # TODO: This looks unnecessary requirement for self.cleaned_data["mtgld_mitgliedschaft"] or self.cleaned_data["mtgld_klasse"]
-        else:
+        elif self.cleaned_data["start_date_form"] or self.cleaned_data["end_date_form"]:
             ids_person = PAASMembership.objects.get_memberships(
                 start=self.cleaned_data["start_date_form"],
                 end=self.cleaned_data["end_date_form"],
