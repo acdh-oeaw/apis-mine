@@ -893,9 +893,7 @@ def enrich_person_context(person_object, context):
                 if isinstance(t[1], tuple)
                 else t[1]
                 for t in get_wahlvorschlag(person_object, mitgliedschaften)
-            ] + ['<br/>', 'zur Wahl vorgeschlagen: <ul>'] +
-                [f"<li><a href='/person/{rel.related_personA_id}'>{rel.related_personA}</a> ({rel.start_date_written})</li>" for rel in person_object.related_personA.filter(relation_type_id__in=classes['vorschlag'][0], start_date__isnull=False).order_by('start_date')
-                 ] + ['</ul>'],
+            ],
             "Funktionen in der Akademie": [
                 f'Zum Präsidenten der Gesamtakademie {rel.relation_type.name} am {rel.start_date_written}{", tätig bis "+rel.end_date_written if rel.end_date_written is not None else ""}'
                 for rel in person_object.personinstitution_set.filter(
@@ -947,6 +945,9 @@ def enrich_person_context(person_object, context):
         context["daten_akademie"]["Eltern"] = []
         context["daten_akademie"]["Eltern"].append(f" {'<br/>'.join(eltern)}")
         context["daten_akademie"].move_to_end("Eltern", last=False)
+    vorschlag = person_object.related_personA.filter(relation_type_id__in=classes['vorschlag'][0], start_date__isnull=False).order_by('start_date')
+    if vorschlag.count() > 0:
+        context["daten_akademie"]["Wahl und Mitgliedschaft"] += ['<br/>', 'zur Wahl vorgeschlagen: <ul>'] + [f"<li><a href='/person/{rel.related_personA_id}'>{rel.related_personA}</a> ({rel.start_date_written})</li>" for rel in vorschlag] + ['</ul>']
     if person_object.personevent_set.filter(relation_type_id=3454).count() > 0:
         context["daten_akademie"][
             "Mitglied in einer nationalsozialistischen Vereinigung"
