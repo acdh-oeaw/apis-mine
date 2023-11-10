@@ -184,7 +184,7 @@ class PersonFilterFormHelperNew(FormHelper):
                         AccordionGroup(
                             "Wissenschaftler/innen/austausch", "wiss_austausch"
                         ),
-                        AccordionGroup("Auszeichnungen", "nobelpreis", "ewk"),
+                        AccordionGroup("Auszeichnungen", "preise"),
                     ),
                     css_class="col-md-6 pt-30 pr-0 pl-0 pl-md-custom",
                 ),
@@ -316,7 +316,14 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             attrs={"data-theme": "bootstrap4"},
         ),
     )
-    nobelpreis = forms.BooleanField(required=False, label="Nobelpreis")
+    preise = MultiSolrField(
+        required=False,
+        label="",
+        widget=autocomplete.Select2Multiple(
+            url="paas_theme:paas_preise_autocomplete",
+            attrs={"data-theme": "bootstrap4"},
+        ),
+    )
     beruf_position = MultiSolrChildsField(
         model_class=PersonInstitutionRelation,
         required=False,
@@ -360,9 +367,6 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             ),
             ("phil.-hist. Klasse", "Philosophisch-Historische Klasse"),
         ],
-    )
-    ewk = forms.BooleanField(
-        required=False, label="Österreichisches Ehrenzeichen für Wissenschaft und Kunst"
     )
     wiss_austausch = MultiSolrField(
         required=False,
@@ -485,10 +489,15 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
                 end_exclusive=self.cleaned_data.get("end_date_form_exclusive"),
             ).get_person_ids()
             sqs = sqs.filter(django_id__in=ids_person)
-        if self.cleaned_data["ewk"]:
-            sqs = sqs.filter(ewk=self.cleaned_data["ewk"])
-        if self.cleaned_data["nobelpreis"]:
-            sqs = sqs.filter(nobelpreis=self.cleaned_data["nobelpreis"])
+        # if self.cleaned_data["ewk"]:
+        #     sqs = sqs.filter(ewk=self.cleaned_data["ewk"])
+        # if self.cleaned_data["nobelpreis"]:
+        #     sqs = sqs.filter(nobelpreis=self.cleaned_data["nobelpreis"])
+        if self.cleaned_data["preise"]:
+            preise_dict = SQ()
+            for preis in self.cleaned_data["preise"]:
+                preise_dict.add(SQ(akademiepreise=preis[1]), SQ.OR)
+            sqs = sqs.filter(preise_dict)
         if self.cleaned_data["wahl_person"]:
             dict_wahl = {"django_ct": "apis_relations.personperson",
                          "elected_by_id__in": [x[0] for x in self.cleaned_data["wahl_person"]]

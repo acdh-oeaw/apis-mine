@@ -30,6 +30,11 @@ urlpatterns = [
         name="paas_person_autocomplete",
     ),
     path(
+        "paas/autocompletes/preise/",
+        autocompletes.PaasPreiseAutocomplete.as_view(),
+        name="paas_preise_autocomplete",
+    ),
+    path(
         r"paas/autocompletes/institution/",
         autocompletes.PaasInstitutionAutocomplete.as_view(),
         name="paas_institution_autocomplete",

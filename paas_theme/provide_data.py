@@ -675,23 +675,23 @@ def enrich_person_context(person_object, context):
         context["image"] = False
     preise = []
     for nobel in person_object.personinstitution_set.filter(
-        relation_type_id=138,
+        relation_type_id__in=[138, 3501],
         related_institution_id__in=getattr(id_mapping, "NOBEL_PREISE"),
     ):
         preise.append(
-            f"{nobel.related_institution.name}, {get_date_range(nobel, classes['time_ranges_ids'])[1:-1]}"
+            f"{nobel.related_institution.name}{' (abgelehnt)' if nobel.relation_type_id == 3501 else ''}, {get_date_range(nobel, classes['time_ranges_ids'])[1:-1]}"
         )
     for ewk in person_object.personinstitution_set.filter(
-        relation_type_id=138, related_institution_id=29953
+        relation_type_id__in=[138, 3501], related_institution_id=29953
     ):
         preise.append(
-            f"{ewk.related_institution.name}{', '+get_date_range(ewk, classes['time_ranges_ids'])[1:-1] if len(get_date_range(ewk, classes['time_ranges_ids'])) > 0 else ''}"
+            f"{ewk.related_institution.name}{' (abgelehnt)' if ewk.relation_type_id == 3501 else ''}{', '+get_date_range(ewk, classes['time_ranges_ids'])[1:-1] if len(get_date_range(ewk, classes['time_ranges_ids'])) > 0 else ''}"
         )
     akad_preise = ""
     for akadp in person_object.personinstitution_set.filter(
-        related_institution_id__in=classes["akademiepreise"], relation_type_id=138
-    ).exclude(relation_type_id=3501):
-        akad_preise += f"<li><a href='/institution/{akadp.related_institution_id}'>{akadp.related_institution}</a>{' '+get_date_range(akadp, classes['time_ranges_ids'])[1:-1] if len(get_date_range(akadp, classes['time_ranges_ids'])) > 0 else ''}</li>"
+        related_institution_id__in=classes["akademiepreise"], relation_type_id__in=[138, 3501]
+    ):
+        akad_preise += f"<li><a href='/institution/{akadp.related_institution_id}'>{akadp.related_institution}</a>{' (abgelehnt)' if akadp.relation_type_id == 3501 else ''}{' '+get_date_range(akadp, classes['time_ranges_ids'])[1:-1] if len(get_date_range(akadp, classes['time_ranges_ids'])) > 0 else ''}</li>"
     if len(akad_preise) > 0:
         akad_preise = (
             "Ausgezeichnet mit folgenden Akademiepreisen:<ul>" + akad_preise + "</ul>"

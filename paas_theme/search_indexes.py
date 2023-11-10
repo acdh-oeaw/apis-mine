@@ -1,5 +1,6 @@
 from haystack import indexes
 from django.conf import settings
+from django.db.models import Q
 
 from apis_core.apis_metainfo.models import Collection, Text
 from apis_core.apis_vocabularies.models import (
@@ -191,7 +192,7 @@ class InstitutionIndex(indexes.SearchIndex, indexes.Indexable):
 
     # TODO: MAYBE remove GEMEINSAM KOMMISSION etc. (not id__in=[1,2,3])
     def index_queryset(self, using=None):
-        qs = self.get_model().objects.filter(kind__parent_class__id=81)
+        qs = self.get_model().objects.filter(Q(kind__parent_class__id=81)|Q(kind_id=137))
         return qs
 
 
@@ -502,10 +503,13 @@ class PersonIndexNew(indexes.SearchIndex, indexes.Indexable):
             pi.related_institution.name
             for pi in PersonInstitution.objects.filter(
                 related_person=object,
-                related_institution_id__in=classes["akademiepreise"],
+                related_institution_id__in=classes["akademiepreise"]+[29953],
                 relation_type_id=138,
             )
         ]
+        nb = object.nobelprizes()
+        if nb is not None:
+            res.extend([x[1] for x in nb]) 
         return res
 
     def prepare_preisaufgaben(self, object):
