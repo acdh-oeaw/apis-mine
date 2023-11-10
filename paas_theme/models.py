@@ -330,23 +330,10 @@ class PAASMembershipsQuerySet(models.QuerySet):
             elif isinstance(memberships[0], int):
                 q_obj &= models.Q(relation_type_id__in=memberships)
         if institutions is not None:
-            if len(institutions) > 0:
-                ids = []
-                if isinstance(institutions[0], str):
-                    for inst in Institution.objects.filter(
-                        id__in=getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN")
-                    ):
-                        for inst2 in institutions:
-                            if inst2.lower() in inst.name.lower():
-                                ids.append(inst.id)
-                                break
-                    q_obj &= models.Q(related_institution_id__in=ids)
+            if institutions == "phil.-hist. Klasse":
+                q_obj &= models.Q(related_institution_id=2)
             else:
-                q_obj &= models.Q(
-                    related_institution_id__in=getattr(
-                        id_mapping, "GESAMTAKADEMIE_UND_KLASSEN"
-                    )
-                )
+                q_obj &= models.Q(related_institution_id=3)
         else:
             q_obj &= models.Q(
                 related_institution_id__in=getattr(
@@ -362,7 +349,7 @@ class PAASMembershipsQuerySet(models.QuerySet):
 
         if start and not end:
 
-            q_obj &= models.q(models.Q(end_date__isnull=True) | models.Q(
+            q_obj &= models.Q(models.Q(end_date__isnull=True) | models.Q(
                 end_date__gte=convert_date(start, boundary="start"))
             )
         elif start:

@@ -354,10 +354,10 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         label="Klasse",
         choices=[
             (
-                "MATHEMATISCH-NATURWISSENSCHAFTLICHE",
+                "math.-nat. Klasse",
                 "Mathematisch-Naturwissenschaftliche Klasse",
             ),
-            ("PHILOSOPHISCH-HISTORISCHE", "Philosophisch-Historische Klasse"),
+            ("phil.-hist. Klasse", "Philosophisch-Historische Klasse"),
         ],
     )
     ewk = forms.BooleanField(
@@ -460,8 +460,9 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
                     SQ(akademiemitgliedschaft_exact=Exact(mitgliedschaft)), SQ.AND
                 )
             if self.cleaned_data["mtgld_klasse"]:
+                klasse = "MATHEMATISCH-NATURWISSENSCHAFTLICHE KLASSE" if self.cleaned_data["mtgld_klasse"] == "math.-nat. Klasse" else "PHILOSOPHISCH-HISTORISCHE KLASSE"
                 mtgld_dic.add(
-                    SQ(klasse_person=Exact(self.cleaned_data["mtgld_klasse"])),
+                    SQ(klasse_person=Exact(klasse)),
                     SQ.AND,
                 )
             sqs = sqs.filter(mtgld_dic)
