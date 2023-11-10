@@ -318,6 +318,8 @@ class PAASMembershipsQuerySet(models.QuerySet):
             )
         else:
             if isinstance(memberships[0], str):
+                if "wM" in memberships:
+                    memberships.append("oM")
                 ids = []
                 for pi in PersonInstitutionRelation.objects.filter(
                     pk__in=getattr(id_mapping, "MITGLIEDSCHAFT")

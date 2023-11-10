@@ -456,9 +456,14 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         ) and not (self.cleaned_data["start_date_form"] or self.cleaned_data["end_date_form"]):
             mtgld_dic = SQ()
             for mitgliedschaft in self.cleaned_data["mtgld_mitgliedschaft"]:
-                mtgld_dic.add(
-                    SQ(akademiemitgliedschaft_exact=Exact(mitgliedschaft)), SQ.AND
-                )
+                if mitgliedschaft == "wM":
+                    mtgld_dic.add(
+                        SQ(akademiemitgliedschaft_exact__in=["wM", "oM"]), SQ.AND
+                    )
+                else:
+                    mtgld_dic.add(
+                        SQ(akademiemitgliedschaft_exact=Exact(mitgliedschaft)), SQ.AND
+                    )
             if self.cleaned_data["mtgld_klasse"]:
                 klasse = "MATHEMATISCH-NATURWISSENSCHAFTLICHE KLASSE" if self.cleaned_data["mtgld_klasse"] == "math.-nat. Klasse" else "PHILOSOPHISCH-HISTORISCHE KLASSE"
                 mtgld_dic.add(
