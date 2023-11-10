@@ -39,6 +39,27 @@ class PaasPersonAutocomplete(autocomplete.Select2QuerySetView):
         return SearchQuerySet().filter(query_object)
 
 
+class PaasPreiseAutocomplete(autocomplete.Select2QuerySetView):
+    f = {"django_ct": "apis_entities.institution", "kind": "Preis"}
+
+    def get_result_value(self, result):
+        return f"{result.pk}|{result.name}"
+
+    def get_result_label(self, item):
+        lbl = item.name
+        date = get_date_label(item)
+        if date:
+            lbl += f" {date}"
+        return lbl
+
+    def get_queryset(self):
+        query_object = SQ(**self.f)
+        if self.q:
+            query_object &= SQ(name__contains=self.q)
+        return SearchQuerySet().filter(query_object)
+
+
+
 class PaasInstitutionAutocomplete(autocomplete.Select2QuerySetView):
     f = {"django_ct": "apis_entities.institution", "academy": False}
 
