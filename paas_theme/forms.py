@@ -496,7 +496,10 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
         if self.cleaned_data["preise"]:
             preise_dict = SQ()
             for preis in self.cleaned_data["preise"]:
-                preise_dict.add(SQ(akademiepreise=preis[1]), SQ.OR)
+                if preis[1] in ["Nobelpreis", "Ignaz-L.-Lieben-Preis"]:
+                    preise_dict.add(SQ(akademiepreise=AutoQuery(f'"{preis[1]}"')), SQ.OR)
+                else:
+                    preise_dict.add(SQ(akademiepreise=Exact(preis[1])), SQ.OR)
             sqs = sqs.filter(preise_dict)
         if self.cleaned_data["wahl_person"]:
             dict_wahl = {"django_ct": "apis_relations.personperson",
