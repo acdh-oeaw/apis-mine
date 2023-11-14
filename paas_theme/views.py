@@ -168,7 +168,7 @@ class PersonListView(GenericListView):
         return self.filter.qs
 
 
-class PersonSearchView(UserPassesTestMixin, FacetedSearchView):
+class PersonSearchView(FacetedSearchView):
     login_url = "/webpage/accounts/login/"
     queryset = SearchQuerySet()
     form_class = PersonFacetedSearchFormNew
@@ -240,7 +240,7 @@ class PersonSearchView(UserPassesTestMixin, FacetedSearchView):
         return access
 
 
-class SearchView(SingleTableMixin, PersonSearchView, UserPassesTestMixin):
+class SearchView(SingleTableMixin, PersonSearchView):
     table_class = SearchResultTable
     template_name = "theme/person_search.html"
 
@@ -249,7 +249,7 @@ class SearchView(SingleTableMixin, PersonSearchView, UserPassesTestMixin):
         return qs
 
 
-class InstitutionSearchView(UserPassesTestMixin, FacetedSearchView):
+class InstitutionSearchView(FacetedSearchView):
     login_url = "/webpage/accounts/login/"
     queryset = SearchQuerySet().models(Institution)
     form_class = InstitutionFacetedSearchFormNew
@@ -289,7 +289,7 @@ class InstitutionSearchView(UserPassesTestMixin, FacetedSearchView):
 
 
 class SearchViewInstitutions(
-    SingleTableMixin, InstitutionSearchView, UserPassesTestMixin
+    SingleTableMixin, InstitutionSearchView
 ):
     table_class = InstitutionsSearchResultTable
     template_name = "theme/institution_search.html"
@@ -298,7 +298,7 @@ class SearchViewInstitutions(
         return self.queryset
 
 
-class PersonDetailView(UserPassesTestMixin, DetailView):
+class PersonDetailView(DetailView):
     model = Person
     template_name = "theme/person_detail.html"
     login_url = "/webpage/accounts/login/"
@@ -353,7 +353,7 @@ class PersonDetailView(UserPassesTestMixin, DetailView):
         return enriched_context
 
 
-class InstitutionDetailView(UserPassesTestMixin, DetailView):
+class InstitutionDetailView(DetailView):
     model = Institution
     template_name = "theme/institution_detail.html"
     login_url = "/webpage/accounts/login/"
