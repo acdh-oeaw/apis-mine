@@ -331,6 +331,8 @@ class PAASMembershipsQuerySet(models.QuerySet):
                 q_obj &= models.Q(relation_type_id__in=ids)
             elif isinstance(memberships[0], int):
                 q_obj &= models.Q(relation_type_id__in=memberships)
+        if institutions == '':
+            institutions = None
         if institutions is not None:
             if institutions == "phil.-hist. Klasse":
                 q_obj &= models.Q(related_institution_id=2)
