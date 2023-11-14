@@ -432,7 +432,7 @@ class PersonFacetedSearchFormNew(FacetedSearchForm):
             "gender",
         ]:
             if self.cleaned_data[feld]:
-                f_dict_for = {feld: AutoQuery(self.cleaned_data[feld])}
+                f_dict_for = {feld: self.cleaned_data[feld]}
                 sqs = sqs.filter(**f_dict_for)
         for feld in [
             ("uni", "universitaet_id__in"),
