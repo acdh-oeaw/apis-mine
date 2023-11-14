@@ -92,7 +92,7 @@
             {% for param_name, value in request.GET.items %}
             {% filter_params request param_name as param_list %}
             {% for param_value in param_list  %}
-            {%if param_name == 'q' or param_name == 'selected_facets'%}
+            {% if param_name == 'q' or param_name == 'selected_facets' %}
             <input type="hidden" name="{{param_name}}" class="form-suche-input" id="suche" placeholder="Suche"
               {% if query %}value="{{param_value}}" {% endif %}>
             {%endif%}
@@ -436,17 +436,6 @@
   });
   window.onload = function () {
     const qs = new URLSearchParams(window.location.search)
-    let wm = qs.get("academy_member")
-    console.log(wm)
-    if (!wm) {
-      document.getElementById("academy_member").checked = false
-    } else if (wm == "false") {
-      document.getElementById("academy_member").checked = false;
-      console.log("ran through check");
-      console.log(wm);
-    } else {
-      document.getElementById("academy_member").checked = true;
-    }
   }
 
   function navigateToLandingPage() {
