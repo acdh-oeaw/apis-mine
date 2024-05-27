@@ -2,12 +2,23 @@
 {% load leaflet_tags %}
 {% block scriptHeader %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.3.2/spin.min.js"></script>
-<script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+<!-- <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/three@latest/build/three.min.js"></script>
+<script crossorigin src="https://unpkg.com/three@0.164.1/build/three.module.min.js"></script> -->
 <script crossorigin
   src="https://unpkg.com/@acdh/network-visualization@latest/lib/network-visualization.umd.js"></script>
-
+<script
+  crossorigin
+  src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"
+></script>
+<script
+  crossorigin
+  src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"
+></script>
+<script
+  crossorigin
+  src="https://unpkg.com/three@0.164.1/build/three.module.min.js"
+></script>
 {% leaflet_js %}
 {% leaflet_css %}
 {% endblock %}
