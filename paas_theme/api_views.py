@@ -6,13 +6,14 @@ from haystack.query import SearchQuerySet
 from .forms import PersonFacetedSearchFormNew
 from apis_core.api_routers import serializers_dict
 from apis_core.apis_relations.models import PersonInstitution, PersonPlace
-from apis_core.apis_entities.models import Institution
+from apis_core.apis_entities.models import Institution, Person
 from apis_core.api_renderers import NetJsonRenderer
 from django.conf import settings
 from copy import deepcopy
 from django.db.models import Q
 from .filters import KommissionenFilter
 from .serializers_analyse import KommissionZeitstrahl, KommissionenZeitstrahlNazis
+from apis_core.apis_entities.serializers import LifePathSerializer
 
 from .provide_data import classes
 
@@ -123,3 +124,43 @@ class EgoNetwork(APIView):
                 ]
                 rel_insts.extend(i1)
         return Response(res)
+
+
+class LifePathMINEViewset(APIView):
+    def get(self, request, pk):
+        b_rel = [3090, 152, 64]
+        d_rel = [3054, 153, 3091]
+        pb_pd = b_rel + d_rel
+        lst_inst = list(
+            PersonInstitution.objects.filter(
+                Q(related_person_id=pk),
+                Q(start_date__isnull=False) | Q(end_date__isnull=False),
+                Q(relation_type_id__in=classes["berufslaufbahn_ids"] + [
+                    1369, # absolvierte Studim an
+                    176 # schloss Schule ab
+                ]),
+            ).filter_for_user()
+        )
+        lst_place = list(
+            PersonPlace.objects.filter(
+                Q(related_person_id=pk),
+                Q(start_date__isnull=False)
+                | Q(end_date__isnull=False)
+                | Q(relation_type_id__in=pb_pd),
+            ).filter_for_user()
+        )
+        comb_lst = lst_inst + lst_place
+        p1 = Person.objects.get(pk=pk)
+        if p1.start_date:
+            for e in comb_lst:
+                if e.relation_type_id in b_rel:
+                    e.start_date = p1.start_date
+        if p1.end_date:
+            for e in comb_lst:
+                if e.relation_type_id in d_rel:
+                    e.start_date = p1.end_date
+        data = LifePathSerializer(comb_lst, many=True).data
+        data = [d for d in data if d is not None]
+        data = sorted(data, key=lambda i: i["year"])
+
+        return Response(data)

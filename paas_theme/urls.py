@@ -24,6 +24,7 @@ urlpatterns = [
     path(r"stories/", views.StoriesIndexPage.as_view(), name="stories_index"),
     path(r"api/network/", api_views.NetVizTheme.as_view()),
     path(r"api/egonetwork/", api_views.EgoNetwork.as_view()),
+    path(r"api/lifepath/<int:pk>/", api_views.LifePathMINEViewset.as_view()),
     path(
         "paas/autocompletes/person/",
         autocompletes.PaasPersonAutocomplete.as_view(),
