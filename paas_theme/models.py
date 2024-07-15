@@ -832,7 +832,7 @@ class PAASInstitution(Institution):
             related_inst = related_inst[0].related_institutionB
             res[
                 "untertitel"
-            ] = f"{self.kind.name}{' - ' + str(related_inst).title() if related_inst else ''}"
+            ] = f"{self.kind.name}{' - ' + str(related_inst).title() if related_inst else ''}".replace("Gemeinsame Kommissionen", "Gesamtakademie")
         elif len(related_inst) > 1:
             lst_untertitel = []
             for rel_inst_2 in related_inst:
