@@ -229,6 +229,7 @@ def create_data_utils(cache_path="cache/data_cache.pkl"):
             return res
 
     berufslaufbahn_ids = get_child_classes([1851, 1385], PersonInstitutionRelation)
+    berufslaufbahn_ids = [x for x in berufslaufbahn_ids if x not in [4201]]
     subs_akademie = get_child_institutions_from_parent(
         getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN")
     )
