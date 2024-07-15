@@ -12,7 +12,7 @@
   const padding = 0
   const adj = 50
 
-  const data = fetch('/apis/api2/lifepath/{{object.pk}}/')
+  const data = fetch('/api/lifepath/{{object.pk}}/')
     .then(response => response.json())
     .then(drawLifepath)
 

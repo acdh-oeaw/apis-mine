@@ -227,18 +227,18 @@ function move_map() {
   //spacetime.style.paddingTop = `${document.querySelector('div.entry-header').offsetHeight}px`
 
   //bio.insertBefore(map_element, biotext);
-  add_histogis_shape()
+  //add_histogis_shape()
   map.invalidateSize()
   const caption = document.createElement("p")
-  caption.style.fontSize = '0.8em'
-  caption.style.fontStyle = 'italic'
-  caption.id = "mapcaption";
-  caption.innerHTML = `Die Polygone werden dynamisch aus <a href="https://histogis.acdh.oeaw.ac.at">HistoGIS</a> erstellt. 
-  Es werden die administrativen Einheiten für die Position aller Marker zum Zeitpunkt ${date.toLocaleDateString('de-DE')} 
-  (Mitte der bekannten Lebensspanne) geladen.`
-  //caption.appendChild(tnode)
+  // caption.style.fontSize = '0.8em'
+  // caption.style.fontStyle = 'italic'
+  // caption.id = "mapcaption";
+  // caption.innerHTML = `Die Polygone werden dynamisch aus <a href="https://histogis.acdh.oeaw.ac.at">HistoGIS</a> erstellt. 
+  // Es werden die administrativen Einheiten für die Position aller Marker zum Zeitpunkt ${date.toLocaleDateString('de-DE')} 
+  // (Mitte der bekannten Lebensspanne) geladen.`
+  // //caption.appendChild(tnode)
 
-  bio.insertBefore(caption, main);
+  // bio.insertBefore(caption, main);
   let max_icon = document.querySelector('#maplifelinebtn')
   max_icon.setAttribute('onclick', 'minimize_map()')
   max_icon.innerHTML = '<i data-feather="minimize-2"></i>'
