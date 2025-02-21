@@ -473,7 +473,9 @@ def get_wahlvorschlag(pers, mitgliedschaften):
                 )
             )
             lst_fin.append((pp.start_date, "<hr/>"))
-    for pe in pers.personevent_set.filter(relation_type_id__in=classes["mitgliedschaft nicht gewählt"]):
+    for pe in pers.personevent_set.filter(
+        relation_type_id__in=classes["mitgliedschaft nicht gewählt"]
+    ):
         if pe.start_date.strftime("%Y") in lst_wahl_dates:
             continue
         lst_fin.append(
@@ -495,7 +497,9 @@ def get_wahlvorschlag(pers, mitgliedschaften):
             lst_fin.append(
                 (
                     datetime.strptime(mit[0], "%Y").date(),
-                    f"{mit[0]} {mit[2]}" if 'erloschen' not in mit[6] else f"{mit[0]} {mit[6]}",
+                    f"{mit[0]} {mit[2]}"
+                    if "erloschen" not in mit[6]
+                    else f"{mit[0]} {mit[6]}",
                 )
             )
             lst_fin.append((datetime.strptime(mit[0], "%Y").date(), "<hr/>"))
@@ -606,7 +610,7 @@ def enrich_person_context(person_object, context):
         context["normdaten"].append(
             {
                 "kind": "GND",
-                "uri": f"https://portal.dnb.de/opac/simpleSearch?reset=true&cqlMode=true&query=auRef%3D{gnd_identifier}&selectedCategory=any",
+                "uri": normdaten_gnd[0].uri,
                 "identifier": gnd_identifier,
             }
         )
@@ -655,7 +659,14 @@ def enrich_person_context(person_object, context):
             fig_caption = fig_caption.first().label
         else:
             fig_caption = "OEAW"
-        context["image"] = (True, lst_images[0].split("/")[-1].replace(".tif", ".png").replace(".jfif", ".png"), fig_caption)
+        context["image"] = (
+            True,
+            lst_images[0]
+            .split("/")[-1]
+            .replace(".tif", ".png")
+            .replace(".jfif", ".png"),
+            fig_caption,
+        )
     elif classes.get("image_wiki", False):
         if (
             person_object.label_set.filter(
@@ -670,7 +681,7 @@ def enrich_person_context(person_object, context):
                     .first()
                     .label
                 ),
-                "@wikicommons"
+                "@wikicommons",
             )
     else:
         context["image"] = False
@@ -690,7 +701,8 @@ def enrich_person_context(person_object, context):
         )
     akad_preise = ""
     for akadp in person_object.personinstitution_set.filter(
-        related_institution_id__in=classes["akademiepreise"], relation_type_id__in=[138, 3501]
+        related_institution_id__in=classes["akademiepreise"],
+        relation_type_id__in=[138, 3501],
     ):
         akad_preise += f"<li><a href='/institution/{akadp.related_institution_id}'>{akadp.related_institution}</a>{' (abgelehnt)' if akadp.relation_type_id == 3501 else ''}{' '+get_date_range(akadp, classes['time_ranges_ids'])[1:-1] if len(get_date_range(akadp, classes['time_ranges_ids'])) > 0 else ''}</li>"
     if len(akad_preise) > 0:
@@ -769,7 +781,7 @@ def enrich_person_context(person_object, context):
         if mit[5].relation_type_id in classes["ausschluss"]:
             if mit[6].lower() == "mitgliedschaft erloschen":
                 context["mitgliedschaften"].append(f"{mit[0]} {mit[6]}")
-            else: 
+            else:
                 context["mitgliedschaften"].append(f"{mit[0]} {mit[3]}")
         elif mit[6].lower() == "ruhend gestellt":
             context["mitgliedschaften"].append(
@@ -923,12 +935,15 @@ def enrich_person_context(person_object, context):
             + [
                 f'Zu{"m Präsident" if person_object.gender == "male" else "r Präsidentin"} der {abbreviate(rel.related_institution)} {rel.relation_type.name} am {rel.start_date_written}{", tätig bis "+rel.end_date_written if rel.end_date_written is not None else ""}'
                 for rel in person_object.personinstitution_set.filter(
-                    related_institution_id__in=[2,3],
+                    related_institution_id__in=[2, 3],
                     relation_type_id__in=classes["akad_funktionen"]["präsidentin"][0],
                 )
             ],
             "WissenschaftlerInnenaustausch": [
-                f"{rel.related_place.name} {get_date_range(rel, classes['time_ranges_ids'])}" for rel in person_object.personplace_set.filter(relation_type_id=3375).order_by("start_date")
+                f"{rel.related_place.name} {get_date_range(rel, classes['time_ranges_ids'])}"
+                for rel in person_object.personplace_set.filter(
+                    relation_type_id=3375
+                ).order_by("start_date")
             ],
             "Mitgliedschaften in anderen Akademien": [
                 f'<a href="/institution/{rel.related_institution_id}">{rel.related_institution}</a>, {rel.relation_type.name} {get_date_range(rel, classes["time_ranges_ids"])}'
@@ -946,9 +961,18 @@ def enrich_person_context(person_object, context):
         context["daten_akademie"]["Eltern"] = []
         context["daten_akademie"]["Eltern"].append(f" {'<br/>'.join(eltern)}")
         context["daten_akademie"].move_to_end("Eltern", last=False)
-    vorschlag = person_object.related_personA.filter(relation_type_id__in=classes['vorschlag'][0], start_date__isnull=False).order_by('start_date')
+    vorschlag = person_object.related_personA.filter(
+        relation_type_id__in=classes["vorschlag"][0], start_date__isnull=False
+    ).order_by("start_date")
     if vorschlag.count() > 0:
-        context["daten_akademie"]["Wahl und Mitgliedschaft"] += ['<br/>', 'zur Wahl vorgeschlagen: <ul>'] + [f"<li><a href='/person/{rel.related_personA_id}'>{rel.related_personA}</a> ({rel.start_date_written})</li>" for rel in vorschlag] + ['</ul>']
+        context["daten_akademie"]["Wahl und Mitgliedschaft"] += (
+            ["<br/>", "zur Wahl vorgeschlagen: <ul>"]
+            + [
+                f"<li><a href='/person/{rel.related_personA_id}'>{rel.related_personA}</a> ({rel.start_date_written})</li>"
+                for rel in vorschlag
+            ]
+            + ["</ul>"]
+        )
     if person_object.personevent_set.filter(relation_type_id=3454).count() > 0:
         context["daten_akademie"][
             "Mitglied in einer nationalsozialistischen Vereinigung"
@@ -968,7 +992,6 @@ def enrich_person_context(person_object, context):
     speeches = person_object.personwork_set.filter(relation_type_id=4317).all()
 
     if speeches:
-
         list_speeches_html = [
             f'<li><a href="/work/{speech.related_work.pk}">"{speech.related_work.name}"</a> (<a href="/event/{speech.related_work.eventwork_set.first().related_event.pk}">{speech.related_work.eventwork_set.first().related_event.name}</a>, {speech.start_date.strftime("%d.%m.%Y")})</li>'
             for speech in speeches.order_by("start_date")
@@ -983,7 +1006,6 @@ def enrich_person_context(person_object, context):
         person_object.personinstitution_set.filter(relation_type_id__in=[30]).count()
         > 0
     ):
-
         lst_kom = dict()
 
         for rel in person_object.personinstitution_set.filter(
@@ -1006,7 +1028,8 @@ def enrich_person_context(person_object, context):
         )
     lst_inst = dict()
     for rel in person_object.personinstitution_set.filter(
-        relation_type_id__in=[3488, 3479, 3423, 1872, 88], related_institution__kind_id=83
+        relation_type_id__in=[3488, 3479, 3423, 1872, 88],
+        related_institution__kind_id=83,
     ).order_by("start_date"):
         if rel.related_institution not in lst_inst.keys():
             lst_inst[rel.related_institution] = [
@@ -1022,15 +1045,14 @@ def enrich_person_context(person_object, context):
     ]
     if len(lst_inst) > 0:
         context["daten_akademie"]["Funktionen in der Akademie"].append(
-        f'{"Direktor/in der folgenden Institute" if len(lst_inst) > 1 else "Direktor/in des folgenden Instituts"}: <ul class="list-unstyled pl-3">{"".join(lst_inst)}</ul>'
+            f'{"Direktor/in der folgenden Institute" if len(lst_inst) > 1 else "Direktor/in des folgenden Instituts"}: <ul class="list-unstyled pl-3">{"".join(lst_inst)}</ul>'
         )
-    
+
     # Membership...
     if (
         person_object.personinstitution_set.filter(relation_type_id__in=[26]).count()
         > 0
     ):
-
         lst_kom = dict()
 
         for rel in person_object.personinstitution_set.filter(
@@ -1050,7 +1072,7 @@ def enrich_person_context(person_object, context):
         ]
         if len(lst_kom) > 0:
             context["daten_akademie"]["Funktionen in der Akademie"].append(
-            f'{"Mitglied der folgenden Kommissionen/Kuratorien" if len(lst_kom) > 1 else "Mitglied der folgenden Kommission/des folgenden Kuratoriums"}: <ul class="list-unstyled pl-3">{"".join(lst_kom)}</ul>'
+                f'{"Mitglied der folgenden Kommissionen/Kuratorien" if len(lst_kom) > 1 else "Mitglied der folgenden Kommission/des folgenden Kuratoriums"}: <ul class="list-unstyled pl-3">{"".join(lst_kom)}</ul>'
             )
 
         del_kom = dict()
@@ -1072,7 +1094,7 @@ def enrich_person_context(person_object, context):
         ]
         if len(del_kom) > 0:
             context["daten_akademie"]["Funktionen in der Akademie"].append(
-            f'{"Delegierte/r an folgenden Institutionen" if len(del_kom) > 1 else "Delegierte/r an der folgenden Institution"}: <ul class="list-unstyled pl-3">{"".join(del_kom)}</ul>'
+                f'{"Delegierte/r an folgenden Institutionen" if len(del_kom) > 1 else "Delegierte/r an der folgenden Institution"}: <ul class="list-unstyled pl-3">{"".join(del_kom)}</ul>'
             )
 
     if (
@@ -1110,9 +1132,9 @@ def enrich_institution_context(institution_object, context):
         related_institutionB_id__in=getattr(id_mapping, "GESAMTAKADEMIE_UND_KLASSEN")
     ).values_list("related_institutionB__name", flat=True)
     if rel_akad.count() > 0:
-        context[
-            "untertitel"
-        ] = f"{context['typ']} der {rel_akad[0].replace('E KLASSE', 'EN KLASSE')}"
+        context["untertitel"] = (
+            f"{context['typ']} der {rel_akad[0].replace('E KLASSE', 'EN KLASSE')}"
+        )
     else:
         loc = institution_object.institutionplace_set.filter(relation_type_id=159)
         if loc.count() == 1:
